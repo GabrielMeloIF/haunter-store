@@ -1,0 +1,1 @@
+//fiz um comentário no server.js explicando o motivo de ter criado ele fora do src
