@@ -2,8 +2,8 @@ import Header from "../Components/Header/Header";
 
 export default function Home() {
   return (
-    <>
-  <Header />
-    </>
+    <div className="bg-[#303030] min-h-screen">
+      <Header />
+    </div>
   );
 }
