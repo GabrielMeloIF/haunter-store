@@ -10,9 +10,9 @@ import Link from "next/link";
 
 export default function Header() {
   return (
-    <header className="topo bg-[#A636E9] flex items-center gap-20 h-19 w-full px-6">
+    <header className="topo bg-[#A636E9] flex items-center gap-6 h-19 w-full px-6">
       {/* Logo  */}
-      <Image src={Logo} alt="Logo" className="relative p-2" />
+    <Image src={Logo} alt="Logo" className="p-2"  />
 
 
       {/* Barra de pesquisa */}
@@ -22,7 +22,7 @@ export default function Header() {
           placeholder="  Pesquisar..."
           className="bg-white/50 w-130 h-7 rounded-xl text-white "
         />
-        <IoIosSearch className="absolute text-white left-160 " />
+        <IoIosSearch className="absolute text-white left-150 " />
       </div>
 
 
