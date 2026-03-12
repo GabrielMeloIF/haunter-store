@@ -1,22 +1,15 @@
 import Header from "../Components/Header/Header";
 import NavBar from "@/Components/Navbar/NavBar";
 import Footer from "@/Components/Footer/Footer";
+import Cards from "@/Components/Card/Card";
 
 export default function Home() {
   return (
-    <div className="bg-[#303030] w-full h-screen ">
+   <>
       <Header />
       <NavBar />
-
-
-
-
-
-
-
-      <footer className="fixed bottom-0 left-0 w-full  text-white text-center ">
+      <Cards />
       <Footer />
-      </footer>
-    </div>
+</>
   );
 }
