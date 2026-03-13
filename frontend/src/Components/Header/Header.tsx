@@ -57,6 +57,7 @@ export default function Header() {
          <div className="bg-[#430883] rounded-xl flex items-center h-10 px-4 py-2 hover:bg-[#7317D7] transition duration-300">
           <CgAdd className="text-xl"/><Link href="/" className="text-white p-5">Anunciar</Link>
         </div>
+
       
     </header>
   );

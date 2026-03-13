@@ -34,7 +34,34 @@ export default function Cards() {
       preco: "R$ 250",
     },
     {
-      id: 4,
+      id: 5,
+      nome: "Headset Gamer",
+      descricao: "Som Surround",
+      imagem: Headset,
+      preco: "R$ 250",
+    },
+    {
+      id: 6,
+      nome: "Headset Gamer",
+      descricao: "Som Surround",
+      imagem: Headset,
+      preco: "R$ 250",
+    },{
+          id: 1,
+      nome: "Mouse Gamer",
+      descricao: "Mouse RGB 6400 DPI",
+      imagem: Mouse,
+      preco: "R$ 120",
+    },
+    {
+      id: 2,
+      nome: "Teclado Mecânico",
+      descricao: "Switch Blue",
+      imagem: Teclado,
+      preco: "R$ 350",
+    },
+    {
+      id: 3,
       nome: "Headset Gamer",
       descricao: "Som Surround",
       imagem: Headset,
@@ -42,6 +69,20 @@ export default function Cards() {
     },
     {
       id: 4,
+      nome: "Headset Gamer",
+      descricao: "Som Surround",
+      imagem: Headset,
+      preco: "R$ 250",
+    },
+    {
+      id: 5,
+      nome: "Headset Gamer",
+      descricao: "Som Surround",
+      imagem: Headset,
+      preco: "R$ 250",
+    },
+    {
+      id: 6,
       nome: "Headset Gamer",
       descricao: "Som Surround",
       imagem: Headset,
@@ -55,14 +96,13 @@ export default function Cards() {
         {produtos.map((produto) => (
           <div
             key={produto.id}
-            className="rounded-lg shadow-md p-4 border-2 border-white w-80"
+            className="rounded-lg shadow-md p-4 border-2 border-white w-80 transition-transform duration-300 hover:scale-105"
           >
             <Image
               src={produto.imagem}
               alt={produto.nome}
               width={300}
               height={200}
-              className="transition-transform duration-300 hover:scale-105"
             />
 
             <h2 className="text-white text-xl font-bold mb-2 mt-5">
