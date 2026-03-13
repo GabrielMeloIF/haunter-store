@@ -12,7 +12,7 @@ export default function Header() {
   return (
     <header className="topo bg-[#A636E9] flex items-center gap-6 h-19 w-full px-6">
       {/* Logo  */}
-    <Image src={Logo} alt="Logo" className="p-2"  />
+    <Link href="/"><Image src={Logo} alt="Logo" className="w-27"/></Link>
 
 
       {/* Barra de pesquisa */}
@@ -22,7 +22,7 @@ export default function Header() {
           placeholder="  Pesquisar..."
           className="bg-white/50 w-130 h-7 rounded-xl text-white "
         />
-        <IoIosSearch className="absolute text-white left-150 " />
+        <IoIosSearch className="absolute text-white left-143   " />
       </div>
 
 

@@ -2,6 +2,8 @@ import Image from "next/image";
 import Mouse from "../../../public/mouse 1.png";
 import Teclado from "../../../public/teclado 1.png";
 import Headset from "../../../public/headset 1.png";
+import { FaStar } from "react-icons/fa";
+import { useState } from "react";
 
 export default function Cards() {
   const produtos = [
@@ -46,8 +48,8 @@ export default function Cards() {
       descricao: "Som Surround",
       imagem: Headset,
       preco: "R$ 250",
-    },{
-          id: 1,
+    }, {
+      id: 1,
       nome: "Mouse Gamer",
       descricao: "Mouse RGB 6400 DPI",
       imagem: Mouse,
@@ -90,6 +92,8 @@ export default function Cards() {
     },
   ];
 
+  const [favoritos, setFavoritos] = useState<number[]>([]);
+
   return (
     <div className="flex justify-center">
       <div className="grid grid-cols-3 justify-center gap-50 p-6">
@@ -98,12 +102,27 @@ export default function Cards() {
             key={produto.id}
             className="rounded-lg shadow-md p-4 border-2 border-white w-80 transition-transform duration-300 hover:scale-105"
           >
-            <Image
-              src={produto.imagem}
-              alt={produto.nome}
-              width={300}
-              height={200}
-            />
+
+            {/* container da imagem */}
+            <div className="relative">
+              <FaStar
+                onClick={() => {
+                  if (favoritos.includes(produto.id)) {
+                    setFavoritos(favoritos.filter((id) => id !== produto.id));
+                  } else {
+                    setFavoritos([...favoritos, produto.id]);
+                  }
+                }}
+                className={`absolute top-2 right-2 text-2xl cursor-pointer ${favoritos.includes(produto.id) ? "text-yellow-400" : "text-black"}`}
+              />
+
+              <Image
+                src={produto.imagem}
+                alt={produto.nome}
+                width={300}
+                height={200}
+              />
+            </div>
 
             <h2 className="text-white text-xl font-bold mb-2 mt-5">
               {produto.nome}
