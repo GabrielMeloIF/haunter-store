@@ -1,5 +1,5 @@
 import Header from "../components/Header/Header";
-import Carrosel from "../components/Carousel/Carousel";
+import Carrosel from "../Components/Carrosel/Carousel";
 
 
 export default function Home() {
