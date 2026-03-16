@@ -34,6 +34,17 @@ export default function Entrar() {
                 />
               </div>
 
+              
+               <div className="flex flex-col gap-1.5">
+                  <Icon icon="material-symbols:lock-outline" className="text-white" width="24" /> 
+                  <p className="text-white">senha</p>
+                <input
+                  type="password"
+                  placeholder="•••••••"
+                  className="bg-white/5 border border-white/10 text-white placeholder:text-white/20 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#A636E9] focus:bg-white/8 transition-all"
+                />
+              </div>
+
               <div className="flex flex-col gap-1.5">
                 <div className="flex justify-between items-center">
                 <Icon icon="material-symbols:lock-outline" className="text-white" width="24" />
@@ -54,7 +65,7 @@ export default function Entrar() {
             {/* Rodapé do card */}
             <p className="text-center text-white/30 text-sm mt-6">
               Não tem uma conta?{" "}
-              <Link href="/cadastro" className="text-[#A636E9] hover:text-[#430883] transition-colors font-medium">
+              <Link href="/entrar" className="text-[#A636E9] hover:text-[#430883] transition-colors font-medium">
                 Cadastre-se
               </Link>
             </p>
