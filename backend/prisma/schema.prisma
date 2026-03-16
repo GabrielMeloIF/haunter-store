@@ -18,3 +18,24 @@ model User {
   dataCriacao DateTime @default(now())
   tipo_usuario String
 }
+
+model Produto {
+  id          Int       @id @default(autoincrement())
+  nome        String
+  descricao   String
+  preco       Float
+  estoque     Int
+  imagemUrl   String?
+  dataCriacao DateTime  @default(now())
+
+  categoriaId Int
+  categoria   Categoria @relation(fields: [categoriaId], references: [id_categoria])
+}
+
+model Categoria {
+  id_categoria   Int      @id @default(autoincrement())
+  nome_categoria String
+  descricao      String?
+
+  produtos       Produto[]
+}

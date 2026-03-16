@@ -1,5 +1,4 @@
-import { prisma } from "../database/prisma.js"
-
+import prisma from "../database/prisma.js";
 export async function createUser(req, res) {
   try {
 
