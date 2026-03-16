@@ -6,12 +6,14 @@ import BtnTopo from "@/Components/BtnTopo/BtnTopo";
 
 export default function Home() {
   return (
-   <>
+    <div className="flex flex-col min-h-screen">
       <Header />
       <NavBar />
-      <Cards />
-      <BtnTopo />
+      <main className="flex-1">
+        <Cards />
+        <BtnTopo />
+      </main>
       <Footer />
-</>
+    </div>
   );
 }

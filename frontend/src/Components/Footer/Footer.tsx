@@ -10,7 +10,7 @@ export default function Footer() {
 
   {/* Logo  */}
   <Link href="/"><Image src={Logo} alt="Logo" className="p-2" /></Link>
-
+    
   {/* links rodapé  */}
   <ul className="flex gap-10 text-white justify-center">
     <li><Link href="/contact" className="text-white hover:text-[#430883]">Ajuda</Link></li>

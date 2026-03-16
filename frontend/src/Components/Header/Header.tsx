@@ -51,7 +51,7 @@ export default function Header() {
       {/* Entrar e Carrinho */}
      
       <div className="bg-white/50 rounded-xl px-7 py-1 border border-transparent hover:border-[#2A0042] transition duration-300">
-        <Link href="/" className="text-white p-2 hover:text-[#430883]  transition duration-300">Entrar</Link>
+        <Link href="/entrar" className="text-white p-2 hover:text-[#430883]  transition duration-300">Entrar</Link>
       </div>
 
          <div className="bg-[#430883] rounded-xl flex items-center h-10 px-4 py-2 hover:bg-[#7317D7] transition duration-300">
