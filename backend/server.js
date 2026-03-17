@@ -1,10 +1,19 @@
-//Melo aqui, criei o server.js fora do src para deixar o código (na minha concepção) mais organizado, os APPs vou colocar todos no 'app.js' dentro do src, e o server.js é só para rodar o servidor, então achei melhor deixar ele fora do src, mas se quiser posso colocar ele dentro do src sem problemas, é só me avisar
+import express from "express";
+import userRoutes from "./src/routes/userRoutes.js";
+import categoriaRoutes from "./src/routes/categoriaRoutes.js";
+import produtoRoutes from "./src/routes/produtoRoutes.js";
 
-const express = require('express');
 const app = express();
 
 app.use(express.json());
+app.use(userRoutes);
+app.use(categoriaRoutes);
+app.use(produtoRoutes);
 
-app.listen(4000, () => {
-  console.log('Servidor rodando na porta 4000');
+app.listen(3000, () => {
+  console.log("Servidor rodando na porta 3000");
+});
+
+app.get("/", (req, res) => {
+  res.send("API rodando");
 });
