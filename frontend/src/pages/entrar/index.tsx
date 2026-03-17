@@ -20,7 +20,7 @@ export default function Entrar() {
 
             {/* Cabeçalho */}
             <div className="mb-8 text-center">
-              <h1 className="text-2xl font-bold text-white tracking-tight">Preencha os campos</h1>
+              <h1 className="text-2xl font-bold text-white tracking-tight">Entrar </h1>
             </div>
 
             {/* Formulário */}
