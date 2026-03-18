@@ -38,7 +38,7 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-1">
-          <BsBell className="text-white  " /><Link href="/" className="text-white hover:text-[#430883] transition duration-300">Notificações</Link>
+          <BsBell className="text-white  " /><Link href="/notificacao" className="text-white hover:text-[#430883] transition duration-300">Notificações</Link>
         </div>
 
         <div className="flex items-center gap-1 ">
