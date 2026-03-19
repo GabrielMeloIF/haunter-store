@@ -6,7 +6,7 @@ import { FaInstagram } from "react-icons/fa";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#A636E9] h-20 w-full grid grid-cols-3 items-center px-6">
+    <footer className="bg-[#A636E9] h-20 w-full grid grid-cols-3 items-center px-6 justify-end-safe">
 
   {/* Logo  */}
   <Link href="/"><Image src={Logo} alt="Logo" className="p-2" /></Link>
