@@ -1,6 +1,7 @@
 "use client";
  
 import { useState } from "react";
+import { Icon } from '@iconify/react';
  
 // Simulando banco de dados com 3 imagens
 const slides = [
@@ -31,6 +32,13 @@ const slides = [
  
 ];
  
+const categories = [
+  { icon: 'mynaui:headphones-solid', label: 'Periféricos' },
+  { icon: 'icon-park-outline:check-one', label: 'Loja', sublabel: '100% Oficial' },
+  { icon: 'proicons:game', label: 'Games' },
+  { icon: 'lsicon:shield-outline', label: 'Experiência', sublabel: 'Segura e simples' },
+];
+
 export default function Carrossel() {
   const [atual, setAtual] = useState(0);
   const [animando, setAnimando] = useState(false);
@@ -50,21 +58,10 @@ export default function Carrossel() {
   const slide = slides[atual];
  
   return (
-    <div className="flex flex-col items-center min-h-screen px-4 mt-30">
-  
+ <div className="flex flex-col items-center min-h-screen px-4 mt-30 ">
  
       {/* Container do carrossel */}
-      <div className="relative flex items-center gap-4 w-full max-w-3xl">
- 
-        {/* Botão Anterior — à esquerda da imagem */}
-        <button
-          onClick={anterior}
-          className="flex-shrink-0 w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all duration-300"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
+      <div className="relative w-full max-w-3xl border border-purple-800">
  
         {/* Imagem */}
         <div className="relative flex-1 rounded-2xl overflow-hidden aspect-video shadow-2xl">
@@ -83,10 +80,29 @@ export default function Carrossel() {
               animando ? "opacity-0 translate-y-3" : "opacity-100 translate-y-0"
             }`}
           >
-           
             <h3 className="text-white text-xl md:text-2xl font-semibold mt-1">{slide.titulo}</h3>
             <p className="text-white/60 text-sm mt-1 italic">{slide.descricao}</p>
           </div>
+ 
+          {/* Botão Anterior — dentro da imagem, lado esquerdo */}
+          <button
+            onClick={anterior}
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all duration-300"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+ 
+          {/* Botão Próximo — dentro da imagem, lado direito */}
+          <button
+            onClick={proximo}
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all duration-300"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
  
           {/* Dots */}
           <div className="absolute bottom-4 right-4 flex gap-1.5">
@@ -101,19 +117,24 @@ export default function Carrossel() {
             ))}
           </div>
         </div>
- 
-        {/* Botão Próximo — à direita da imagem */}
-        <button
-          onClick={proximo}
-          className="flex-shrink-0 w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all duration-300"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
       </div>
- 
-     
+
+  <div className="flex flex-wrap justify-center gap-8 mt-15">
+      {categories.map((cat, index) => (
+         <div key={index} className="flex flex-col items-center cursor-pointer">
+          {/* Círculo com hover na borda */}
+          <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center border-0 hover:border-3 hover:border-purple-800 ">
+            <Icon icon={cat.icon} width="48" height="48" className="text-gray-500" />
+          </div>
+
+          {/* Texto abaixo do círculo */}
+          <div className="text-center mt-2">
+            <span className="block text-sm font-medium text-white">{cat.label}</span>
+            {cat.sublabel && <span className="block text-xs text-white">{cat.sublabel}</span>}
+          </div>
+        </div>
+      ))}
+    </div>
     </div>
   );
 }
