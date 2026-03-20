@@ -9,8 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@iconify/react": "^6.0.2",
     "bootstrap-icons": "^1.13.1",
+    "@iconify/json": "^2.2.452",
+    "@iconify/react": "^6.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.6.0",
