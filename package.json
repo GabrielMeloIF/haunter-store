@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/GabrielMeloIF/haunter-store/issues"
   },
-  "homepage": "https://github.com/GabrielMeloIF/haunter-store#readme"
+  "homepage": "https://github.com/GabrielMeloIF/haunter-store#readme",
+  "dependencies": {
+    "lucide-react": "^0.577.0"
+  }
 }
