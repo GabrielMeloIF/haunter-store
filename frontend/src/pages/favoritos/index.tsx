@@ -3,6 +3,7 @@ import NavBar from "@/Components/Navbar/NavBar";
 import Footer from "@/Components/Footer/Footer";
 import Cards from "@/Components/Card/Card";
 
+
 export default function Favoritos() {
   return (
     <div className="flex flex-col min-h-screen">
