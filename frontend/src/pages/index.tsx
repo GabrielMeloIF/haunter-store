@@ -14,8 +14,7 @@ export default function Home() {
   return (
     <div className="bg-[#303030] min-h-screen">
       <Header />
-      <Carrossel />
-      <NavBar />
+        <NavBar />
       <Carrossel />
       <main className="flex-1">
         <Cards />
