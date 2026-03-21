@@ -1,6 +1,7 @@
 import Header from "@/Components/Header/Header";
 import Footer from "@/Components/Footer/Footer";
 import NavBar from "@/Components/Navbar/NavBar";
+import Link from "next/link";
 import { Icon } from "@iconify/react";
 
 // ===== BANCO DE DADOS SIMULADO =====
@@ -61,20 +62,22 @@ export default function Notificacao() {
                   {n.usuario}
                 </span>
               </div>
-
               {/* Divisor */}
               <div className="w-px h-8 bg-gray-200 " />
-
               {/* Mensagem + Hora */}
               <div className="flex flex-col flex-1 min-w-0">
                 <p className="text-gray-600 truncate text-sm">{n.mensagem}</p>
-                <span className="text-gray-400 text-xs mt-0.5">{formatarHora(n.hora)}</span>
+                <span className="text-gray-400 text-xs mt-0.5">
+                  {formatarHora(n.hora)}
+                </span>
               </div>
-
               {/* Botão */}
-              <button className="bg-[#A636E9] hover:bg-[#430883] transition duration-300 text-white font-bold py-2 px-4 rounded  text-sm">
+              <Link
+                href="/chat"
+                className="bg-[#A636E9] hover:bg-[#430883] transition duration-300 text-white font-bold py-2 px-4 rounded text-sm inline-block"
+              >
                 Responder
-              </button>
+              </Link>
             </div>
           ))}
         </div>
