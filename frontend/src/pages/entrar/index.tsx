@@ -1,80 +1,182 @@
-import Logo from "../../../public/logo.png";
-import Link from "next/link";
-import Image from "next/image";
-import { Icon } from "@iconify/react";
+"use client"
 
-export default function Entrar() {
+import Image from "next/image"
+import { useState } from "react"
+import { Camera, Heart, MessageCircle, Share2, Eye, EyeOff } from "lucide-react"
+
+function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen">
+    <input
+      {...props}
+      className="w-full h-12 px-4 rounded-lg border border-gray-300 bg-white/50 focus:outline-none "
+    />
+  )
+}
 
-      {/* LADO ESQUERDO (BANNER) */}
-      <div className="flex items-center justify-center bg-[#303030]">
+function Button(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      {...props}
+      className="w-full h-12 rounded-lg bg-purple-600 text-white font-semibold hover:opacity-90"
+    />
+  )
+}
+
+type AuthMode = "login" | "register"
+
+export default function AuthPage() {
+  const [mode, setMode] = useState<AuthMode>("login")
+  const [showPassword, setShowPassword] = useState(false)
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    name: "",
+    username: "",
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    console.log("Form submitted:", { mode, formData })
+  }
+
+  const toggleMode = () => {
+    setMode(mode === "login" ? "register" : "login")
+    setFormData({ email: "", password: "", name: "", username: "" })
+  }
+
+  return (
+    <div className="grid lg:grid-cols-2 min-h-screen">
+
+      {/* LEFT */}
+      <div className="relative hidden lg:flex flex-col bg-purple-700 overflow-hidden">
+        
         <Image
-          src={Logo}
+          src="/logo.png"
           alt="Banner"
-          className="w-30 h-auto object-contain"
+          fill
+          className="object-cover opacity-20 "
         />
-      </div>
 
-      {/* LADO DIREITO (FORMULÁRIO) */}
-      <div className="flex flex-col min-h-screen">
+        <div className="absolute inset-0  to-purple-700" />
 
-        {/* FORM */}
-        <main className="flex-1 flex items-center justify-center px-4 py-16">
-          <div className="w-full max-w-md">
+        <div className="relative z-10 flex flex-col justify-between h-full p-10 text-white">
+          
+          {/* Top */}
+          <div className="flex items-center gap-3">
+            <span className="text-lg font-bold">Haunter Store</span>
+          </div>
 
-            <div className="bg-white/5 rounded-2xl p-10">
+          {/* Center */}
+          <div className="flex flex-col gap-6">
+            <h2 className="text-4xl font-bold">
+              Melhores Produtos
+            </h2>
 
-              {/* Cabeçalho */}
-              <div className="mb-8 text-center">
-                <h1 className="text-2xl font-bold text-white tracking-tight">
-                  Entrar
-                </h1>
+            <div className="flex flex-col gap-4 mt-4">
+              
+              <div className="flex items-center gap-4">
+                <Heart />
+                <p>Melhores preços</p>
               </div>
 
-              {/* Formulário */}
-              <div className="flex flex-col gap-5">
-
-                <div className="flex flex-col gap-1.5">
-                  <Icon icon="material-symbols:mail-outline-rounded" className="text-white" width="24" />
-                  <input
-                    type="email"
-                    placeholder="seu@email.com"
-                    className="bg-white/5 border border-white/10 text-white placeholder:text-white/20 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#A636E9] focus:bg-white/8 transition-all"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex justify-between items-center">
-                    <Icon icon="material-symbols:lock-outline" className="text-white" width="24" />
-                    <a href="#" className="text-xs text-[#A636E9] hover:text-[#430883] transition-colors">
-                      Esqueceu a senha?
-                    </a>
-                  </div>
-                  <input
-                    type="password"
-                    placeholder="••••••••"
-                    className="bg-white/5 border border-white/10 text-white placeholder:text-white/20 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#A636E9] focus:bg-white/8 transition-all"
-                  />
-                </div>
-
-                <button className="mt-2 w-full bg-[#A636E9] hover:bg-[#430883] active:scale-[0.98] text-white font-semibold py-3 rounded-xl transition-all text-sm tracking-wide">
-                  Entrar
-                </button>
+              <div className="flex items-center gap-4">
+                <MessageCircle />
+                <p>Qualidade</p>
               </div>
 
-              {/* Rodapé */}
-              <p className="text-center text-white/30 text-sm mt-6">
-                Não tem uma conta?{" "}
-                <Link href="/cadastro" className="text-[#A636E9] hover:text-[#430883] transition-colors font-medium">
-                  Cadastre-se
-                </Link>
-              </p>
+              <div className="flex items-center gap-4">
+                <Share2 />
+                <p>Eficiência</p>
+              </div>
 
             </div>
           </div>
-        </main>
+
+          {/* Bottom */}
+          <div className="text-sm opacity-70">
+          
+          </div>
+        </div>
+      </div>
+
+      {/* RIGHT */}
+      <div className="flex items-center justify-center p-6">
+        <div className="w-full max-w-sm">
+
+          {/* Logo */}
+          <div className="mb-8 text-center">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-500 to-purple-900 bg-clip-text text-transparent">
+             Haunter Store
+            </h1>
+            <p className="mt-2 text-gray-500 text-sm">
+              {mode === "login" ? "Entre na sua conta" : "Crie sua conta"}
+            </p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
+            {mode === "register" && (
+              <>
+                <Input
+                  placeholder="Nome completo"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                />
+                <Input
+                  placeholder="Usuário"
+                  value={formData.username}
+                  onChange={(e) =>
+                    setFormData({ ...formData, username: e.target.value })
+                  }
+                />
+              </>
+            )}
+
+            <Input
+              type="email"
+              placeholder="E-mail"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+            />
+
+            <div className="relative">
+              <Input
+                type={showPassword ? "text" : "password"}
+                placeholder="Senha"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+              >
+                {showPassword ? <EyeOff /> : <Eye />}
+              </button>
+            </div>
+
+            <Button type="submit">
+              {mode === "login" ? "Entrar" : "Cadastrar"}
+            </Button>
+          </form>
+
+          {/* Toggle */}
+          <p className="mt-6 text-center text-sm">
+            {mode === "login" ? "Não tem conta?" : "Já tem conta?"}
+            <button onClick={toggleMode} className="ml-2 text-purple-600">
+              {mode === "login" ? "Criar" : "Entrar"}
+            </button>
+          </p>
+
+        </div>
       </div>
     </div>
-  );
+  )
 }

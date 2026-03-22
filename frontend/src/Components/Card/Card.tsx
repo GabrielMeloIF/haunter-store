@@ -1,7 +1,8 @@
 import Image from "next/image";
+import Link from "next/link";
 import { FaStar } from "react-icons/fa";
 import { useState } from "react";
-import { perifericos, games, Produto } from "@/produtos";
+import { perifericos, games, Produto } from "@/Produtos";
 
 export default function Cards() {
   const [favoritos, setFavoritos] = useState<number[]>(() => {
@@ -33,9 +34,9 @@ export default function Cards() {
       <p className="text-white">{produto.descricao}</p>
       <div className="flex gap-30 items-center mt-2">
         <p className="text-white font-bold text-xl">{produto.preco}</p>
-        <button className="bg-[#A636E9] text-white px-4 py-2 rounded hover:bg-[#430883]">
+        <Link href="/comprar" className="bg-[#A636E9] text-white px-4 py-2 rounded hover:bg-[#430883]">
           Comprar
-        </button>
+        </Link>
       </div>
     </div>
   );
