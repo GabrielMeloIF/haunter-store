@@ -1,6 +1,4 @@
-"use client";
- 
-import { useState } from "react";
+ import { useState } from "react";
 import { Icon } from '@iconify/react';
  
 const slides = [

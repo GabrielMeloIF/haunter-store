@@ -8,11 +8,11 @@ export default function Entrar() {
     <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen">
 
       {/* LADO ESQUERDO (BANNER) */}
-      <div className="hidden md:flex items-center justify-center from-[#A636E9] to-[#430883]">
+      <div className="flex items-center justify-center bg-[#303030]">
         <Image
           src={Logo}
           alt="Banner"
-          className="w-72"
+          className="w-30 h-auto object-contain"
         />
       </div>
 
