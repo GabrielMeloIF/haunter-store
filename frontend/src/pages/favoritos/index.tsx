@@ -3,7 +3,7 @@ import Image from "next/image";
 import Header from "@/Components/Header/Header";
 import NavBar from "@/Components/Navbar/NavBar";
 import Footer from "@/Components/Footer/Footer";
-import { todosProdutos, Produto } from "@/Produtos";
+import { todosProdutos, Produto } from "../../produtos";
 
 export default function Favoritos() {
   const [produtosFavoritos, setProdutosFavoritos] = useState<Produto[]>([]);

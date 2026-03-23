@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaStar } from "react-icons/fa";
 import { useState } from "react";
-import { perifericos, games, Produto } from "@/Produtos";
+import { perifericos, games, Produto } from "../../produtos/index";
 
 export default function Cards() {
   const [favoritos, setFavoritos] = useState<number[]>(() => {
