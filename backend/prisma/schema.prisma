@@ -1,7 +1,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -9,31 +8,86 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Usuario {
+  id_usuario    Int         @id @default(autoincrement())
+  nome          String
+  email         String      @unique
+  senha         String
+  cpf           String      @unique
+  telefone      String
+  endereco      String
+  data_cadastro DateTime    @default(now())
+  tipo_usuario  TipoUsuario @default(CLIENTE)
+
+  carrinhos Carrinho[]
+  pedidos   Pedido[]
+}
+
+enum TipoUsuario {
+  CLIENTE
+  ADMIN
+}
+
 model Categoria {
-  id_categoria Int       @id @default(autoincrement())
-  nome_categoria String  @unique
-  descricao     String
+  id_categoria   Int    @id @default(autoincrement())
+  nome_categoria String @unique
+  descricao      String
 
   produtos Produto[]
 }
 
 model Produto {
-  id          Int    @id @default(autoincrement())
-  nome        String
-  preco       Float
-  descricao   String
-  estoque     Int
+  id            Int      @id @default(autoincrement())
+  nome          String
+  descricao     String
+  preco         Float
+  estoque       Int
+  tipo_produto  String?
   data_cadastro DateTime @default(now())
-  categoriaId Int
-  categoria   Categoria @relation(fields: [categoriaId], references: [id_categoria])
+  categoriaId   Int
+  categoria     Categoria @relation(fields: [categoriaId], references: [id_categoria])
+
+  itensCarrinho Carrinho[]
+  itensPedido   ItemPedido[]
 }
 
-model Usuario {
-  id_usuario Int    @id @default(autoincrement())
-  nome       String
-  email      String  @unique
-  senha      String
-  cpf        String  @unique
-  telefone   String
-  endereco   String
+model Carrinho {
+  id_carrinho     Int      @id @default(autoincrement())
+  id_usuario      Int
+  id_produto      Int
+  quantidade      Int
+  data_adicionado DateTime @default(now())
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+  produto Produto @relation(fields: [id_produto], references: [id])
+}
+
+model Pedido {
+  id_pedido   Int          @id @default(autoincrement())
+  id_usuario  Int
+  data_pedido DateTime     @default(now())
+  valor_total Float
+  status      StatusPedido @default(PENDENTE)
+
+  usuario     Usuario      @relation(fields: [id_usuario], references: [id_usuario])
+  itensPedido ItemPedido[]
+}
+
+enum StatusPedido {
+  PENDENTE
+  CONFIRMADO
+  ENVIADO
+  ENTREGUE
+  CANCELADO
+}
+
+model ItemPedido {
+  id_item        Int   @id @default(autoincrement())
+  id_pedido      Int
+  id_produto     Int
+  quantidade     Int
+  preco_unitario Float
+
+  pedido  Pedido  @relation(fields: [id_pedido], references: [id_pedido])
+  produto Produto @relation(fields: [id_produto], references: [id])
 }
