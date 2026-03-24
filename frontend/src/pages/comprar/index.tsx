@@ -7,22 +7,26 @@ import { Icon } from "@iconify/react";
 import Image from "next/image";
 import Link from "next/link";
 
-const produtos = [
-  {
-    id: 1,
-    nome: "Mouse Fortrek Spider",
-    descricao:
-      "Eleve sua experiência nos jogos e no dia a dia com o Mouse Fortrek Spider. Com um design moderno e agressivo, iluminação em LED vermelho e acabamento ergonômico, ele foi desenvolvido para oferecer conforto e alta performance durante longas horas de uso.",
-    preco: "R$ 79,00",
-    imagem: "/mouse 1.png",
-    comentario:
-      "Ótimo mouse para jogos, confortável e com boa precisão. A iluminação em LED é um bônus visual que eu adoro!",
-  },
-];
-export default function Comprar() {
-  const [rating, setRating] = useState(0);
 
+export default function Comprar() {
+  const [produtos, setProdutos] = useState([
+    {
+      id: 1,
+      nome: "Mouse Fortrek Spider",
+      descricao:
+        "Eleve sua experiência nos jogos e no dia a dia com o Mouse Fortrek Spider. Com um design moderno e agressivo, iluminação em LED vermelho e acabamento ergonômico, ele foi desenvolvido para oferecer conforto e alta performance durante longas horas de uso.",
+      preco: "R$ 79,00",
+      imagem: "/mouse 1.png",
+      comentario:
+        "Ótimo mouse para jogos, confortável e com boa precisão. A iluminação em LED é um bônus visual que eu adoro!",
+      estrelas: 4,
+    },
+  ]);
+
+  const limitado = produtos[0].comentario.slice(0, 80) + "...";
+  const [rating, setRating] = useState(0);
   const [favoritos, setFavoritos] = useState<number[]>([]);
+  const [novoComentario, setNovoComentario] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -55,6 +59,25 @@ export default function Comprar() {
     setCurrentImage((prev) => (prev === 0 ? imagens.length - 1 : prev - 1));
   };
 
+
+  const adicionarComentario = () => {
+    if (!novoComentario.trim()) return;
+
+    const novo = {
+      id: Date.now(),
+      nome: "Mouse Fortrek Spider",
+      descricao: "Eleve sua experiência...",
+      preco: "R$ 79,00",
+      imagem: "/mouse 1.png",
+      comentario: novoComentario,
+      estrelas: rating,
+    };
+
+    setProdutos([...produtos, novo]);
+    setNovoComentario(""); // limpa o campo após enviar
+    setRating(0);          // reseta as estrelas após enviar
+  };
+
   return (
     <>
       <Header />
@@ -83,11 +106,10 @@ export default function Comprar() {
                     alt="Mouse Gamer"
                     width={110}
                     height={50}
-                    className={`cursor-pointer border-2 ${
-                      index === currentImage
+                    className={`cursor-pointer border-2 ${index === currentImage
                         ? "border-purple-500 rounded-2xl"
                         : "border-transparent"
-                    }`}
+                      }`}
                     onClick={() => setCurrentImage(index)}
                   />
                 ))}
@@ -111,9 +133,8 @@ export default function Comprar() {
               {[1, 2, 3, 4, 5].map((star) => (
                 <FaStar
                   key={star}
-                  className={`cursor-pointer text-2xl -mt-8 ${
-                    star <= rating ? "text-yellow-400" : "text-black"
-                  }`}
+                  className={`cursor-pointer text-2xl -mt-8 ${star <= rating ? "text-yellow-400" : "text-black"
+                    }`}
                   onClick={() => setRating(star)}
                 />
               ))}
@@ -139,11 +160,13 @@ export default function Comprar() {
           </div>
         </div>
       </div>
+
       <div className="flex justify-center gap-60 -mt-40 mb-39">
         <div className="flex flex-col items-center cursor-pointer">
           <FaStar
             onClick={() => toggleFavorito(produto.id)}
-            className={`text-3xl ${favoritos.includes(produto.id) ? "text-black" : "text-yellow-400"}`}
+            className={`text-3xl ${favoritos.includes(produto.id) ? "text-black" : "text-yellow-400"
+              }`}
           />
           <span className="text-white mt-1 text-sm">Favoritar</span>
         </div>
@@ -159,13 +182,46 @@ export default function Comprar() {
           <span className="text-white">Compartilhar</span>
         </button>
       </div>
+
       <div className="bg-white rounded-lg p-4 mt-4 flex flex-col">
-        <p className="text-black ml-70 text-2xl mt-10 ">Comentários do produto</p>
-          <div className="flex ">
-        <input type="text" placeholder="Escreva seu comentário..." className="ml-30 w-150 bg-gray-200 placeholder:text-gray-500 border border-gray-300 rounded-lg p-2 mt-17 focus:outline-none focus:ring-2 focus:ring-purple-500" />
-        <p>aaa</p>
+        <p className="text-black ml-70 text-2xl mt-10">Comentários do produto</p>
+
+       
+        <div className="flex gap-2 ml-30 mt-17">
+          <input
+            type="text"
+            placeholder="Escreva seu comentário..."
+            value={novoComentario}
+            onChange={(e) => setNovoComentario(e.target.value)}
+            className="w-150 bg-gray-200 placeholder:text-gray-500 border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      adicionarComentario();
+                    }
+                  }}
+          />
+          <button
+            onClick={adicionarComentario}
+            className="bg-[#5a10a8] text-white px-4 py-2 rounded-lg hover:bg-[#3a0a6a] transition duration-200"
+          >
+            Enviar
+          </button>
         </div>
+
+        {produtos.map((p) => (
+          <div
+            key={p.id}
+            className="flex items-center bg-gray-400 rounded w-230 h-16 ml-20 mt-5 gap-10"
+          >
+            <Icon icon="heroicons:user" className="ml-7 text-2xl text-white" />
+            <p>{p.comentario.slice(0, 80)}{p.comentario.length > 80 ? "..." : ""}</p>
+            <p className="flex items-center gap-2">
+              {p.estrelas} <FaStar className="text-yellow-400" />
+            </p>
+          </div>
+        ))}
       </div>
+
       <Footer />
     </>
   );
