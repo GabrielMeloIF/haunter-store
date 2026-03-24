@@ -11,10 +11,12 @@ const produtos = [
   {
     id: 1,
     nome: "Mouse Fortrek Spider",
-    descricao: "Eleve sua experiência nos jogos e no dia a dia com o Mouse Fortrek Spider. Com um design moderno e agressivo, iluminação em LED vermelho e acabamento ergonômico, ele foi desenvolvido para oferecer conforto e alta performance durante longas horas de uso.",
+    descricao:
+      "Eleve sua experiência nos jogos e no dia a dia com o Mouse Fortrek Spider. Com um design moderno e agressivo, iluminação em LED vermelho e acabamento ergonômico, ele foi desenvolvido para oferecer conforto e alta performance durante longas horas de uso.",
     preco: "R$ 79,00",
     imagem: "/mouse 1.png",
-    comentario: "Ótimo mouse para jogos, confortável e com boa precisão. A iluminação em LED é um bônus visual que eu adoro!"
+    comentario:
+      "Ótimo mouse para jogos, confortável e com boa precisão. A iluminação em LED é um bônus visual que eu adoro!",
   },
 ];
 export default function Comprar() {
@@ -31,24 +33,71 @@ export default function Comprar() {
 
   const toggleFavorito = (id: number) => {
     setFavoritos((prev) => {
-      const novos = prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id];
+      const novos = prev.includes(id)
+        ? prev.filter((f) => f !== id)
+        : [...prev, id];
       localStorage.setItem("favoritos", JSON.stringify(novos));
       return novos;
     });
   };
 
   const produto = produtos[0];
+
+  const imagens = ["/mouse 1.png", "/headset 1.png", "/teclado 1.png"];
+
+  const [currentImage, setCurrentImage] = useState(0);
+
+  const nextImage = () => {
+    setCurrentImage((prev) => (prev + 1) % imagens.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImage((prev) => (prev === 0 ? imagens.length - 1 : prev - 1));
+  };
+
   return (
     <>
       <Header />
       <NavBar />
       <div className="flex">
         <div className="flex flex-col p-20">
-          <Image src="/mouse 1.png" alt="Mouse Gamer" width={400} height={300} />
+          <Image
+            src={imagens[currentImage]}
+            alt="Mouse Gamer"
+            width={400}
+            height={300}
+          />
           <div className="mt-5 flex gap-8">
-            <Image src="/mouse 1.png" alt="Mouse Gamer" width={110} height={50} />
-            <Image src="/mouse 1.png" alt="Mouse Gamer" width={110} height={50} />
-            <Image src="/mouse 1.png" alt="Mouse Gamer" width={110} height={50} />
+            <div className="mt-5 flex items-center gap-4">
+              {/* Seta esquerda */}
+              <button onClick={prevImage} className="text-white text-2xl">
+                ‹
+              </button>
+
+              {/* Imagens */}
+              <div className="flex gap-4">
+                {imagens.map((img, index) => (
+                  <Image
+                    key={index}
+                    src={img}
+                    alt="Mouse Gamer"
+                    width={110}
+                    height={50}
+                    className={`cursor-pointer border-2 ${
+                      index === currentImage
+                        ? "border-purple-500 rounded-2xl"
+                        : "border-transparent"
+                    }`}
+                    onClick={() => setCurrentImage(index)}
+                  />
+                ))}
+              </div>
+
+              {/* Seta direita */}
+              <button onClick={nextImage} className="text-white text-2xl">
+                ›
+              </button>
+            </div>
           </div>
         </div>
 
@@ -62,20 +111,29 @@ export default function Comprar() {
               {[1, 2, 3, 4, 5].map((star) => (
                 <FaStar
                   key={star}
-                  className={`cursor-pointer text-2xl -mt-8 ${star <= rating ? "text-yellow-400" : "text-black"
-                    }`}
+                  className={`cursor-pointer text-2xl -mt-8 ${
+                    star <= rating ? "text-yellow-400" : "text-black"
+                  }`}
                   onClick={() => setRating(star)}
                 />
               ))}
             </div>
           </div>
           <p className="text-lg mt-2 text-white">{produtos[0].descricao}</p>
-          <p className="text-3xl font-bold mt-4 text-white">{produtos[0].preco}</p>
+          <p className="text-3xl font-bold mt-4 text-white">
+            {produtos[0].preco}
+          </p>
           <div className="flex gap-4 mt-6">
-            <Link href="/carrinho" className="bg-[#5a10a8] text-white py-2 px-4 rounded-lg hover:bg-[#3a0a6a] transition duration-200 mt-4">
+            <Link
+              href="/carrinho"
+              className="bg-[#5a10a8] text-white py-2 px-4 rounded-lg hover:bg-[#3a0a6a] transition duration-200 mt-4"
+            >
               Adicionar ao Carrinho
             </Link>
-            <Link href="/comprar" className="bg-[#5a10a8] text-white py-2 px-4 rounded-lg hover:bg-[#3a0a6a] transition duration-200 mt-4">
+            <Link
+              href="/comprar"
+              className="bg-[#5a10a8] text-white py-2 px-4 rounded-lg hover:bg-[#3a0a6a] transition duration-200 mt-4"
+            >
               Comprar Agora
             </Link>
           </div>
@@ -100,6 +158,13 @@ export default function Comprar() {
           <Icon icon="typcn:arrow-back" width={40} className="-mt-4" />
           <span className="text-white">Compartilhar</span>
         </button>
+      </div>
+      <div className="bg-white rounded-lg p-4 mt-4 flex flex-col">
+        <p className="text-black ml-70 text-2xl mt-10 ">Comentários do produto</p>
+          <div className="flex ">
+        <input type="text" placeholder="Escreva seu comentário..." className="ml-30 w-150 bg-gray-200 placeholder:text-gray-500 border border-gray-300 rounded-lg p-2 mt-17 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+        <p>aaa</p>
+        </div>
       </div>
       <Footer />
     </>
