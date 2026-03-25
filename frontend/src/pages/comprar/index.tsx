@@ -7,7 +7,6 @@ import { Icon } from "@iconify/react";
 import Image from "next/image";
 import Link from "next/link";
 
-
 export default function Comprar() {
   const [produtos, setProdutos] = useState([
     {
@@ -16,16 +15,14 @@ export default function Comprar() {
       descricao:
         "Eleve sua experiência nos jogos e no dia a dia com o Mouse Fortrek Spider. Com um design moderno e agressivo, iluminação em LED vermelho e acabamento ergonômico, ele foi desenvolvido para oferecer conforto e alta performance durante longas horas de uso.",
       preco: "R$ 79,00",
-      imagem: "/mouse 1.png",
+    imagens: ["/mouse 1.png", "/headset 1.png", "/teclado 1.png"],
       comentario:
         "Ótimo mouse para jogos, confortável e com boa precisão. A iluminação em LED é um bônus visual que eu adoro!",
       estrelas: 4,
     },
   ]);
 
-  const limitado = produtos[0].comentario.slice(0, 80) + "...";
   const [rating, setRating] = useState(0);
-  const [favoritos, setFavoritos] = useState<number[]>([]);
   const [novoComentario, setNovoComentario] = useState("");
 
   useEffect(() => {
@@ -40,25 +37,29 @@ export default function Comprar() {
       const novos = prev.includes(id)
         ? prev.filter((f) => f !== id)
         : [...prev, id];
+
       localStorage.setItem("favoritos", JSON.stringify(novos));
       return novos;
     });
   };
 
-  const produto = produtos[0];
+  const [favoritos, setFavoritos] = useState<number[]>(() => {
+    if (typeof window === "undefined") return [];
+    const salvo = localStorage.getItem("favoritos");
+    return salvo ? JSON.parse(salvo) : [];
+  });
 
-  const imagens = ["/mouse 1.png", "/headset 1.png", "/teclado 1.png"];
+  const produto = produtos[0];
 
   const [currentImage, setCurrentImage] = useState(0);
 
   const nextImage = () => {
-    setCurrentImage((prev) => (prev + 1) % imagens.length);
+    setCurrentImage((prev) => (prev + 1) % produto.imagens.length);
   };
 
   const prevImage = () => {
-    setCurrentImage((prev) => (prev === 0 ? imagens.length - 1 : prev - 1));
+    setCurrentImage((prev) => (prev === 0 ? produto.imagens.length - 1 : prev - 1));
   };
-
 
   const adicionarComentario = () => {
     if (!novoComentario.trim()) return;
@@ -68,14 +69,20 @@ export default function Comprar() {
       nome: "Mouse Fortrek Spider",
       descricao: "Eleve sua experiência...",
       preco: "R$ 79,00",
-      imagem: "/mouse 1.png",
+      imagens: ["/mouse 1.png"],
       comentario: novoComentario,
       estrelas: rating,
     };
 
     setProdutos([...produtos, novo]);
-    setNovoComentario(""); // limpa o campo após enviar
-    setRating(0);          // reseta as estrelas após enviar
+    setNovoComentario("");
+    setRating(0);
+  };
+
+  const calculoRating = () => {
+    if (produtos.length === 0) return 0;
+    const total = produtos.reduce((acc, p) => acc + p.estrelas, 0);
+    return Math.round(total / produtos.length);
   };
 
   return (
@@ -85,7 +92,7 @@ export default function Comprar() {
       <div className="flex">
         <div className="flex flex-col p-20">
           <Image
-            src={imagens[currentImage]}
+            src={produto.imagens[currentImage]}
             alt="Mouse Gamer"
             width={400}
             height={300}
@@ -99,17 +106,18 @@ export default function Comprar() {
 
               {/* Imagens */}
               <div className="flex gap-4">
-                {imagens.map((img, index) => (
+                {produto.imagens.map((img, index) => (
                   <Image
                     key={index}
                     src={img}
-                    alt="Mouse Gamer"
+                    alt={produto.nome}
                     width={110}
                     height={50}
-                    className={`cursor-pointer border-2 ${index === currentImage
+                    className={`cursor-pointer border-2 ${
+                      index === currentImage
                         ? "border-purple-500 rounded-2xl"
                         : "border-transparent"
-                      }`}
+                    }`}
                     onClick={() => setCurrentImage(index)}
                   />
                 ))}
@@ -133,8 +141,9 @@ export default function Comprar() {
               {[1, 2, 3, 4, 5].map((star) => (
                 <FaStar
                   key={star}
-                  className={`cursor-pointer text-2xl -mt-8 ${star <= rating ? "text-yellow-400" : "text-black"
-                    }`}
+                  className={`cursor-pointer text-2xl -mt-8 ${
+                    star <= rating ? "text-yellow-400" : "text-black"
+                  }`}
                   onClick={() => setRating(star)}
                 />
               ))}
@@ -165,8 +174,9 @@ export default function Comprar() {
         <div className="flex flex-col items-center cursor-pointer">
           <FaStar
             onClick={() => toggleFavorito(produto.id)}
-            className={`text-3xl ${favoritos.includes(produto.id) ? "text-black" : "text-yellow-400"
-              }`}
+            className={`text-3xl ${
+              favoritos.includes(produto.id) ? "text-yellow-400" : "text-black"
+            }`}
           />
           <span className="text-white mt-1 text-sm">Favoritar</span>
         </div>
@@ -183,10 +193,12 @@ export default function Comprar() {
         </button>
       </div>
 
+      {/* Seção de comentários */}
       <div className="bg-white rounded-lg p-4 mt-4 flex flex-col">
-        <p className="text-black ml-70 text-2xl mt-10">Comentários do produto</p>
+        <p className="text-black ml-70 text-2xl mt-10">
+          Comentários do produto
+        </p>
 
-       
         <div className="flex gap-2 ml-30 mt-17">
           <input
             type="text"
@@ -195,10 +207,10 @@ export default function Comprar() {
             onChange={(e) => setNovoComentario(e.target.value)}
             className="w-150 bg-gray-200 placeholder:text-gray-500 border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
             onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      adicionarComentario();
-                    }
-                  }}
+              if (e.key === "Enter") {
+                adicionarComentario();
+              }
+            }}
           />
           <button
             onClick={adicionarComentario}
@@ -207,19 +219,43 @@ export default function Comprar() {
             Enviar
           </button>
         </div>
+        {/* Exibe os comentários existentes e posta */}
+        <div className="flex">
+          {/* COLUNA DOS COMENTÁRIOS */}
+          <div className="flex items-start">
+            {/* COMENTÁRIOS */}
+            <div>
+              {produtos.map((p) => (
+                <div
+                  key={p.id}
+                  className="flex items-center bg-gray-400 rounded w-230 h-16 ml-20 mt-5 gap-10"
+                >
+                  <Icon
+                    icon="heroicons:user"
+                    className="ml-7 text-2xl text-white"
+                  />
 
-        {produtos.map((p) => (
-          <div
-            key={p.id}
-            className="flex items-center bg-gray-400 rounded w-230 h-16 ml-20 mt-5 gap-10"
-          >
-            <Icon icon="heroicons:user" className="ml-7 text-2xl text-white" />
-            <p>{p.comentario.slice(0, 80)}{p.comentario.length > 80 ? "..." : ""}</p>
-            <p className="flex items-center gap-2">
-              {p.estrelas} <FaStar className="text-yellow-400" />
-            </p>
+                  <p>
+                    {p.comentario.slice(0, 80)}
+                    {p.comentario.length > 80 ? "..." : ""}
+                  </p>
+
+                  <p className="flex items-center gap-2">
+                    {p.estrelas}
+                    <FaStar className="text-yellow-400" />
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* ESTRELA GRANDE (ÚNICA) */}
+            <div className="ml-100 mt-5 flex flex-col">
+              <h2 className="text-xl">Avaliações</h2>
+              <FaStar className="text-yellow-400 text-6xl ml-4 mt-10 " />
+              <p className="ml-4">{calculoRating()} estrelas</p>
+            </div>
           </div>
-        ))}
+        </div>
       </div>
 
       <Footer />
