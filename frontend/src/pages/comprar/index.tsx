@@ -49,6 +49,27 @@ export default function Comprar() {
     return salvo ? JSON.parse(salvo) : [];
   });
 
+  function adicionarAoCarrinho(id: number) {
+  const salvo = localStorage.getItem("carrinho");
+  const carrinho = salvo ? JSON.parse(salvo) : [];
+
+  const itemExistente = carrinho.find((item: any) => item.id === id);
+
+  let novoCarrinho;
+
+  if (itemExistente) {
+    novoCarrinho = carrinho.map((item: any) =>
+      item.id === id
+        ? { ...item, quantidade: item.quantidade + 1 }
+        : item
+    );
+  } else {
+    novoCarrinho = [...carrinho, { id, quantidade: 1 }];
+  }
+
+  localStorage.setItem("carrinho", JSON.stringify(novoCarrinho));
+}
+
   const produto = produtos[0];
 
   const [currentImage, setCurrentImage] = useState(0);
@@ -157,11 +178,12 @@ export default function Comprar() {
             <Link
               href="/carrinho"
               className="bg-[#5a10a8] text-white py-2 px-4 rounded-lg hover:bg-[#3a0a6a] transition duration-200 mt-4"
+              onClick={() => adicionarAoCarrinho(produto.id)}
             >
               Adicionar ao Carrinho
             </Link>
             <Link
-              href="/comprar"
+              href="/finalizar"
               className="bg-[#5a10a8] text-white py-2 px-4 rounded-lg hover:bg-[#3a0a6a] transition duration-200 mt-4"
             >
               Comprar Agora

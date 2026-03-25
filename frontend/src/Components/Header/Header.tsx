@@ -71,7 +71,7 @@ export default function Header() {
           <span className="text-xs xl:text-sm">Notificações</span>
         </Link>
         <Link
-          href="/"
+          href="/carrinho"
           className="flex items-center gap-1 text-white hover:text-[#430883] transition duration-300 whitespace-nowrap"
         >
           <BsCart2 className="text-sm xl:text-base" />
