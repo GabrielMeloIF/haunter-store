@@ -4,7 +4,7 @@ import { IoIosSearch } from "react-icons/io";
 import { BsBell, BsBorderAll, BsCart2, BsEnvelope } from "react-icons/bs";
 import { CgAdd } from "react-icons/cg";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
 export default function Header() {
@@ -13,9 +13,34 @@ export default function Header() {
 
   const handleBuscar = () => {
     if (!busca.trim()) return;
-
     router.push(`/${busca}`);
   };
+
+  interface User {
+    name: string;
+    email: string;
+    photoURL: string;
+    uid: string;
+  }
+
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("user");
+
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+    }
+  }, []);
+
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    window.location.reload();
+  };
+
   return (
     <header className="bg-[#A636E9] flex items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10 2xl:gap-15 w-full px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12">
       {/* Logo */}
@@ -47,83 +72,58 @@ export default function Header() {
         />
       </div>
 
-      {/* Links  */}
+      {/* Links */}
       <nav className="hidden lg:flex ml-auto gap-4 xl:gap-6 2xl:gap-10 items-center flex-shrink-0">
-        <Link
-          href="/"
-          className="flex items-center gap-1 text-white hover:text-[#430883] transition duration-300 whitespace-nowrap"
-        >
-          <BsBorderAll className="text-sm xl:text-base" />
-          <span className="text-xs xl:text-sm">Meus anúncios</span>
+        <Link href="/" className="flex items-center gap-1 text-white hover:text-[#430883]">
+          <BsBorderAll />
+          <span>Meus anúncios</span>
         </Link>
-        <Link
-          href="/chat"
-          className="flex items-center gap-1 text-white hover:text-[#430883] transition duration-300 whitespace-nowrap"
-        >
-          <BsEnvelope className="text-sm xl:text-base" />
-          <span className="text-xs xl:text-sm">Mensagens</span>
+
+        <Link href="/chat" className="flex items-center gap-1 text-white hover:text-[#430883]">
+          <BsEnvelope />
+          <span>Mensagens</span>
         </Link>
-        <Link
-          href="/notificacao"
-          className="flex items-center gap-1 text-white hover:text-[#430883] transition duration-300 whitespace-nowrap"
-        >
-          <BsBell className="text-sm xl:text-base" />
-          <span className="text-xs xl:text-sm">Notificações</span>
+
+        <Link href="/notificacao" className="flex items-center gap-1 text-white hover:text-[#430883]">
+          <BsBell />
+          <span>Notificações</span>
         </Link>
-        <Link
-          href="/"
-          className="flex items-center gap-1 text-white hover:text-[#430883] transition duration-300 whitespace-nowrap"
-        >
-          <BsCart2 className="text-sm xl:text-base" />
-          <span className="text-xs xl:text-sm">Carrinho</span>
+
+        <Link href="/" className="flex items-center gap-1 text-white hover:text-[#430883]">
+          <BsCart2 />
+          <span>Carrinho</span>
         </Link>
       </nav>
 
-      {/* Ícones  */}
-      <nav className="flex lg:hidden items-center gap-2 sm:gap-4 ml-auto flex-shrink-0">
-        <Link
-          href="/"
-          className="text-white hover:text-[#430883] transition duration-300"
-        >
-          <BsBorderAll className="text-lg sm:text-xl" />
-        </Link>
-        <Link
-          href="/chat"
-          className="text-white hover:text-[#430883] transition duration-300"
-        >
-          <BsEnvelope className="text-lg sm:text-xl" />
-        </Link>
-        <Link
-          href="/notificacao"
-          className="text-white hover:text-[#430883] transition duration-300"
-        >
-          <BsBell className="text-lg sm:text-xl" />
-        </Link>
-        <Link
-          href="/"
-          className="text-white hover:text-[#430883] transition duration-300"
-        >
-          <BsCart2 className="text-lg sm:text-xl" />
-        </Link>
+      {/* Ícones mobile */}
+      <nav className="flex lg:hidden items-center gap-2 ml-auto">
+        <Link href="/" className="text-white"><BsBorderAll /></Link>
+        <Link href="/chat" className="text-white"><BsEnvelope /></Link>
+        <Link href="/notificacao" className="text-white"><BsBell /></Link>
+        <Link href="/" className="text-white"><BsCart2 /></Link>
       </nav>
 
-      {/* Entrar */}
-      <div className="hidden md:flex flex-shrink-0 bg-white/50 rounded-xl px-2 lg:px-4 xl:px-6 py-1 border border-transparent hover:border-[#2A0042] transition duration-300">
-        <Link
-          href="/entrar"
-          className="text-white text-xs lg:text-sm hover:text-[#430883] transition duration-300 whitespace-nowrap"
-        >
-          Entrar
-        </Link>
+      {/* entrar com usuario logado */}
+      <div className="hidden md:flex flex-shrink-0 bg-white/50 rounded-xl px-2 lg:px-4 xl:px-6 py-1 border border-transparent hover:border-[#430883] transition duration-300">
+        {user ? (
+          <img
+            src={user.photoURL}
+            alt="user"
+            className="w-8 h-8 rounded-full cursor-pointer"
+            onClick={handleLogout} 
+            title="Sair"
+          />
+        ) : (
+          <Link href="/entrar" className="text-white hover:text-[#430883] transition duration-300 ">
+            Entrar
+          </Link>
+        )}
       </div>
 
       {/* Anunciar */}
-      <div className="flex-shrink-0 bg-[#430883] rounded-xl flex items-center h-7 sm:h-8 md:h-9 lg:h-10 px-2 sm:px-3 lg:px-4 hover:bg-[#7317D7] transition duration-300">
-        <CgAdd className="text-white text-base sm:text-lg lg:text-xl flex-shrink-0" />
-        <Link
-          href="/"
-          className="text-white text-xs lg:text-sm px-1 sm:px-2 lg:px-3 whitespace-nowrap hidden sm:block"
-        >
+      <div className="flex-shrink-0 bg-[#430883] rounded-xl flex items-center h-7 sm:h-8 md:h-9 lg:h-10 px-2 sm:px-3 lg:px-4 hover:bg-[#7317D7]">
+        <CgAdd className="text-white" />
+        <Link href="/" className="text-white hidden sm:block px-2">
           Anunciar
         </Link>
       </div>

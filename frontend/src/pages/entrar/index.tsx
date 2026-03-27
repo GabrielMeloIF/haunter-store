@@ -3,6 +3,9 @@
 import Image from "next/image"
 import { useState } from "react"
 import { Camera, Heart, MessageCircle, Share2, Eye, EyeOff } from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation" 
+import { Icon } from "@iconify/react";
 
 function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
@@ -27,6 +30,8 @@ type AuthMode = "login" | "register"
 export default function AuthPage() {
   const [mode, setMode] = useState<AuthMode>("login")
   const [showPassword, setShowPassword] = useState(false)
+  const router = useRouter() 
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -34,9 +39,19 @@ export default function AuthPage() {
     username: "",
   })
 
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Form submitted:", { mode, formData })
+
+    const user = {
+      name: formData.name || "Usuário",
+      email: formData.email,
+      uid: "123",
+    }
+
+    localStorage.setItem("user", JSON.stringify(user))
+
+    router.push("/") 
   }
 
   const toggleMode = () => {
@@ -48,32 +63,28 @@ export default function AuthPage() {
     <div className="grid lg:grid-cols-2 min-h-screen">
 
       {/* LEFT */}
-      <div className="relative hidden lg:flex flex-col bg-purple-700 overflow-hidden">
-        
+      <div className="relative hidden lg:flex flex-col overflow-hidden">
         <Image
-          src="/logo.png"
+          src="/bannerEntrar.png"
           alt="Banner"
           fill
-          className="object-cover opacity-20 "
+          className="object-cover opacity-70 "
         />
 
-        <div className="absolute inset-0  to-purple-700" />
+        <div className="absolute inset-0 to-purple-700" />
 
         <div className="relative z-10 flex flex-col justify-between h-full p-10 text-white">
           
-          {/* Top */}
           <div className="flex items-center gap-3">
-            <span className="text-lg font-bold">Haunter Store</span>
+            <Link href="/" className="text-lg font-bold">Haunter Store</Link>
           </div>
 
-          {/* Center */}
           <div className="flex flex-col gap-6">
             <h2 className="text-4xl font-bold">
               Melhores Produtos
             </h2>
 
             <div className="flex flex-col gap-4 mt-4">
-              
               <div className="flex items-center gap-4">
                 <Heart />
                 <p>Melhores preços</p>
@@ -88,14 +99,10 @@ export default function AuthPage() {
                 <Share2 />
                 <p>Eficiência</p>
               </div>
-
             </div>
           </div>
 
-          {/* Bottom */}
-          <div className="text-sm opacity-70">
-          
-          </div>
+          <div className="text-sm opacity-70"></div>
         </div>
       </div>
 
@@ -103,17 +110,15 @@ export default function AuthPage() {
       <div className="flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
 
-          {/* Logo */}
           <div className="mb-8 text-center">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-500 to-purple-900 bg-clip-text text-transparent">
-             Haunter Store
+              Haunter Store
             </h1>
             <p className="mt-2 text-gray-500 text-sm">
               {mode === "login" ? "Entre na sua conta" : "Crie sua conta"}
             </p>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
             {mode === "register" && (
@@ -167,7 +172,6 @@ export default function AuthPage() {
             </Button>
           </form>
 
-          {/* Toggle */}
           <p className="mt-6 text-center text-sm">
             {mode === "login" ? "Não tem conta?" : "Já tem conta?"}
             <button onClick={toggleMode} className="ml-2 text-purple-600">
