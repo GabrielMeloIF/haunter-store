@@ -98,7 +98,7 @@ export default function ProfilePage() {
                 alt="Foto do usuário"
                 width={80}
                 height={80}
-                className="rounded-full object-cover"
+                className="rounded-full object-cover min-w-20 min-h-20 max-w-20 max-h-20"
               />
             ) : (
               <div className="w-20 h-20 rounded-full bg-purple-700 flex items-center justify-center text-white text-2xl font-bold">

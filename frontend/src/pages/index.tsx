@@ -12,7 +12,7 @@ import BtnTopo from "@/Components/BtnTopo/BtnTopo";
 
 export default function Home() {
   return (
-    <div className="bg-[#303030] min-h-screen">
+<>
       <Header />
         <NavBar />
       <Carrossel />
@@ -21,7 +21,7 @@ export default function Home() {
         <BtnTopo />
       </main>
       <Footer />
-    </div>
+   </>
   );
 }
     

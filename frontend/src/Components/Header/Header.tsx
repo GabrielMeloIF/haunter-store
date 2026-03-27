@@ -123,7 +123,7 @@ export default function Header() {
                 alt="Foto do usuário"
                 width={32}
                 height={32}
-                className="rounded-full object-cover cursor-pointer"
+                className="rounded-full object-cover cursor-pointer max-w-8 max-h-8 min-w-8 min-h-8"
                 title="Minha conta"
               />
             ) : (
