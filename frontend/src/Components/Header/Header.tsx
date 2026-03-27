@@ -4,17 +4,19 @@ import { IoIosSearch } from "react-icons/io";
 import { BsBell, BsBorderAll, BsCart2, BsEnvelope } from "react-icons/bs";
 import { CgAdd } from "react-icons/cg";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 
 export default function Header() {
   const router = useRouter();
   const [busca, setBusca] = useState("");
 
-  const handleBuscar = () => {
-    if (!busca.trim()) return;
-    router.push(`/${busca}`);
-  };
+  const handleBuscar = useCallback(() => {
+    const query = busca.trim().toLowerCase();
+    if (!query) return;
+    router.push(`/busca?q=${query}`);
+    setBusca("");
+  }, [busca, router]);
 
   interface User {
     name: string;
@@ -25,30 +27,42 @@ export default function Header() {
 
   const [user, setUser] = useState<User | null>(null);
 
+  // 👤 Carregar usuário e atualizar automaticamente
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedUser = localStorage.getItem("user");
-
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
+    const loadUser = () => {
+      if (typeof window !== "undefined") {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        } else {
+          setUser(null);
+        }
       }
-    }
+    };
+
+    loadUser();
+
+    // Ouve evento customizado "userChange" disparado pelo perfil
+    window.addEventListener("userChange", loadUser);
+
+    return () => {
+      window.removeEventListener("userChange", loadUser);
+    };
   }, []);
 
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    window.location.reload();
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") handleBuscar();
   };
 
   return (
     <header className="bg-[#A636E9] flex items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10 2xl:gap-15 w-full px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12">
+      
       {/* Logo */}
       <Link href="/" className="shrink-0">
         <Image
           src={Logo}
           alt="Logo"
-          className="w-15 sm:w-16 md:w-18 lg:w-15 "
+          className="w-15 sm:w-16 md:w-18 lg:w-15"
         />
       </Link>
 
@@ -58,13 +72,9 @@ export default function Header() {
           type="text"
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Pesquisar..."
           className="bg-white/50 w-full h-6 sm:h-7 md:h-8 rounded-xl text-white placeholder-white/80 px-3 pr-8 outline-none text-xs sm:text-sm"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleBuscar();
-            }
-          }}
         />
         <IoIosSearch
           onClick={handleBuscar}
@@ -103,18 +113,30 @@ export default function Header() {
         <Link href="/" className="text-white"><BsCart2 /></Link>
       </nav>
 
-      {/* entrar com usuario logado */}
+      {/* Usuário */}
       <div className="hidden md:flex flex-shrink-0 bg-white/50 rounded-xl px-2 lg:px-4 xl:px-6 py-1 border border-transparent hover:border-[#430883] transition duration-300">
         {user ? (
-          <img
-            src={user.photoURL}
-            alt="user"
-            className="w-8 h-8 rounded-full cursor-pointer"
-            onClick={handleLogout} 
-            title="Sair"
-          />
+          <Link href="/perfil">
+            {user.photoURL ? (
+              <Image
+                src={user.photoURL}
+                alt="Foto do usuário"
+                width={32}
+                height={32}
+                className="rounded-full object-cover cursor-pointer"
+                title="Minha conta"
+              />
+            ) : (
+              <div
+                className="w-8 h-8 rounded-full bg-purple-700 flex items-center justify-center text-white font-bold cursor-pointer"
+                title="Minha conta"
+              >
+                {user.name?.[0]?.toUpperCase() || "U"}
+              </div>
+            )}
+          </Link>
         ) : (
-          <Link href="/entrar" className="text-white hover:text-[#430883] transition duration-300 ">
+          <Link href="/entrar" className="text-white hover:text-[#430883] transition duration-300">
             Entrar
           </Link>
         )}
