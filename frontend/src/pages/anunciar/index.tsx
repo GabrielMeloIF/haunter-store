@@ -1,7 +1,7 @@
 'use client'
 
 import Header from "@/Components/Header/Header";
-import Hero from "@/Components/Hero/Hero";
+import NavBar from "@/Components/Navbar/NavBar";
 import Footer from "@/Components/Footer/Footer";
 import { useRouter } from 'next/navigation'
 import { useRef, useState, useEffect } from 'react'
@@ -132,7 +132,7 @@ export default function StepDetails() {
   return (
     <div>
       <Header />
-      <Hero />
+      <NavBar />
 
       <div className="max-w-7xl mx-auto p-15">
 

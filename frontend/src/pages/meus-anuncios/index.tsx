@@ -1,7 +1,7 @@
 'use client'
 
 import Header from "@/Components/Header/Header";
-import Hero from "@/Components/Hero/Hero";
+import Navbar from "@/Components/Navbar/NavBar";
 import Footer from "@/Components/Footer/Footer";
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
@@ -96,7 +96,7 @@ export default function StepReview(props: Props) {
   return (
     <div className="animate-fadeUp">
       <Header />
-      <Hero />
+      <Navbar/>
 
       <div className="max-w-7xl mx-auto p-15">
 
@@ -185,7 +185,7 @@ export default function StepReview(props: Props) {
             className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3 rounded-full text-sm border-2 border-white transition-colors shadow-lg shadow-purple-500/30
                        disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-purple-600"
           >
-            🚀 Publicar anúncio
+             Publicar anúncio
           </button>
         </div>
       </div>

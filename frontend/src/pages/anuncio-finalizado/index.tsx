@@ -31,7 +31,7 @@ export default function StepSuccess({ onReset }: Props) {
 
           {/* Texto */}
           <h2 className="text-2xl font-black text-gray-800 mb-2">
-            Anúncio publicado! 🎉
+            Anúncio publicado! 
           </h2>
 
           <p className="text-gray-500 text-sm mb-6">
