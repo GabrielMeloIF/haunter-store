@@ -9,14 +9,11 @@ export default function NavBar() {
           <Link href="/favoritos">Favoritos</Link>
         </li>
         <li className="px-3 sm:px-5 md:px-7 py-1 rounded-lg hover:bg-[#5a10a8] transition duration-200 text-sm sm:text-base">
-          <Link href="/contact">Peças</Link>
-        </li>
-        <li className="px-3 sm:px-5 md:px-7 py-1 rounded-lg hover:bg-[#5a10a8] transition duration-200 text-sm sm:text-base">
-          <Link href="/contact">Periféricos</Link>
+          <Link href="/perifericos">Periféricos</Link>
         </li>
         <li className="px-3 sm:px-5 md:px-7 py-1 rounded-lg hover:bg-[#5a10a8] transition duration-200 text-sm sm:text-base">
 
-          <Link href="/contact">Jogos</Link>
+          <Link href="/jogos">Jogos</Link>
         </li>
       </ul>
     </nav>

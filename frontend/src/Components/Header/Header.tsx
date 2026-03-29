@@ -27,7 +27,7 @@ export default function Header() {
 
   const [user, setUser] = useState<User | null>(null);
 
-  // 👤 Carregar usuário e atualizar automaticamente
+  //  Carrega usuário e atualizar automaticamente
   useEffect(() => {
     const loadUser = () => {
       if (typeof window !== "undefined") {
@@ -42,7 +42,7 @@ export default function Header() {
 
     loadUser();
 
-    // Ouve evento customizado "userChange" disparado pelo perfil
+   
     window.addEventListener("userChange", loadUser);
 
     return () => {
@@ -99,7 +99,7 @@ export default function Header() {
           <span>Notificações</span>
         </Link>
 
-        <Link href="/" className="flex items-center gap-1 text-white hover:text-[#430883]">
+        <Link href="/carrinho" className="flex items-center gap-1 text-white hover:text-[#430883]">
           <BsCart2 />
           <span>Carrinho</span>
         </Link>

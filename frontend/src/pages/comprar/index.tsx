@@ -15,7 +15,7 @@ export default function Comprar() {
       descricao:
         "Eleve sua experiência nos jogos e no dia a dia com o Mouse Fortrek Spider. Com um design moderno e agressivo, iluminação em LED vermelho e acabamento ergonômico, ele foi desenvolvido para oferecer conforto e alta performance durante longas horas de uso.",
       preco: "R$ 79,00",
-    imagens: ["/mouse 1.png", "/headset 1.png", "/teclado 1.png"],
+      imagens: ["/mouse 1.png", "/headset 1.png", "/teclado 1.png"],
       comentario:
         "Ótimo mouse para jogos, confortável e com boa precisão. A iluminação em LED é um bônus visual que eu adoro!",
       estrelas: 4,
@@ -37,7 +37,6 @@ export default function Comprar() {
       const novos = prev.includes(id)
         ? prev.filter((f) => f !== id)
         : [...prev, id];
-
       localStorage.setItem("favoritos", JSON.stringify(novos));
       return novos;
     });
@@ -50,7 +49,6 @@ export default function Comprar() {
   });
 
   const produto = produtos[0];
-
   const [currentImage, setCurrentImage] = useState(0);
 
   const nextImage = () => {
@@ -58,12 +56,21 @@ export default function Comprar() {
   };
 
   const prevImage = () => {
-    setCurrentImage((prev) => (prev === 0 ? produto.imagens.length - 1 : prev - 1));
+    setCurrentImage((prev) =>
+      prev === 0 ? produto.imagens.length - 1 : prev - 1
+    );
+  };
+
+  const adicionarAoCarrinho = () => {
+    const salvo = localStorage.getItem("carrinho");
+    const ids: number[] = salvo ? JSON.parse(salvo) : [];
+    ids.push(produto.id);
+    localStorage.setItem("carrinho", JSON.stringify(ids));
+    alert("Produto adicionado ao carrinho!");
   };
 
   const adicionarComentario = () => {
     if (!novoComentario.trim()) return;
-
     const novo = {
       id: Date.now(),
       nome: "Mouse Fortrek Spider",
@@ -73,7 +80,6 @@ export default function Comprar() {
       comentario: novoComentario,
       estrelas: rating,
     };
-
     setProdutos([...produtos, novo]);
     setNovoComentario("");
     setRating(0);
@@ -99,12 +105,9 @@ export default function Comprar() {
           />
           <div className="mt-5 flex gap-8">
             <div className="mt-5 flex items-center gap-4">
-              {/* Seta esquerda */}
               <button onClick={prevImage} className="text-white text-2xl">
                 ‹
               </button>
-
-              {/* Imagens */}
               <div className="flex gap-4">
                 {produto.imagens.map((img, index) => (
                   <Image
@@ -122,8 +125,6 @@ export default function Comprar() {
                   />
                 ))}
               </div>
-
-              {/* Seta direita */}
               <button onClick={nextImage} className="text-white text-2xl">
                 ›
               </button>
@@ -154,14 +155,14 @@ export default function Comprar() {
             {produtos[0].preco}
           </p>
           <div className="flex gap-4 mt-6">
-            <Link
-              href="/carrinho"
+            <button
+              onClick={adicionarAoCarrinho}
               className="bg-[#5a10a8] text-white py-2 px-4 rounded-lg hover:bg-[#3a0a6a] transition duration-200 mt-4"
             >
               Adicionar ao Carrinho
-            </Link>
+            </button>
             <Link
-              href="/comprar"
+              href="/finalizar-compra"
               className="bg-[#5a10a8] text-white py-2 px-4 rounded-lg hover:bg-[#3a0a6a] transition duration-200 mt-4"
             >
               Comprar Agora
@@ -198,7 +199,6 @@ export default function Comprar() {
         <p className="text-black ml-70 text-2xl mt-10">
           Comentários do produto
         </p>
-
         <div className="flex gap-2 ml-30 mt-17">
           <input
             type="text"
@@ -219,11 +219,9 @@ export default function Comprar() {
             Enviar
           </button>
         </div>
-        {/* Exibe os comentários existentes e posta */}
+
         <div className="flex">
-          {/* COLUNA DOS COMENTÁRIOS */}
           <div className="flex items-start">
-            {/* COMENTÁRIOS */}
             <div>
               {produtos.map((p) => (
                 <div
@@ -234,12 +232,10 @@ export default function Comprar() {
                     icon="heroicons:user"
                     className="ml-7 text-2xl text-white"
                   />
-
                   <p>
                     {p.comentario.slice(0, 80)}
                     {p.comentario.length > 80 ? "..." : ""}
                   </p>
-
                   <p className="flex items-center gap-2">
                     {p.estrelas}
                     <FaStar className="text-yellow-400" />
@@ -248,10 +244,9 @@ export default function Comprar() {
               ))}
             </div>
 
-            {/* ESTRELA GRANDE (ÚNICA) */}
             <div className="ml-100 mt-5 flex flex-col">
               <h2 className="text-xl">Avaliações</h2>
-              <FaStar className="text-yellow-400 text-6xl ml-4 mt-10 " />
+              <FaStar className="text-yellow-400 text-6xl ml-4 mt-10" />
               <p className="ml-4">{calculoRating()} estrelas</p>
             </div>
           </div>
