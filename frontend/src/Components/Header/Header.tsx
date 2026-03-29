@@ -84,7 +84,7 @@ export default function Header() {
 
       {/* Links */}
       <nav className="hidden lg:flex ml-auto gap-4 xl:gap-6 2xl:gap-10 items-center flex-shrink-0">
-        <Link href="/" className="flex items-center gap-1 text-white hover:text-[#430883]">
+        <Link href="/meus-anuncios" className="flex items-center gap-1 text-white hover:text-[#430883]">
           <BsBorderAll />
           <span>Meus anúncios</span>
         </Link>
@@ -145,7 +145,7 @@ export default function Header() {
       {/* Anunciar */}
       <div className="flex-shrink-0 bg-[#430883] rounded-xl flex items-center h-7 sm:h-8 md:h-9 lg:h-10 px-2 sm:px-3 lg:px-4 hover:bg-[#7317D7]">
         <CgAdd className="text-white" />
-        <Link href="/" className="text-white hidden sm:block px-2">
+        <Link href="/anunciar" className="text-white hidden sm:block px-2">
           Anunciar
         </Link>
       </div>
