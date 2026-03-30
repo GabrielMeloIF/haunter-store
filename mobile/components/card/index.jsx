@@ -63,7 +63,7 @@ export default function Cards() {
           onPress={() => toggleFavorito(produto.id)}
         >
           <AntDesign
-            name={favoritos.includes(produto.id) ? "star" : "staro"}
+            name={favoritos.includes(produto.id) ? "star" : "star"}
             size={22}
             color={favoritos.includes(produto.id) ? "#facc15" : "#fff"}
           />

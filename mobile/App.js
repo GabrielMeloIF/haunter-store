@@ -4,11 +4,13 @@ import Header from './components/header';
 import NavBar from './components/navbar';
 import Carrossel from './components/carrossel';
 import Cards from './components/card';
+import Footer from './components/footer';
 
 export default function App() {
   return (
     <ScrollView>
     <View style={styles.container}>
+       <StatusBar style="auto" />
       <View style={{ width: '100%' }}>
       <Header />
       </View>
@@ -19,7 +21,9 @@ export default function App() {
         <Cards />
       </View>
   
-      <StatusBar style="auto" />
+      <Footer />
+
+      
     </View>
     </ScrollView>
   );
