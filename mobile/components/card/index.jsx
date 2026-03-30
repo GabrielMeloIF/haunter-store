@@ -18,11 +18,25 @@ const perifericos = [
     preco: "R$ 320,00",
     imagem: require("../../assets/headset 1.png"),
   },
+ {
+    id: 2,
+    nome: "Head phone JBL bluetooth bateria para 24hrs",
+    descricao: "Fone de ouvido bluetooth com bateria de longa duração",
+    preco: "R$ 320,00",
+    imagem: require("../../assets/headset 1.png"),
+  },
 ];
 
 const games = [
   {
-    id: 2,
+    id: 3,
+    nome: "God of War",
+    descricao: "Batalhas épicas com gráficos impressionantes",
+    preco: "R$ 199,00",
+    imagem: require("../../assets/god-of-war.png"),
+  },
+   {
+    id: 4,
     nome: "God of War",
     descricao: "Batalhas épicas com gráficos impressionantes",
     preco: "R$ 199,00",
@@ -112,7 +126,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   card: {
-    width: 200,
+    width: "47%",
     borderRadius: 12,
     overflow: "hidden",
     backgroundColor: "#3a3a3a",
@@ -141,11 +155,12 @@ const styles = StyleSheet.create({
   },
   nome: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: "bold",
-    lineHeight: 24,
+    lineHeight: 20,
   },
   footer: {
+    gap: 11,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -153,10 +168,11 @@ const styles = StyleSheet.create({
   },
   preco: {
     color: "#fff",
-    fontSize: 20,
+    fontSize: 12,
     fontWeight: "bold",
   },
   comprarBtn: {
+    width: 82,
     backgroundColor: "#A636E9",
     paddingHorizontal: 20,
     paddingVertical: 12,
@@ -164,7 +180,7 @@ const styles = StyleSheet.create({
   },
   comprarText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 10,
     fontWeight: "bold",
   },
 });

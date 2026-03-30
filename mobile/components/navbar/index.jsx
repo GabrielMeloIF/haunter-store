@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
  
 const links = [
   { label: "Favoritos", href: "/favoritos" },
@@ -7,10 +8,7 @@ const links = [
 ];
  
 export default function NavBar() {
-  const handleNav = (href) => {
-    // Troque pelo seu router, ex: router.push(href)
-    console.log("Navegar para:", href);
-  };
+  const router = useRouter();
  
   return (
     <View style={styles.nav}>
@@ -18,7 +16,7 @@ export default function NavBar() {
         <TouchableOpacity
           key={link.href}
           style={styles.item}
-          onPress={() => handleNav(link.href)}
+          onPress={() => router.push(link.href)}
           activeOpacity={0.7}
         >
           <Text style={styles.text}>{link.label}</Text>
