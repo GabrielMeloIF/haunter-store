@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -19,8 +18,13 @@ model Usuario {
   data_cadastro DateTime    @default(now())
   tipo_usuario  TipoUsuario @default(CLIENTE)
 
-  carrinhos Carrinho[]
-  pedidos   Pedido[]
+  avaliacoes   Avaliacao[]
+  cupons       CupomUsuario[]
+  carrinhos    Carrinho[]
+  pedidos      Pedido[]
+  conversas    Conversa[]     @relation("UsuarioConversas")
+  mensagens    Mensagem[]
+  notificacoes Notificacao[]
 }
 
 enum TipoUsuario {
@@ -37,16 +41,17 @@ model Categoria {
 }
 
 model Produto {
-  id            Int      @id @default(autoincrement())
+  id            Int       @id @default(autoincrement())
   nome          String
   descricao     String
   preco         Float
   estoque       Int
   tipo_produto  String?
-  data_cadastro DateTime @default(now())
+  data_cadastro DateTime  @default(now())
   categoriaId   Int
   categoria     Categoria @relation(fields: [categoriaId], references: [id_categoria])
 
+  avaliacoes    Avaliacao[]
   itensCarrinho Carrinho[]
   itensPedido   ItemPedido[]
 }
@@ -90,4 +95,76 @@ model ItemPedido {
 
   pedido  Pedido  @relation(fields: [id_pedido], references: [id_pedido])
   produto Produto @relation(fields: [id_produto], references: [id])
+}
+
+model Conversa {
+  id_conversa Int      @id @default(autoincrement())
+  criada_em   DateTime @default(now())
+
+  participantes Usuario[]  @relation("UsuarioConversas")
+  mensagens     Mensagem[]
+}
+
+model Mensagem {
+  id_mensagem  Int      @id @default(autoincrement())
+  id_conversa  Int
+  id_remetente Int
+  conteudo     String   @db.Text
+  lida         Boolean  @default(false)
+  enviada_em   DateTime @default(now())
+
+  conversa  Conversa @relation(fields: [id_conversa], references: [id_conversa])
+  remetente Usuario  @relation(fields: [id_remetente], references: [id_usuario])
+}
+
+model Notificacao {
+  id_notificacao Int             @id @default(autoincrement())
+  id_usuario     Int
+  tipo           TipoNotificacao
+  titulo         String
+  descricao      String          @db.Text
+  lida           Boolean         @default(false)
+  criada_em      DateTime        @default(now())
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+}
+
+enum TipoNotificacao {
+  MENSAGEM
+  CONVERSA
+  SISTEMA
+}
+
+model Avaliacao {
+  id_avaliacao Int      @id @default(autoincrement())
+  id_usuario   Int
+  id_produto   Int
+  nota         Int
+  comentario   String   @db.Text
+  avaliada_em  DateTime @default(now())
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+  produto Produto @relation(fields: [id_produto], references: [id])
+}
+
+model Cupom {
+  id_cupom  Int      @id @default(autoincrement())
+  codigo    String   @unique
+  descricao String   @db.Text
+  desconto  Float
+  validade  DateTime
+  criado_em DateTime @default(now())
+
+  usuarios CupomUsuario[]
+}
+
+model CupomUsuario {
+  id_cupom_usuario Int       @id @default(autoincrement())
+  id_usuario       Int
+  id_cupom         Int
+  utilizado        Boolean   @default(false)
+  utilizado_em     DateTime?
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+  cupom   Cupom   @relation(fields: [id_cupom], references: [id_cupom])
 }
