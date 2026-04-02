@@ -6,24 +6,24 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Substitua pelos seus dados reais
 const perifericos = [
   {
     id: 1,
     nome: "Head phone JBL bluetooth bateria para 24hrs",
     descricao: "Fone de ouvido bluetooth com bateria de longa duração",
     preco: "R$ 320,00",
-    imagem: require("../../assets/headset 1.png"),
+    imagem: require("../../../assets/headset 1.png"),
   },
  {
     id: 2,
     nome: "Head phone JBL bluetooth bateria para 24hrs",
     descricao: "Fone de ouvido bluetooth com bateria de longa duração",
     preco: "R$ 320,00",
-    imagem: require("../../assets/headset 1.png"),
+    imagem: require("../../../assets/headset 1.png"),
   },
 ];
 
@@ -33,25 +33,36 @@ const games = [
     nome: "God of War",
     descricao: "Batalhas épicas com gráficos impressionantes",
     preco: "R$ 199,00",
-    imagem: require("../../assets/god-of-war.png"),
+    imagem: require("../../../assets/god.webp"),
   },
    {
     id: 4,
     nome: "God of War",
     descricao: "Batalhas épicas com gráficos impressionantes",
     preco: "R$ 199,00",
-    imagem: require("../../assets/god-of-war.png"),
+    imagem: require("../../../assets/forza.png"),
   },
 ];
 
 export default function Cards() {
-  const [favoritos, setFavoritos] = useState([]);
+ const [favoritos, setFavoritos] = useState([]);
 
-  const toggleFavorito = (id) => {
-    setFavoritos((prev) =>
-      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
-    );
+useEffect(() => {
+  const carregar = async () => {
+    const salvo = await AsyncStorage.getItem("favoritos");
+    if (salvo) setFavoritos(JSON.parse(salvo));
   };
+  carregar();
+}, []);
+
+const toggleFavorito = async (id) => {
+  const novos = favoritos.includes(id)
+    ? favoritos.filter((f) => f !== id)
+    : [...favoritos, id];
+
+  setFavoritos(novos);
+  await AsyncStorage.setItem("favoritos", JSON.stringify(novos));
+};
 
   const CardItem = ({ produto }) => (
     <View style={styles.card}>

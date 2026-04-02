@@ -1,10 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View,ScrollView } from 'react-native';
-import Header from './components/header';
-import NavBar from './components/navbar';
-import Carrossel from './components/carrossel';
-import Cards from './components/card';
-import Footer from './components/footer';
+import Header from '../src/components/header';
+import NavBar from '../src/components/navbar';
+import Carrossel from '../src/components/carrossel';
+import Cards from '../src/components/card';
+import Footer from '../src/components/footer';
 
 export default function App() {
   return (

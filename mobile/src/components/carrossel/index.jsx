@@ -16,27 +16,27 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 const slides = [
   {
     id: 1,
-    image: require("../../assets/promo.png"),
+    image: require("../../../assets/promo.png"),
     titulo: "Promoção!!",
     descricao: "Venha aproveitar nossas promoções",
   },
   {
     id: 2,
-    image: require("../../assets/forza.png"),
+    image: require("../../../assets/forza.png"),
     titulo: "Forza Horizon 6",
     descricao:
       "Explore o Japão em um mundo aberto com paisagens incríveis, dirija mais de 550 carros reais e construa sua fama para se tornar uma lenda das corridas.",
   },
   {
     id: 3,
-    image: require("../../assets/fortinite.png"),
+    image: require("../../../assets/fortinite.png"),
     titulo: "Fortnite",
     descricao:
       "Viaje para uma nova ilha, explore novas formas de jogar e aproveite um Passe de Batalha cheio de recompensas.",
   },
   {
     id: 4,
-    image: require("../../assets/god-of-war.png"),
+    image: require("../../../assets/god-of-war.png"),
     titulo: "God of War",
     descricao:
       "Batalhas épicas com gráficos impressionantes. Kratos busca vingança contra os Deuses que o traíram.",

@@ -1,6 +1,6 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet, Linking } from "react-native";
  
-import Logo from "../../assets/logo.png";
+import Logo from "../../../assets/logo.png";
 
 import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
  

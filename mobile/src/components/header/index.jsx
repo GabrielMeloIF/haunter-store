@@ -11,10 +11,13 @@ import { useState } from "react";
 import Feather from '@expo/vector-icons/Feather';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { useRouter } from "expo-router";
  
-const Logo = require("../../assets/logo.png");
+const Logo = require("../../../assets/logo.png");
  
 export default function Header() {
+const router = useRouter(); 
+
   const [busca, setBusca] = useState("");
   const { width } = useWindowDimensions();
   const isMobile = width < 1024;
@@ -43,7 +46,7 @@ export default function Header() {
       </View>
 
     {/*  logo */}
-      <TouchableOpacity>
+      <TouchableOpacity onPress={()=> router.push("/")}>
         <Image source={Logo} style={styles.logo} resizeMode="contain" />
       </TouchableOpacity>
  

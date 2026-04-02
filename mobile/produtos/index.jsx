@@ -8,7 +8,7 @@ export const perifericos = [
 ];
  
 export const games = [
-  { id: 7, nome: "Fortnite", descricao: "Ação e aventura", imagem: require("../assets/forza.png"), preco: "R$ 199" },
+  { id: 7, nome: "Fortnite", descricao: "Ação e aventura", imagem: require("../assets/logo.png"), preco: "R$ 199" },
   { id: 8, nome: "God of War III Remasterizado", descricao: "Ação", imagem: require("../assets/god.webp"), preco: "R$ 249" },
   { id: 9, nome: "God of War III Remasterizado", descricao: "Ação", imagem: require("../assets/god.webp"), preco: "R$ 249" },
   { id: 10, nome: "Fortnite", descricao: "Ação e aventura", imagem: require("../assets/forza.png"), preco: "R$ 199" },
