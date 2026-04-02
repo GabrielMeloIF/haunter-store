@@ -54,7 +54,7 @@ const router = useRouter();
       <View style={[styles.side, { justifyContent: "flex-end" }]}>
  
         {isMobile && (
-          <TouchableOpacity style={styles.navIcon}>
+          <TouchableOpacity style={styles.navIcon} onPress={() => router.push("/carrinho")}>
             <Feather name="shopping-cart" size={24} color="white" />
           </TouchableOpacity>
         )}

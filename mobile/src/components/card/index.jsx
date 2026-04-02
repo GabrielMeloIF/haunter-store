@@ -9,6 +9,7 @@ import {
 import { useState, useEffect } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 
 const perifericos = [
   {
@@ -45,6 +46,9 @@ const games = [
 ];
 
 export default function Cards() {
+
+  const router = useRouter(); 
+
  const [favoritos, setFavoritos] = useState([]);
 
 useEffect(() => {
@@ -88,7 +92,7 @@ const toggleFavorito = async (id) => {
         <View style={styles.footer}>
           <Text style={styles.preco}>{produto.preco}</Text>
           <TouchableOpacity style={styles.comprarBtn}>
-            <Text style={styles.comprarText}>Comprar</Text>
+            <Text style={styles.comprarText} onPress={() => router.push("/comprar")}>Comprar</Text>
           </TouchableOpacity>
         </View>
       </View>
