@@ -12,36 +12,32 @@ import Feather from '@expo/vector-icons/Feather';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useRouter } from "expo-router";
-import { useNavigation, DrawerActions } from '@react-navigation/native';
-
+ 
 const Logo = require("../../../assets/logo.png");
-
+ 
 export default function Header() {
-
-  const navigation = useNavigation();
-
-  const router = useRouter();
+const router = useRouter(); 
 
   const [busca, setBusca] = useState("");
   const { width } = useWindowDimensions();
   const isMobile = width < 1024;
-
+ 
   const handleBuscar = () => {
     const query = busca.trim().toLowerCase();
     if (!query) return;
     console.log("Buscar:", query);
     setBusca("");
   };
-
+ 
   return (
     <View style={styles.header}>
 
-      {/* hamburguer */}
-      <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer())}>
-        <AntDesign name="bars" size={24} color="white" />
-      </TouchableOpacity>
+          {/* hamburguer */}
+          <View>
+            <AntDesign name="bars" size={24} color="white" />
+          </View>
 
-
+ 
       {/*  busca */}
       <View style={styles.side}>
         <TouchableOpacity onPress={handleBuscar}>
@@ -49,20 +45,16 @@ export default function Header() {
         </TouchableOpacity>
       </View>
 
-      {/*  logo */}
-      <TouchableOpacity onPress={() => router.push("/")}>
+    {/*  logo */}
+      <TouchableOpacity onPress={()=> router.push("/")}>
         <Image source={Logo} style={styles.logo} resizeMode="contain" />
       </TouchableOpacity>
-
+ 
       {/* ícones */}
       <View style={[styles.side, { justifyContent: "flex-end" }]}>
-
-        {isMobile && (
-          <TouchableOpacity style={styles.navIcon} onPress={() => router.push("/carrinho")}>
-            <Feather name="shopping-cart" size={24} color="white" />
-          </TouchableOpacity>
-        )}
-
+ 
+       
+ 
         {!isMobile && (
           <>
             {["Meus anúncios", "Mensagens", "Notificações", "Carrinho"].map((item) => (
@@ -72,22 +64,22 @@ export default function Header() {
             ))}
           </>
         )}
-
+ 
         <TouchableOpacity style={styles.userBtn}>
           <Feather name="user" size={20} color="white" />
         </TouchableOpacity>
-
+ 
         <TouchableOpacity style={styles.anunciarBtn}>
           <Feather name="plus-circle" size={20} color="white" />
           {!isMobile && <Text style={styles.anunciarText}>Anunciar</Text>}
         </TouchableOpacity>
-
+ 
       </View>
-
+ 
     </View>
   );
 }
-
+ 
 const styles = StyleSheet.create({
   header: {
     backgroundColor: "#A636E9",
@@ -138,5 +130,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
   },
-
+ 
 });

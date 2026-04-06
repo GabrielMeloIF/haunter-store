@@ -209,7 +209,7 @@ export default function Comprar() {
                 </View>
             </View>
 
-            <Footer />
+       
         </ScrollView>
     );
 }

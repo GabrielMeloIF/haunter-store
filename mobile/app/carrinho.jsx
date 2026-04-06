@@ -141,7 +141,7 @@ export default function Carrinho() {
         </View>
       </View>
 
-      <Footer />
+     
     </ScrollView>
   );
 }

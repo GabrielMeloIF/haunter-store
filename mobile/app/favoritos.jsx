@@ -83,7 +83,7 @@ export default function Favoritos() {
         </View>
       </View>
 
-      <Footer />
+    
     </ScrollView>
   );
 }
