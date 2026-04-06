@@ -1,37 +1,30 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View,ScrollView } from 'react-native';
-import Header from '../src/components/header';
-import NavBar from '../src/components/navbar';
-import Carrossel from '../src/components/carrossel';
-import Cards from '../src/components/card';
-import Footer from '../src/components/footer';
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Text, View } from "react-native";
+import { useEffect } from "react";
+import Header from "../src/components/header";
+import NavBar from "../src/components/navbar";
+import Carrossel from "../src/components/carrossel";
+import Cards from "../src/components/card";
+
 
 export default function App() {
   return (
-    <ScrollView>
     <View style={styles.container}>
-       <StatusBar style="auto" />
-      <View style={{ width: '100%' }}>
+      <StatusBar style="auto" />
       <Header />
-      </View>
-      <NavBar />
-      <Carrossel />
-
-      <View>
+      <div style={{ overflowY: "auto", overflowX: "hidden", flex: 1 }}>
+        <NavBar />
+        <Carrossel />
         <Cards />
-      </View>
-  
-      <Footer />
-
-      
+        
+      </div>
     </View>
-    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
- container: {
-  flex: 1,
-  backgroundColor: '#303030',
-},
+  container: {
+    flex: 1,
+    backgroundColor: "#303030",
+  },
 });

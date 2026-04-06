@@ -41,6 +41,7 @@ export default function Favoritos() {
       contentContainerStyle={styles.scrollContainer}
     >
       <View style={styles.content}>
+        
         <Header />
         <NavBar />
 
