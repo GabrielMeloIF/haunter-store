@@ -8,19 +8,14 @@ import { useRouter } from "expo-router";
 //import { useState } from "react";
 
 
-export default function Register() {
+export default function Login() {
 
   const router = useRouter();
 
     return (
     <View style={styles.container}>
-        <Text style={styles.title}>Registre-se</Text>
+        <Text style={styles.title}>Log-in</Text>
         <View>
-            <TextInput 
-                style={styles.inputs} 
-                placeholder="Nome"
-            />
-
             <TextInput 
                 style={styles.inputs} 
                 placeholder="Email"
@@ -30,21 +25,17 @@ export default function Register() {
                 placeholder="Senha" 
                 secureTextEntry
             />
-            <TextInput 
-                style={styles.inputs} 
-                placeholder="Confirme a senha" 
-                secureTextEntry
-            />
             <View style={styles.buttonContainer}>
                 <Text style={styles.backButton} onPress={() => router.push('/')}>
                     Voltar
                 </Text>
-                <Text style={styles.registerButton} onPress={() => router.push('/')}>
-                    Cadastrar
+                <Text style={styles.loginButton} onPress={() => router.push('/')}>
+                    Logar
                 </Text>
             </View>
         </View>
-        <Text style={styles.loginText}>Já tem conta? <Text style={styles.loginLink} onPress={() => router.push('/login')}>Entre já</Text></Text>
+        <Text style={styles.registerText}>Ainda não possui conta?</Text>
+        <Text style={styles.registerLink} onPress={() => router.push('/register')}>Crie uma já</Text>
     </View>
   )
 }
@@ -84,19 +75,19 @@ const styles = StyleSheet.create({
         color: '#000',
         borderRadius: 30, 
     },
-    registerButton: {
+    loginButton: {
         backgroundColor: '#430883',
         paddingHorizontal: 20,
         paddingVertical: 5,
         color: '#fff',
         borderRadius: 30,
     },
-    loginText: {
+    registerText: {
         marginTop: 20,
         color: '#FFFFFF',
         letterSpacing: 0.5,
     },
-    loginLink: {
+    registerLink: {
         color: '#691CA3',
         fontWeight: 'bold'
     }  

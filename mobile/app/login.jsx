@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
 import Header from '../src/components/header';
-import Register from '../src/components/registercard/registercard';
+import Login from '../src/components/logincard/logincard';
 
 
 
@@ -10,7 +10,7 @@ export default function App() {
     <View style={styles.container}>
       <Header />
       <View style={styles.card}>
-        <Register />
+        <Login />
       </View>
       <StatusBar style="auto" />
     </View>
