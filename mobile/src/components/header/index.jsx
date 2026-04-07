@@ -69,7 +69,7 @@ const router = useRouter();
           </>
         )}
  
-        <TouchableOpacity style={styles.userBtn}>
+        <TouchableOpacity style={styles.userBtn} onPress={() => router.push("/register")}>
           <Feather name="user" size={20} color="white" />
         </TouchableOpacity>
  
