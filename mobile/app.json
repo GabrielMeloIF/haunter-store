@@ -15,9 +15,9 @@
       "supportsTablet": true
     },
     "scheme": "your-app-scheme",
-  "experiments": {
-    "typedRoutes": true
-  },
+    "experiments": {
+      "typedRoutes": true
+    },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -31,7 +31,8 @@
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-image"
     ]
   }
 }
