@@ -42,6 +42,10 @@ export default function Layout() {
       <Tabs.Screen name="conversas" options={{ title: 'Conversas' }} />
       <Tabs.Screen name="perfil" options={{ title: 'Perfil' }} />
       <Tabs.Screen name="comprar" options={{ href: null}} />
+      <Tabs.Screen name="jogos" options={{ href: null}} />
+      <Tabs.Screen name="perifericos" options={{ href: null}} />
+      <Tabs.Screen name="login" options={{ href: null}} />
+       <Tabs.Screen name="register" options={{ href: null}} />
     </Tabs>
   );
 }
