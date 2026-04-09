@@ -7,91 +7,32 @@ import {
   FlatList,
   Dimensions,
 } from "react-native";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
-const CARD_WIDTH = width * 0.88; 
+
 const CARD_GAP = 12;
+const CARD_WIDTH = width < 400 ? width * 0.45 : width * 0.45;
 
 const perifericos = [
-  {
-    id: 1,
-    nome: "Head phone JBL bluetooth bateria para 24hrs",
-    preco: "R$ 320,00",
-    imagem: require("../../../assets/headset 1.png"),
-  },
-  {
-    id: 2,
-    nome: "Head phone JBL bluetooth bateria para 24hrs",
-    preco: "R$ 320,00",
-    imagem: require("../../../assets/headset 1.png"),
-  },
-  {
-    id: 5,
-    nome: "Head phone JBL bluetooth bateria para 24hrs",
-    preco: "R$ 320,00",
-    imagem: require("../../../assets/headset 1.png"),
-  },
-  {
-    id: 6,
-    nome: "Head phone JBL bluetooth bateria para 24hrs",
-    preco: "R$ 320,00",
-    imagem: require("../../../assets/headset 1.png"),
-  },
-  {
-    id: 9,
-    nome: "Head phone JBL bluetooth bateria para 24hrs",
-    preco: "R$ 320,00",
-    imagem: require("../../../assets/headset 1.png"),
-  },
-  {
-    id: 10,
-    nome: "Head phone JBL bluetooth bateria para 24hrs",
-    preco: "R$ 320,00",
-    imagem: require("../../../assets/headset 1.png"),
-  },
+  { id: 1, nome: "Head phone JBL bluetooth bateria para 24hrs", preco: "R$ 320,00", imagem: require("../../../assets/headset 1.png") },
+  { id: 2, nome: "Head phone JBL bluetooth bateria para 24hrs", preco: "R$ 320,00", imagem: require("../../../assets/headset 1.png") },
+  { id: 5, nome: "Head phone JBL bluetooth bateria para 24hrs", preco: "R$ 320,00", imagem: require("../../../assets/headset 1.png") },
+  { id: 6, nome: "Head phone JBL bluetooth bateria para 24hrs", preco: "R$ 320,00", imagem: require("../../../assets/headset 1.png") },
+  { id: 9, nome: "Head phone JBL bluetooth bateria para 24hrs", preco: "R$ 320,00", imagem: require("../../../assets/headset 1.png") },
+  { id: 10, nome: "Head phone JBL bluetooth bateria para 24hrs", preco: "R$ 320,00", imagem: require("../../../assets/headset 1.png") },
 ];
 
 const games = [
-  {
-    id: 3,
-    nome: "God of War",
-    preco: "R$ 199,00",
-    imagem: require("../../../assets/god.webp"),
-  },
-  {
-    id: 4,
-    nome: "Forza",
-    preco: "R$ 199,00",
-    imagem: require("../../../assets/forza.png"),
-  },
-  {
-    id: 7,
-    nome: "God of War",
-    preco: "R$ 199,00",
-    imagem: require("../../../assets/god.webp"),
-  },
-  {
-    id: 8,
-    nome: "Forza",
-    preco: "R$ 199,00",
-    imagem: require("../../../assets/forza.png"),
-  },
-  {
-    id: 11,
-    nome: "God of War",
-    preco: "R$ 199,00",
-    imagem: require("../../../assets/god.webp"),
-  },
-  {
-    id: 12,
-    nome: "Forza",
-    preco: "R$ 199,00",
-    imagem: require("../../../assets/forza.png"),
-  }
+  { id: 3, nome: "God of War", preco: "R$ 199,00", imagem: require("../../../assets/god.webp") },
+  { id: 4, nome: "Forza", preco: "R$ 199,00", imagem: require("../../../assets/forza.png") },
+  { id: 7, nome: "God of War", preco: "R$ 199,00", imagem: require("../../../assets/god.webp") },
+  { id: 8, nome: "Forza", preco: "R$ 199,00", imagem: require("../../../assets/forza.png") },
+  { id: 11, nome: "God of War", preco: "R$ 199,00", imagem: require("../../../assets/god.webp") },
+  { id: 12, nome: "Forza", preco: "R$ 199,00", imagem: require("../../../assets/forza.png") },
 ];
 
 export default function Cards() {
@@ -144,78 +85,29 @@ export default function Cards() {
     </View>
   );
 
-  // ── Carrossel usando div (funciona no web) ──
-  const Carrossel = ({ data }) => {
-    const scrollRef = useRef(null);
-
-    // arraste com mouse no web
-    useEffect(() => {
-      const el = scrollRef.current;
-      if (!el) return;
-      let isDown = false;
-      let startX, scrollLeft;
-
-      const onMouseDown = (e) => {
-        e.stopPropagation();
-        isDown = true;
-        startX = e.pageX - el.offsetLeft;
-        scrollLeft = el.scrollLeft;
-      };
-      const onMouseLeave = () => { isDown = false; };
-      const onMouseUp = () => { isDown = false; };
-      const onMouseMove = (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        e.stopPropagation();
-        const x = e.pageX - el.offsetLeft;
-        el.scrollLeft = scrollLeft - (x - startX);
-      };
-
-      el.addEventListener("mousedown", onMouseDown);
-      el.addEventListener("mouseleave", onMouseLeave);
-      el.addEventListener("mouseup", onMouseUp);
-      el.addEventListener("mousemove", onMouseMove);
-      return () => {
-        el.removeEventListener("mousedown", onMouseDown);
-        el.removeEventListener("mouseleave", onMouseLeave);
-        el.removeEventListener("mouseup", onMouseUp);
-        el.removeEventListener("mousemove", onMouseMove);
-      };
-    }, []);
-
-    return (
-      <div
-        ref={scrollRef}
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          overflowX: "auto",         
-          gap: CARD_GAP,
-          paddingLeft: 16,
-          paddingRight: 40,
-          paddingBottom: 8,
-          scrollSnapType: "x mandatory",
-          cursor: "grab",
-          WebkitOverflowScrolling: "touch",
-          msOverflowStyle: "none",
-          scrollbarWidth: "none",
-        }}
-      >
-        {data.map((item) => (
-          <div
-            key={String(item.id)}
-            style={{
-              minWidth: CARD_WIDTH,
-              scrollSnapAlign: "center",
-              flexShrink: 0,
-            }}
-          >
-            <CardItem produto={item} />
-          </div>
-        ))}
-      </div>
-    );
-  };
+  // ── Carrossel dos periféricos e jogos ──
+  const Carrossel = ({ data }) => (
+    <FlatList
+      data={data}
+      keyExtractor={(item) => String(item.id)}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{
+        paddingLeft: 16,
+        paddingRight: 40,
+        paddingBottom: 8,
+      }}
+      renderItem={({ item }) => (
+        <View style={{ width: CARD_WIDTH, marginRight: CARD_GAP }}>
+          <CardItem produto={item} />
+        </View>
+      )}
+      // snap travando em 2 cards por vez
+      snapToInterval={(CARD_WIDTH + CARD_GAP) * 2}
+      decelerationRate="fast"
+      pagingEnabled={false}
+    />
+  );
 
   const secoes = [
     { key: "perifericos", titulo: "Periféricos", data: perifericos },
@@ -260,7 +152,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: "100%",
-    height: 200,
+    height: 160,
     backgroundColor: "#fff",
   },
   image: {
@@ -276,13 +168,13 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   info: {
-    padding: 16,
+    padding: 12,
     backgroundColor: "#4a4a4a",
     gap: 12,
   },
   nome: {
     color: "#fff",
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "bold",
     lineHeight: 20,
   },
