@@ -2,7 +2,6 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
  
 const links = [
-  { label: "Favoritos", href: "/favoritos" },
   { label: "Periféricos", href: "/perifericos" },
   { label: "Jogos", href: "/jogos" },
 ];

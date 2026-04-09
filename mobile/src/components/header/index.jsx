@@ -32,11 +32,6 @@ const router = useRouter();
   return (
     <View style={styles.header}>
 
-          {/* hamburguer */}
-          <View>
-            <AntDesign name="bars" size={24} color="white" />
-          </View>
-
  
       {/*  busca */}
       <View style={styles.side}>
