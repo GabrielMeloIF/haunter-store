@@ -181,12 +181,14 @@ const styles = StyleSheet.create({
   opcaoSelecionada: { backgroundColor: "#A636E9" },
   opcaoText: { color: "#fff", fontSize: 14, fontWeight: "600" },
   formulario: {
-    backgroundColor: "#363636",
+    backgroundColor: "#2A2A2A",
     borderRadius: 10,
     width: "85%",
     alignSelf: "center",
     padding: 16,
     marginBottom: 32,
+    borderWidth: 1,
+    borderColor: "#A636E9",
   },
   label: { color: "#fff", marginBottom: 6, fontSize: 14, fontWeight: "600",  },
   input: {
