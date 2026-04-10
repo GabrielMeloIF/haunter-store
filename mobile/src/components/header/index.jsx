@@ -8,36 +8,36 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { useState } from "react";
-import Feather from '@expo/vector-icons/Feather';
-import EvilIcons from '@expo/vector-icons/EvilIcons';
-import AntDesign from '@expo/vector-icons/AntDesign';
+import Feather from "@expo/vector-icons/Feather";
+import EvilIcons from "@expo/vector-icons/EvilIcons";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { useRouter } from "expo-router";
- 
+import { useUser } from "../../components/context/userContext";
+
 const Logo = require("../../../assets/logo.png");
- 
+
 export default function Header() {
-const router = useRouter(); 
+  const router = useRouter();
+  const { userImage } = useUser();
 
   const [busca, setBusca] = useState("");
   const { width } = useWindowDimensions();
   const isMobile = width < 1024;
- 
+
   const handleBuscar = () => {
     const query = busca.trim().toLowerCase();
     if (!query) return;
     console.log("Buscar:", query);
     setBusca("");
   };
- 
+
   return (
     <View style={styles.header}>
+      {/* hamburguer */}
+      <View>
+        <AntDesign name="bars" size={24} color="white" />
+      </View>
 
-          {/* hamburguer */}
-          <View>
-            <AntDesign name="bars" size={24} color="white" />
-          </View>
-
- 
       {/*  busca */}
       <View style={styles.side}>
         <TouchableOpacity onPress={handleBuscar}>
@@ -45,41 +45,45 @@ const router = useRouter();
         </TouchableOpacity>
       </View>
 
-    {/*  logo */}
-      <TouchableOpacity onPress={()=> router.push("/")}>
+      {/*  logo */}
+      <TouchableOpacity onPress={() => router.push("/")}>
         <Image source={Logo} style={styles.logo} resizeMode="contain" />
       </TouchableOpacity>
- 
+
       {/* ícones */}
       <View style={[styles.side, { justifyContent: "flex-end" }]}>
- 
-       
- 
         {!isMobile && (
           <>
-            {["Meus anúncios", "Mensagens", "Notificações", "Carrinho"].map((item) => (
-              <TouchableOpacity key={item} style={styles.navLink}>
-                <Text style={styles.navLinkText}>{item}</Text>
-              </TouchableOpacity>
-            ))}
+            {["Meus anúncios", "Mensagens", "Notificações", "Carrinho"].map(
+              (item) => (
+                <TouchableOpacity key={item} style={styles.navLink}>
+                  <Text style={styles.navLinkText}>{item}</Text>
+                </TouchableOpacity>
+              ),
+            )}
           </>
         )}
- 
-        <TouchableOpacity style={styles.userBtn} onPress={() => router.push("/register")}>
-          <Feather name="user" size={20} color="white" />
+
+        <TouchableOpacity
+          style={styles.userBtn}
+          onPress={() => router.push("/register")}
+        >
+          {userImage ? (
+            <Image source={{ uri: userImage }} style={styles.userImage} />
+          ) : (
+            <Feather name="user" size={20} color="white" />
+          )}
         </TouchableOpacity>
- 
+
         <TouchableOpacity style={styles.anunciarBtn}>
           <Feather name="plus-circle" size={20} color="white" />
           {!isMobile && <Text style={styles.anunciarText}>Anunciar</Text>}
         </TouchableOpacity>
- 
       </View>
- 
     </View>
   );
 }
- 
+
 const styles = StyleSheet.create({
   header: {
     backgroundColor: "#A636E9",
@@ -88,6 +92,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     width: "100%",
+  },
+  userImage: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
   },
   side: {
     flex: 1,
@@ -130,5 +139,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
   },
- 
 });

@@ -1,14 +1,46 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
+import { useUser } from "../context/userContext";
 
 export default function UserCard() {
   const router = useRouter();
+  const [imageUri, setImageUri] = useState(null);
+  const { setUserImage } = useUser();
+
+  const handleImagePicker = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      setImageUri(uri);
+      setUserImage(uri);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Conta</Text>
 
       <View style={styles.card}>
+        <View style={styles.profileContainer}>
+          <TouchableOpacity onPress={handleImagePicker}>
+            <Image
+              source={{ uri: imageUri || "https://via.placeholder.com/100" }} // Placeholder if no image is selected
+              style={styles.profileImage}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleImagePicker}>
+            <Text style={styles.changeImageText}>Alterar imagem</Text>
+          </TouchableOpacity>
+        </View>
+
         <View>
           <Text style={styles.label}>Email cadastrado</Text>
           <Text style={styles.value}>Exemplo@gmail.com</Text>
@@ -59,6 +91,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#D9D9D9",
     borderRadius: 20,
     padding: 20,
+  },
+
+  profileContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
+  },
+
+  changeImageText: {
+    color: "#430883",
+    fontWeight: "500",
   },
 
   label: {
