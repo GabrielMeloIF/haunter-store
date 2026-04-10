@@ -11,6 +11,7 @@ export default function Finalizar() {
   const router = useRouter();
 
   const [isChecked, setIsChecked] = useState(false);
+  const [isChecked2, setIsChecked2] = useState(false);
   return (
     <View style={styles.container}>
       <Header />
@@ -48,7 +49,7 @@ export default function Finalizar() {
         />
 
         <View style={{ display: "flex", flexDirection: "column", marginLeft:23 }}>
-          <View style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+          <View style={{ display: "flex", flexDirection: "row", alignItems: "center", marginBottom: 8}}>
             <Checkbox
               style={{ borderRadius: 20, marginRight: 8 }}
               value={isChecked}
@@ -60,8 +61,8 @@ export default function Finalizar() {
 
           <View style={{ display: "flex", flexDirection: "row", alignItems: "center", gap:8 }}>
             <Checkbox
-              value={isChecked}
-              onValueChange={setIsChecked}
+              value={isChecked2}
+              onValueChange={setIsChecked2}
             />
 
             <Text style={{ color: "#ffff" }}>Casa</Text>
@@ -72,7 +73,7 @@ export default function Finalizar() {
       </View>
       <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
         <Text style={styles.btnV} onPress={() => router.push("/")}>Voltar</Text>
-        <Text style={styles.btnP}>Proximo</Text>
+        <Text style={styles.btnP} onPress={() => router.push("/pagamento")}>Proximo</Text>
 
       </View>
     </View>
@@ -101,8 +102,8 @@ const styles = StyleSheet.create({
     marginTop: 32,
     backgroundColor: "#292929",
     borderRadius: 10,
-    width: 350,
-    height: 400,
+    width: "85%",
+    height: 410,
     display: "flex",
     marginLeft: 'auto',
     marginRight: 'auto',
@@ -133,28 +134,33 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 10,
     color: "#fff",
-    width: 90,
-    height: 40,
-    marginBottom: 20,
+    width: 100,
+    height: 45,
+    marginBotom: 20,
     paddingHorizontal: 14,
     paddingVertical: 20,
     fontWeight: "bold",
     alignSelf: "end",
     margin: 12,
+    marginRight: 28,
     display: "flex",
     alignItems: "center",
+    justifyContent: "center",
+    fontSize: 16,
   },
   btnV: {
-    backgroundColor: "#6e6e6eff",
-    width: 55,
-    height: 38,
+    backgroundColor: "#555",
+    width: 82,
+    height: 45,
     borderRadius: 10,
     color: "#fff",
     alignItems: "center",
     display: "flex",
     justifyContent: "center",
-    margin: 10,
-    fontWeight: "bold"
+    margin: 13,
+    marginLeft: 32,
+    fontWeight: "bold",
+    fontSize: 16,
   }
 
 });

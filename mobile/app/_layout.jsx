@@ -45,7 +45,9 @@ export default function Layout() {
       <Tabs.Screen name="jogos" options={{ href: null}} />
       <Tabs.Screen name="perifericos" options={{ href: null}} />
       <Tabs.Screen name="login" options={{ href: null}} />
-       <Tabs.Screen name="register" options={{ href: null}} />
+      <Tabs.Screen name="register" options={{ href: null}} />
+      <Tabs.Screen name="finalizar" options={{ href: null}} />
+      <Tabs.Screen name="pagamento" options={{ href: null}} />
     </Tabs>
   );
 }

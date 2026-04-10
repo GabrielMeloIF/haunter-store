@@ -9,10 +9,12 @@ import {
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useState } from "react";
 import { Picker } from "@react-native-picker/picker";
+import { useRouter } from "expo-router";
 
 export default function Finalizar() {
   const [formaSelecionada, setFormaSelecionada] = useState("Crédito");
   const [parcela, setParcela] = useState("1x");
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
@@ -145,10 +147,10 @@ export default function Finalizar() {
       {/* botões */}
       <View style={styles.btnBox}>
         <TouchableOpacity style={styles.btnSecundario}>
-          <Text style={styles.btnTextSecundario}>Voltar</Text>
+          <Text style={styles.btnTextSecundario} onPress={() => router.push("/finalizar")}>Voltar</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.btnPrimario}>
-          <Text style={styles.btnText}>Próximo</Text>
+          <Text style={styles.btnText} onPress={() => router.push("/confirmacao")}>Próximo</Text>
         </TouchableOpacity>
       </View>
     </View>
