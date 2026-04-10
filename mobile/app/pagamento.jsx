@@ -146,11 +146,32 @@ export default function Finalizar() {
 
       {/* botões */}
       <View style={styles.btnBox}>
-        <TouchableOpacity style={styles.btnSecundario}>
-          <Text style={styles.btnTextSecundario} onPress={() => router.push("/finalizar")}>Voltar</Text>
+        <TouchableOpacity
+          style={styles.btnSecundario}
+          onPress={() => router.back()}
+        >
+          <Text style={styles.btnTextSecundario} onPress={() => router.push("/finalizar")}>
+            Voltar
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.btnPrimario}>
-          <Text style={styles.btnText} onPress={() => router.push("/confirmacao")}>Próximo</Text>
+        <TouchableOpacity
+          style={styles.btnPrimario}
+          onPress={() =>
+            router.push({
+              pathname: "/confirmacao",
+              params: {
+                produto: JSON.stringify({
+                  nome: "Headset Gamer XYZ",
+                  imagemKey: "headset",
+                }),
+                quantidade: "1",
+                valor: "R$ 120,00",
+                pagamento: `${formaSelecionada} - ${parcela}`,
+              },
+            })
+          }
+        >
+          <Text style={styles.btnText}>Próximo</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -158,7 +179,7 @@ export default function Finalizar() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#303030"},
+  container: { flex: 1, backgroundColor: "#303030" },
   tituloBox: {
     flexDirection: "row",
     alignItems: "center",
@@ -192,15 +213,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#A636E9",
   },
-  label: { color: "#fff", marginBottom: 6, fontSize: 14, fontWeight: "600",  },
+  label: { color: "#fff", marginBottom: 6, fontSize: 14, fontWeight: "600" },
   input: {
-        backgroundColor: "#D9D9D9",
-        borderRadius: 8,
-        height: 40,
-        fontSize: 14,
-        paddingHorizontal: 10,
-        marginBottom: 20,
-        color: "#333",
+    backgroundColor: "#D9D9D9",
+    borderRadius: 8,
+    height: 40,
+    fontSize: 14,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+    color: "#333",
   },
   btnBox: {
     flexDirection: "row",

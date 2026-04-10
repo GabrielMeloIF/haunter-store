@@ -72,7 +72,7 @@ export default function Finalizar() {
 
       </View>
       <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
-        <Text style={styles.btnV} onPress={() => router.push("/")}>Voltar</Text>
+        <Text style={styles.btnV} onPress={() => router.push("/comprar")}>Voltar</Text>
         <Text style={styles.btnP} onPress={() => router.push("/pagamento")}>Proximo</Text>
 
       </View>

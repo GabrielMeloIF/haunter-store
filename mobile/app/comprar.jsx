@@ -79,7 +79,7 @@ export default function Comprar() {
             ...produto,
             id: Date.now(),
             comentario: novoComentario,
-            estrelas: rating,
+            estrelas: rating,   
         };
 
         setProdutos([...produtos, novo]);

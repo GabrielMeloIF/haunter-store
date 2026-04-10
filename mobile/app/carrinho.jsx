@@ -10,11 +10,12 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../src/components/header";
 import NavBar from "../src/components/navbar";
-import Footer from "../src/components/footer";
+import { useRouter } from "expo-router";
 import { todosProdutos } from "../produtos";
 
 export default function Carrinho() {
   const [itens, setItens] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     carregarCarrinho();
@@ -133,7 +134,9 @@ export default function Carrinho() {
                 </Text>
 
                 <TouchableOpacity style={styles.btnFinalizar}>
-                  <Text style={styles.btnTexto}>Finalizar compra</Text>
+                  <Text style={styles.btnTexto} onPress={() => router.push("pagamento")}>
+                    Finalizar compra
+                  </Text>
                 </TouchableOpacity>
               </View>
             </>

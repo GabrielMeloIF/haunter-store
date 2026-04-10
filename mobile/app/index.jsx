@@ -1,7 +1,6 @@
 
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
-import { useEffect } from "react";
 import Header from "../src/components/header";
 import NavBar from "../src/components/navbar";
 import Carrossel from "../src/components/carrossel";
@@ -18,7 +17,6 @@ export default function Home() {
         <NavBar />
         <Carrossel />
         <Cards />
-        
       </div>
     </View>
 
