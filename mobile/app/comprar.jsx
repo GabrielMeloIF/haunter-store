@@ -14,8 +14,12 @@ import Header from "../src/components/header";
 import NavBar from "../src/components/navbar";
 import Footer from "../src/components/footer";
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { useRouter } from "expo-router";
 
 export default function Comprar() {
+
+  const router = useRouter(); 
+
     const [produtos, setProdutos] = useState([
         {
             id: 1,
@@ -160,7 +164,7 @@ export default function Comprar() {
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.btn}>
-                            <Text style={styles.btnText}>Comprar</Text>
+                            <Text style={styles.btnText} onPress={()=> router.push("/finalizar")}>Comprar</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
