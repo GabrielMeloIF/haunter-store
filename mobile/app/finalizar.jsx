@@ -47,7 +47,7 @@ export default function Finalizar() {
           placeholder="Ex: condomínio..."
         />
 
-        <View style={{ display: "flex", flexDirection: "column" }}>
+        <View style={{ display: "flex", flexDirection: "column", marginLeft:23 }}>
           <View style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
             <Checkbox
               style={{ borderRadius: 20, marginRight: 8 }}
@@ -58,7 +58,7 @@ export default function Finalizar() {
             <Text style={{ color: "#ffff" }}>trabalho</Text>
           </View>
 
-          <View>
+          <View style={{ display: "flex", flexDirection: "row", alignItems: "center", gap:8 }}>
             <Checkbox
               value={isChecked}
               onValueChange={setIsChecked}
