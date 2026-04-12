@@ -13,11 +13,11 @@ export default function Home() {
     <View style={styles.container}>
       <StatusBar style="auto" />
       <Header />
-      <div style={{ overflowY: "auto", overflowX: "hidden", flex: 1 }}>
+      <View style={{ overflowY: "auto", overflowX: "hidden", flex: 1 }}>
         <NavBar />
         <Carrossel />
         <Cards />
-      </div>
+      </View>
     </View>
 
   );
