@@ -10,12 +10,22 @@ import {
 import { useState } from "react";
 import Feather from "@expo/vector-icons/Feather";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
+<<<<<<< HEAD
 import { useRouter } from "expo-router";
+=======
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { useRouter } from "expo-router";
+import { useUser } from "../../components/context/userContext";
+>>>>>>> mobal/user/page
 
 const Logo = require("../../../assets/logo.png");
 
 export default function Header() {
   const router = useRouter();
+<<<<<<< HEAD
+=======
+  const { userImage } = useUser();
+>>>>>>> mobal/user/page
 
   const [busca, setBusca] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -23,6 +33,7 @@ export default function Header() {
   const isMobile = width < 1024;
 
   const handleBuscar = () => {
+<<<<<<< HEAD
   if (!showSearch) {
     setShowSearch(true);
     return;
@@ -36,6 +47,22 @@ export default function Header() {
   return (
     <View style={styles.header}>
       {/* busca */}
+=======
+    const query = busca.trim().toLowerCase();
+    if (!query) return;
+    console.log("Buscar:", query);
+    setBusca("");
+  };
+
+  return (
+    <View style={styles.header}>
+      {/* hamburguer */}
+      <View>
+        <AntDesign name="bars" size={24} color="white" />
+      </View>
+
+      {/*  busca */}
+>>>>>>> mobal/user/page
       <View style={styles.side}>
         <TouchableOpacity onPress={handleBuscar}>
           <EvilIcons name="search" size={20} color="white" />
@@ -75,7 +102,15 @@ export default function Header() {
           style={styles.userBtn}
           onPress={() => router.push("/register")}
         >
+<<<<<<< HEAD
           <Feather name="user" size={20} color="white" />
+=======
+          {userImage ? (
+            <Image source={{ uri: userImage }} style={styles.userImage} />
+          ) : (
+            <Feather name="user" size={20} color="white" />
+          )}
+>>>>>>> mobal/user/page
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.anunciarBtn}>
@@ -95,6 +130,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     width: "100%",
+  },
+  userImage: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
   },
   side: {
     flex: 1,
@@ -137,6 +177,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
   },
+<<<<<<< HEAD
 
   side: {
     flexDirection: "row",
@@ -156,4 +197,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 13,
   },
+=======
+>>>>>>> mobal/user/page
 });
