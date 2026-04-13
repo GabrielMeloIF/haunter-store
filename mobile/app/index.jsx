@@ -1,6 +1,6 @@
 
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View,  ScrollView,} from "react-native";
 import Header from "../src/components/header";
 import NavBar from "../src/components/navbar";
 import Carrossel from "../src/components/carrossel";
@@ -13,13 +13,12 @@ export default function Home() {
     <View style={styles.container}>
       <StatusBar style="auto" />
       <Header />
-      <View style={{ overflowY: "auto", overflowX: "hidden", flex: 1 }}>
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         <NavBar />
         <Carrossel />
         <Cards />
-      </View>
+      </ScrollView>
     </View>
-
   );
 }
 
