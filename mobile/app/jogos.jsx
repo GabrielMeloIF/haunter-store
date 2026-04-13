@@ -48,6 +48,7 @@ export default function Jogos() {
     const novos = favoritos.includes(id)
       ? favoritos.filter((f) => f !== id)
       : [...favoritos, id];
+
     setFavoritos(novos);
     await AsyncStorage.setItem("favoritos", JSON.stringify(novos));
   };
@@ -56,6 +57,7 @@ export default function Jogos() {
     <View style={styles.card}>
       <View style={styles.imageContainer}>
         <Image source={produto.imagem} style={styles.image} resizeMode="cover" />
+
         <TouchableOpacity
           style={styles.starBtn}
           onPress={() => toggleFavorito(produto.id)}
@@ -67,10 +69,13 @@ export default function Jogos() {
           />
         </TouchableOpacity>
       </View>
+
       <View style={styles.info}>
         <Text style={styles.nome}>{produto.nome}</Text>
+
         <View style={styles.footer}>
           <Text style={styles.preco}>{produto.preco}</Text>
+
           <TouchableOpacity
             style={styles.comprarBtn}
             onPress={() => router.push("/comprar")}
@@ -84,20 +89,18 @@ export default function Jogos() {
 
   return (
     <View style={styles.container}>
-      <style>{`body { overflow-x: hidden; }`}</style>
       <Header />
       <NavBar />
 
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.sectionTitle}>Jogos</Text>
+
         <View style={styles.grid}>
           {jogos.map((produto) => (
             <CardItem key={produto.id} produto={produto} />
           ))}
         </View>
       </ScrollView>
-
-  
     </View>
   );
 }
@@ -107,36 +110,43 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#303030",
   },
+
   content: {
     paddingHorizontal: CARD_GAP,
     paddingVertical: 24,
     gap: 16,
   },
+
   sectionTitle: {
     color: "#fff",
     fontSize: 22,
     fontWeight: "bold",
   },
+
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: CARD_GAP,
   },
+
   card: {
     width: CARD_WIDTH,
     borderRadius: 12,
     overflow: "hidden",
     backgroundColor: "#3a3a3a",
   },
+
   imageContainer: {
     width: "100%",
-    height: 120,
+    height: 180,
     backgroundColor: "#fff",
   },
+
   image: {
     width: "100%",
     height: "100%",
   },
+
   starBtn: {
     position: "absolute",
     top: 10,
@@ -145,32 +155,43 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 4,
   },
+
   info: {
-    padding: 8,
+    padding: 12,
     backgroundColor: "#4a4a4a",
-    gap: 6,
+    gap: 10,
   },
+
   nome: {
     color: "#fff",
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: "bold",
-    lineHeight: 15,
+    lineHeight: 18,
   },
-  
+
+  footer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 4,
+  },
+
   preco: {
     color: "#fff",
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: "bold",
   },
+
   comprarBtn: {
     backgroundColor: "#A636E9",
-    paddingHorizontal: 8,
-    paddingVertical: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     borderRadius: 8,
   },
+
   comprarText: {
     color: "#fff",
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: "bold",
   },
 });
