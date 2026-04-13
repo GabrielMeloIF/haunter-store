@@ -1,9 +1,11 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { View } from 'react-native';
+import { UserProvider } from '../src/components/context/userContext'; // ajusta o caminho
 
 export default function Layout() {
   return (
+   < UserProvider>
     <Tabs
       screenOptions={({ route }) => ({
         headerShown: false,
@@ -15,7 +17,7 @@ export default function Layout() {
     index: 'home',
     carrinho: 'cart',
     favoritos: 'heart',
-    perfil: 'person',
+    user: 'person',
     conversas: 'chatbubbles',
   };
   
@@ -40,7 +42,7 @@ export default function Layout() {
       <Tabs.Screen name="favoritos" options={{ title: 'Favoritos' }} />
       <Tabs.Screen name="carrinho" options={{ title: 'Carrinho' }} />
       <Tabs.Screen name="conversas" options={{ title: 'Conversas' }} />
-      <Tabs.Screen name="perfil" options={{ title: 'Perfil' }} />
+      <Tabs.Screen name="user" options={{ title: 'Perfil' }} />
       <Tabs.Screen name="comprar" options={{ href: null}} />
       <Tabs.Screen name="jogos" options={{ href: null}} />
       <Tabs.Screen name="perifericos" options={{ href: null}} />
@@ -48,6 +50,10 @@ export default function Layout() {
       <Tabs.Screen name="register" options={{ href: null}} />
       <Tabs.Screen name="finalizar" options={{ href: null}} />
       <Tabs.Screen name="pagamento" options={{ href: null}} />
+      <Tabs.Screen name="confirmacao" options={{ href: null}} />
+      <Tabs.Screen name="anunciar" options={{ href: null}} />
+      <Tabs.Screen name="anunciar2" options={{ href: null}} />
     </Tabs>
+    </UserProvider>
   );
 }

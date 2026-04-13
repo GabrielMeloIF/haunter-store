@@ -10,12 +10,17 @@ import {
 import { useState } from "react";
 import Feather from "@expo/vector-icons/Feather";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
-import { useRouter } from "expo-router";
 
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { useRouter } from "expo-router";
+import { useUser } from "../../components/context/userContext";
 const Logo = require("../../../assets/logo.png");
 
 export default function Header() {
   const router = useRouter();
+
+  const { userImage } = useUser();
+
 
   const [busca, setBusca] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -23,19 +28,17 @@ export default function Header() {
   const isMobile = width < 1024;
 
   const handleBuscar = () => {
-  if (!showSearch) {
-    setShowSearch(true);
-    return;
-  }
-  const query = busca.trim().toLowerCase();
-  if (!query) return;
-  console.log("Buscar:", query);
-  
-};
+
+    const query = busca.trim().toLowerCase();
+    if (!query) return;
+    console.log("Buscar:", query);
+    setBusca("");
+  };
 
   return (
     <View style={styles.header}>
-      {/* busca */}
+      {/*  busca */}
+
       <View style={styles.side}>
         <TouchableOpacity onPress={handleBuscar}>
           <EvilIcons name="search" size={20} color="white" />
@@ -75,7 +78,13 @@ export default function Header() {
           style={styles.userBtn}
           onPress={() => router.push("/register")}
         >
-          <Feather name="user" size={20} color="white" />
+
+          {userImage ? (
+            <Image source={{ uri: userImage }} style={styles.userImage} />
+          ) : (
+            <Feather name="user" size={20} color="white" />
+          )}
+
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.anunciarBtn} onPress={() => router.push("/anunciar")}
@@ -96,6 +105,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     width: "100%",
+  },
+  userImage: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
   },
   side: {
     flex: 1,
@@ -139,6 +153,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
+
   side: {
     flexDirection: "row",
     alignItems: "center",
@@ -157,4 +172,5 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 13,
   },
+
 });
