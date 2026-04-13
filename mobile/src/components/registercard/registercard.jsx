@@ -39,7 +39,7 @@ export default function Register() {
                 <Text style={styles.backButton} onPress={() => router.push('/')}>
                     Voltar
                 </Text>
-                <Text style={styles.registerButton} onPress={() => router.push('/')}>
+                <Text style={styles.registerButton} onPress={() => router.push('/user')}>
                     Cadastrar
                 </Text>
             </View>

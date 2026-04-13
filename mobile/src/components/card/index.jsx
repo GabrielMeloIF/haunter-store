@@ -85,7 +85,6 @@ export default function Cards() {
     </View>
   );
 
-  // ── Carrossel dos periféricos e jogos ──
   const Carrossel = ({ data }) => (
     <FlatList
       data={data}
