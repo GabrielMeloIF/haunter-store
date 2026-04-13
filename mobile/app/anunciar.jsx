@@ -13,6 +13,7 @@ import {
   Pressable,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import Header from "../src/components/header";
 import NavBar from "../src/components/navbar";
@@ -27,7 +28,7 @@ const CONTACT_OPTIONS = [
 
 const CONDITION_OPTIONS = ["Novo", "Seminovo", "Usado"];
 
-const INITIAL_FORM = {
+export const INITIAL_FORM = {
   category:    "",
   subcategory: "",
   title:       "",
@@ -51,8 +52,8 @@ export default function StepDetails() {
   const [conditionOpen, setConditionOpen] = useState(false);
 
   // Lightbox
-  const [lbVisible, setLbVisible]   = useState(false);
-  const [lbIndex, setLbIndex]       = useState(0);
+  const [lbVisible, setLbVisible] = useState(false);
+  const [lbIndex, setLbIndex]     = useState(0);
 
   // Web: referência para o input file oculto
   const fileInputRef = useRef(null);
@@ -69,8 +70,11 @@ export default function StepDetails() {
     (async () => {
       try {
         const saved = await AsyncStorage.getItem(AD_STORAGE_KEY);
-        if (saved) setForm({ ...INITIAL_FORM, ...JSON.parse(saved) });
-      } catch {}
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setForm((prev) => ({ ...prev, ...parsed }));
+        }
+      } catch (_) {}
     })();
   }, []);
 
@@ -104,11 +108,13 @@ export default function StepDetails() {
     if (form.photos.length >= 20) return;
 
     if (Platform.OS === "web") {
-      fileInputRef.current?.click();
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+        fileInputRef.current.click();
+      }
       return;
     }
 
-    // Nativo
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true,
@@ -116,7 +122,7 @@ export default function StepDetails() {
       selectionLimit: 20 - form.photos.length,
     });
 
-    if (!result.canceled) {
+    if (!result.canceled && result.assets?.length) {
       const uris = result.assets.map((a) => a.uri);
       setForm((prev) => ({
         ...prev,
@@ -125,39 +131,39 @@ export default function StepDetails() {
     }
   }
 
-  /** Web: converte File → data URL e adiciona ao estado. */
   function handleWebFileChange(e) {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
 
     const slots = 20 - form.photos.length;
     const toRead = files.slice(0, slots);
+
     const readers = toRead.map(
       (file) =>
         new Promise((resolve) => {
           const reader = new FileReader();
           reader.onload = (ev) => resolve(ev.target.result);
+          reader.onerror = () => resolve(null);
           reader.readAsDataURL(file);
         })
     );
 
     Promise.all(readers).then((dataUrls) => {
+      const valid = dataUrls.filter(Boolean);
       setForm((prev) => ({
         ...prev,
-        photos: [...prev.photos, ...dataUrls].slice(0, 20),
+        photos: [...prev.photos, ...valid].slice(0, 20),
       }));
-      // Limpa o input para permitir selecionar o mesmo arquivo novamente
-      e.target.value = "";
+      if (e.target) e.target.value = "";
     });
   }
 
-  function handleRemovePhoto(uri) {
-    setForm((prev) => ({
-      ...prev,
-      photos: prev.photos.filter((p) => p !== uri),
-    }));
-    // Ajusta o índice do lightbox se necessário
-    setLbIndex((prev) => Math.max(0, prev - 1));
+  function handleRemovePhoto(index) {
+    setForm((prev) => {
+      const newPhotos = prev.photos.filter((_, i) => i !== index);
+      setLbIndex((i) => Math.min(i, Math.max(0, newPhotos.length - 1)));
+      return { ...prev, photos: newPhotos };
+    });
   }
 
   // ── Lightbox ──────────────────────────────────────────────────────────────
@@ -182,8 +188,10 @@ export default function StepDetails() {
   }
 
   async function handleNext() {
-    await AsyncStorage.setItem(AD_STORAGE_KEY, JSON.stringify(form));
-    router.push("/meus-anuncios");
+    try {
+      await AsyncStorage.setItem(AD_STORAGE_KEY, JSON.stringify(form));
+    } catch (_) {}
+    router.push("/revisar-anuncios");
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -203,7 +211,7 @@ export default function StepDetails() {
 
             {/* Hero */}
             <View style={styles.hero}>
-              <Text style={styles.heroTitle}>Fotos e detalhes do anúncio</Text>
+              <Text style={styles.heroTitle}>Fotos e detalhes</Text>
               <Text style={styles.heroSub}>
                 Anúncios com fotos vendem até 10× mais rápido.
               </Text>
@@ -218,7 +226,6 @@ export default function StepDetails() {
                 </Text>
               </Text>
 
-              {/* Input file oculto — somente web */}
               {Platform.OS === "web" && (
                 <input
                   ref={fileInputRef}
@@ -233,7 +240,7 @@ export default function StepDetails() {
               <View style={styles.photoGrid}>
                 {form.photos.map((uri, index) => (
                   <TouchableOpacity
-                    key={uri + index}
+                    key={`photo-${index}`}
                     style={styles.photoThumb}
                     onPress={() => openLightbox(index)}
                     activeOpacity={0.85}
@@ -243,18 +250,13 @@ export default function StepDetails() {
                       style={styles.photoImg}
                       resizeMode="cover"
                     />
-                    {/* Índice */}
                     <View style={styles.photoIndex}>
                       <Text style={styles.photoIndexText}>{index + 1}</Text>
                     </View>
-                    {/* Botão remover */}
                     <TouchableOpacity
                       style={styles.photoRemove}
-                      onPress={(e) => {
-                        e.stopPropagation?.();
-                        handleRemovePhoto(uri);
-                      }}
-                      hitSlop={{ top: 6, right: 6, bottom: 6, left: 6 }}
+                      onPress={() => handleRemovePhoto(index)}
+                      hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
                     >
                       <Text style={styles.photoRemoveText}>×</Text>
                     </TouchableOpacity>
@@ -275,7 +277,7 @@ export default function StepDetails() {
 
               {form.photos.length === 0 && (
                 <Text style={styles.photoHint}>
-                  Toque em "+ Adicionar foto" para escolher imagens da galeria.
+                  Toque em "Adicionar foto" para escolher imagens da galeria.
                 </Text>
               )}
             </View>
@@ -470,25 +472,19 @@ export default function StepDetails() {
           style={styles.lbOverlay}
           onPress={() => setLbVisible(false)}
         >
-          <Pressable
-            style={styles.lbContainer}
-            onPress={(e) => e.stopPropagation?.()}
-          >
-            {/* Imagem principal */}
-            {form.photos[lbIndex] && (
+          <Pressable style={styles.lbContainer}>
+            {form.photos[lbIndex] ? (
               <Image
                 source={{ uri: form.photos[lbIndex] }}
                 style={styles.lbImage}
                 resizeMode="contain"
               />
-            )}
+            ) : null}
 
-            {/* Contador */}
             <Text style={styles.lbCounter}>
               {lbIndex + 1} / {form.photos.length}
             </Text>
 
-            {/* Botão fechar */}
             <TouchableOpacity
               style={styles.lbClose}
               onPress={() => setLbVisible(false)}
@@ -496,19 +492,23 @@ export default function StepDetails() {
               <Text style={styles.lbCloseText}>×</Text>
             </TouchableOpacity>
 
-            {/* Navegação */}
             {form.photos.length > 1 && (
               <>
-                <TouchableOpacity style={[styles.lbArrow, styles.lbArrowLeft]} onPress={lbPrev}>
+                <TouchableOpacity
+                  style={[styles.lbArrow, styles.lbArrowLeft]}
+                  onPress={lbPrev}
+                >
                   <Text style={styles.lbArrowText}>‹</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.lbArrow, styles.lbArrowRight]} onPress={lbNext}>
+                <TouchableOpacity
+                  style={[styles.lbArrow, styles.lbArrowRight]}
+                  onPress={lbNext}
+                >
                   <Text style={styles.lbArrowText}>›</Text>
                 </TouchableOpacity>
               </>
             )}
 
-            {/* Miniaturas */}
             {form.photos.length > 1 && (
               <ScrollView
                 horizontal
@@ -518,7 +518,7 @@ export default function StepDetails() {
               >
                 {form.photos.map((uri, i) => (
                   <TouchableOpacity
-                    key={uri + i}
+                    key={`lb-thumb-${i}`}
                     onPress={() => setLbIndex(i)}
                     style={[
                       styles.lbThumb,
@@ -557,8 +557,6 @@ const styles = StyleSheet.create({
   main: {
     padding: 16,
   },
-
-  // Hero
   hero: {
     borderLeftWidth: 4,
     borderLeftColor: "#A636E9",
@@ -575,8 +573,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 2,
   },
-
-  // Seções
   section: {
     marginBottom: 20,
   },
@@ -598,8 +594,6 @@ const styles = StyleSheet.create({
     textAlign: "right",
     marginTop: 4,
   },
-
-  // Inputs
   input: {
     backgroundColor: "#fff",
     borderWidth: 2,
@@ -618,31 +612,27 @@ const styles = StyleSheet.create({
     minHeight: 110,
     paddingTop: 12,
   },
-
-  // Preço
   priceRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
   },
   currencySymbol: {
     color: "#A636E9",
     fontWeight: "800",
     fontSize: 15,
+    marginRight: 8,
   },
   negotiableRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
     marginTop: 10,
   },
   negotiableLabel: {
     color: "#aaa",
     fontSize: 13,
     fontWeight: "700",
+    marginLeft: 8,
   },
-
-  // Select / Dropdown
   select: {
     backgroundColor: "#fff",
     borderWidth: 2,
@@ -689,18 +679,17 @@ const styles = StyleSheet.create({
     color: "#A636E9",
     fontWeight: "800",
   },
-
-  // ── Galeria ──────────────────────────────────────────────────────────────
   photoGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
   },
   photoThumb: {
     width: 82,
     height: 82,
     borderRadius: 10,
     overflow: "hidden",
+    marginRight: 8,
+    marginBottom: 8,
   },
   photoImg: {
     width: "100%",
@@ -747,6 +736,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgba(166,54,233,0.07)",
+    marginBottom: 8,
   },
   photoAddIcon: {
     fontSize: 22,
@@ -764,12 +754,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontStyle: "italic",
   },
-
-  // Contato
   contactRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 10,
   },
   contactChip: {
     borderWidth: 2,
@@ -778,6 +765,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     backgroundColor: "#fff",
+    marginRight: 10,
+    marginBottom: 8,
   },
   contactChipActive: {
     borderColor: "#A636E9",
@@ -791,8 +780,6 @@ const styles = StyleSheet.create({
   contactChipTextActive: {
     color: "#A636E9",
   },
-
-  // Navegação
   navRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -830,8 +817,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontSize: 13,
   },
-
-  // ── Lightbox ─────────────────────────────────────────────────────────────
   lbOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.92)",
@@ -875,7 +860,7 @@ const styles = StyleSheet.create({
   },
   lbArrow: {
     position: "absolute",
-    top: "35%",
+    top: 130,
     backgroundColor: "rgba(166,54,233,0.7)",
     borderRadius: 30,
     width: 40,
@@ -900,7 +885,6 @@ const styles = StyleSheet.create({
     maxHeight: 60,
   },
   lbStripContent: {
-    gap: 8,
     paddingHorizontal: 4,
   },
   lbThumb: {
@@ -910,6 +894,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderWidth: 2,
     borderColor: "transparent",
+    marginRight: 8,
   },
   lbThumbActive: {
     borderColor: "#A636E9",

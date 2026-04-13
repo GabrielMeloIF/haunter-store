@@ -78,7 +78,8 @@ export default function Header() {
           <Feather name="user" size={20} color="white" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.anunciarBtn}>
+        <TouchableOpacity style={styles.anunciarBtn} onPress={() => router.push("/anunciar")}
+        >
           <Feather name="plus-circle" size={20} color="white" />
           {!isMobile && <Text style={styles.anunciarText}>Anunciar</Text>}
         </TouchableOpacity>
