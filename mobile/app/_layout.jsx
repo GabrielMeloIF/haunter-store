@@ -5,7 +5,7 @@ import { UserProvider } from '../src/components/context/userContext'; // ajusta 
 
 export default function Layout() {
   return (
-   < UserProvider>
+   <UserProvider>
     <Tabs
       screenOptions={({ route }) => ({
         headerShown: false,
@@ -53,6 +53,7 @@ export default function Layout() {
       <Tabs.Screen name="confirmacao" options={{ href: null}} />
       <Tabs.Screen name="anunciar" options={{ href: null}} />
       <Tabs.Screen name="anunciar2" options={{ href: null}} />
+      <Tabs.Screen name="revisar-anuncios" options={{ href: null}} />
     </Tabs>
     </UserProvider>
   );
