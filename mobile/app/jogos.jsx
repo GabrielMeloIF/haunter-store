@@ -12,7 +12,8 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import Header from "../src/components/header";
-import NavBar from "../src/components/navbar";
+
+import Filtro from "../src/components/filtro";
 
 const { width } = Dimensions.get("window");
 const CARD_GAP = 16;
@@ -90,8 +91,7 @@ export default function Jogos() {
   return (
     <View style={styles.container}>
       <Header />
-      <NavBar />
-
+      <Filtro />
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.sectionTitle}>Jogos</Text>
 

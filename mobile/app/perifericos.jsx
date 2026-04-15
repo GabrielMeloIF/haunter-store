@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import Header from "../src/components/header";
 import NavBar from "../src/components/navbar";
+import Filtro from "../src/components/filtro";
 
 
 const { width } = Dimensions.get("window");
@@ -137,7 +138,7 @@ export default function Perifericos() {
     <View style={styles.container}>
     <style>{`body { overflow-x: hidden; }`}</style>
     <Header />
-    <NavBar />
+    <Filtro />
 
     <ScrollView contentContainerStyle={styles.content}>
       <Text style={styles.sectionTitle}>Periféricos</Text>

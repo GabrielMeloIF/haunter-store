@@ -4,6 +4,7 @@ import Header from "../src/components/header";
 import NavBar from "../src/components/navbar";
 import Carrossel from "../src/components/carrossel";
 import Cards from "../src/components/card";
+import Filtro from "../src/components/filtro";
 
 
 export default function Home() {
@@ -13,9 +14,9 @@ export default function Home() {
       <StatusBar style="auto" />
       <Header />
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-        <NavBar />
         <Carrossel />
-        <Cards />
+          <Filtro />
+          <Cards />
       </ScrollView>
     </View>
   );

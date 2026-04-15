@@ -11,7 +11,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../src/components/header";
 import NavBar from "../src/components/navbar";
 import Footer from "../src/components/footer";
-import { todosProdutos } from "../produtos";
+import { todosProdutos } from "../src/produtos/index";
 
 export default function Favoritos() {
   const [produtosFavoritos, setProdutosFavoritos] = useState([]);
