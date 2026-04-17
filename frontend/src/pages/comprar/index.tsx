@@ -6,6 +6,8 @@ import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
 import Link from "next/link";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Comprar() {
   const [produtos, setProdutos] = useState([
@@ -24,6 +26,11 @@ export default function Comprar() {
 
   const [rating, setRating] = useState(0);
   const [novoComentario, setNovoComentario] = useState("");
+  const [favoritos, setFavoritos] = useState<number[]>(() => {
+    if (typeof window === "undefined") return [];
+    const salvo = localStorage.getItem("favoritos");
+    return salvo ? JSON.parse(salvo) : [];
+  });
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -41,12 +48,6 @@ export default function Comprar() {
       return novos;
     });
   };
-
-  const [favoritos, setFavoritos] = useState<number[]>(() => {
-    if (typeof window === "undefined") return [];
-    const salvo = localStorage.getItem("favoritos");
-    return salvo ? JSON.parse(salvo) : [];
-  });
 
   const produto = produtos[0];
   const [currentImage, setCurrentImage] = useState(0);
@@ -66,17 +67,20 @@ export default function Comprar() {
     const ids: number[] = salvo ? JSON.parse(salvo) : [];
     ids.push(produto.id);
     localStorage.setItem("carrinho", JSON.stringify(ids));
-    alert("Produto adicionado ao carrinho!");
+    toast.success("Produto adicionado ao carrinho!", {
+      position: "bottom-right",
+      autoClose: 3000,
+    });
   };
 
   const adicionarComentario = () => {
     if (!novoComentario.trim()) return;
     const novo = {
       id: Date.now(),
-      nome: "Mouse Fortrek Spider",
-      descricao: "Eleve sua experiência...",
-      preco: "R$ 79,00",
-      imagens: ["/mouse 1.png"],
+      nome: produto.nome,
+      descricao: produto.descricao,
+      preco: produto.preco,
+      imagens: [produto.imagens[0]],
       comentario: novoComentario,
       estrelas: rating,
     };
@@ -96,6 +100,7 @@ export default function Comprar() {
       <Header />
       <NavBar />
       <div className="flex">
+        {/* Imagem principal */}
         <div className="flex flex-col p-20">
           <Image
             src={produto.imagens[currentImage]}
@@ -136,7 +141,7 @@ export default function Comprar() {
         <div className="flex flex-col p-20 rounded-lg h-100 w-200 mt-20 bg-[#d9d9d9]/20">
           <div className="flex items-center gap-63 mb-5">
             <h1 className="text-2xl font-bold text-white -mt-8 mb-3">
-              {produtos[0].nome}
+              {produto.nome}
             </h1>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -150,10 +155,8 @@ export default function Comprar() {
               ))}
             </div>
           </div>
-          <p className="text-lg mt-2 text-white">{produtos[0].descricao}</p>
-          <p className="text-3xl font-bold mt-4 text-white">
-            {produtos[0].preco}
-          </p>
+          <p className="text-lg mt-2 text-white">{produto.descricao}</p>
+          <p className="text-3xl font-bold mt-4 text-white">{produto.preco}</p>
           <div className="flex gap-4 mt-6">
             <button
               onClick={adicionarAoCarrinho}
@@ -171,6 +174,7 @@ export default function Comprar() {
         </div>
       </div>
 
+      {/* Favoritar e compartilhar */}
       <div className="flex justify-center gap-60 -mt-40 mb-39">
         <div className="flex flex-col items-center cursor-pointer">
           <FaStar
@@ -185,7 +189,10 @@ export default function Comprar() {
           onClick={() => {
             const url = window.location.href;
             navigator.clipboard.writeText(url);
-            alert("Link copiado!");
+            toast.info("Link copiado!", {
+              position: "bottom-right",
+              autoClose: 2000,
+            });
           }}
           className="flex flex-col items-center text-purple-600 px-4 py-2 rounded hover:text-purple-700"
         >
@@ -196,9 +203,7 @@ export default function Comprar() {
 
       {/* Seção de comentários */}
       <div className="bg-white rounded-lg p-4 mt-4 flex flex-col">
-        <p className="text-black ml-70 text-2xl mt-10">
-          Comentários do produto
-        </p>
+        <p className="text-black ml-70 text-2xl mt-10">Comentários do produto</p>
         <div className="flex gap-2 ml-30 mt-17">
           <input
             type="text"

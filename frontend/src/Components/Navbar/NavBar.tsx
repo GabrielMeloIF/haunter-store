@@ -30,7 +30,7 @@ export default function NavBar() {
     <nav className="py-3 px-4">
       <ul className="flex gap-6 text-white">
         <li className="relative flex flex-row items-center ">
-          <button onClick={toggleMenu} className=" bg-[#A636E9] px-3 py-1 rounded-lg hover:bg-[#430883] transition duration-300 ">
+          <button onClick={toggleMenu} className=" bg-[#A636E9] px-3 py-1 rounded-lg hover:bg-[#430883] transition duration-300">
             Categorias
           </button>
 

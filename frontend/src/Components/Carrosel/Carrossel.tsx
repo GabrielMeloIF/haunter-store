@@ -118,7 +118,7 @@ export default function Carrossel({ className = "" }) {
       {/* Categorias */}
       <div className="flex flex-wrap justify-center gap-8 mt-6">
         {categories.map((cat, index) => (
-          <div key={index} className="flex flex-col items-center cursor-pointer">
+          <div key={index} className="flex flex-col items-center">
             {/* Círculo com hover na borda */}
             <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center border-0 hover:border-3 hover:border-purple-800">
               <Icon icon={cat.icon} width="48" height="48" className="text-gray-500" />

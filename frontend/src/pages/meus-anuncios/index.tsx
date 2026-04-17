@@ -1,194 +1,113 @@
-'use client'
-
 import Header from "@/Components/Header/Header";
 import Navbar from "@/Components/Navbar/NavBar";
 import Footer from "@/Components/Footer/Footer";
-import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
+import { useAds } from '@/context/AdsContext'
 
-type ContactMethod = 'chat' | 'whatsapp' | 'phone'
-
-type AdFormData = {
-  category:    string
-  subcategory: string
-  title:       string
-  description: string
-  price:       string
-  negotiable:  boolean
-  condition:   string
-  cep:         string
-  city:        string
-  contacts:    ContactMethod[]
-  photos:      string[]
-}
-
-const EMPTY_FORM: AdFormData = {
-  category:    '',
-  subcategory: '',
-  title:       '',
-  description: '',
-  price:       '',
-  negotiable:  false,
-  condition:   '',
-  cep:         '',
-  city:        '',
-  contacts:    [],
-  photos:      [],
-}
-
-const AD_STORAGE_KEY = 'ad_form_data'
-
-interface Props {
-  // Props opcionais: se não fornecidas, lê do sessionStorage
-  form?:      AdFormData
-  terms?:     boolean
-  onTerms?:   (v: boolean) => void
-  onBack?:    () => void
-  onPublish?: () => void
-}
-
-export default function StepReview(props: Props) {
-  const router = useRouter()
-  const [localTerms, setLocalTerms] = useState(false)
-
-  const [form, setForm] = useState<AdFormData>(props.form ?? EMPTY_FORM)
-
-  // Lê o sessionStorage apenas no cliente, após montagem, para evitar hydration mismatch
-  useEffect(() => {
-    if (props.form) return // se veio via props, não sobrescreve
-    try {
-      const saved = sessionStorage.getItem(AD_STORAGE_KEY)
-      if (saved) setForm({ ...EMPTY_FORM, ...JSON.parse(saved) })
-    } catch { /* sessionStorage indisponível */ }
-  }, [props.form])
-
-  const terms    = props.terms    ?? localTerms
-  const setTerms = props.onTerms  ?? setLocalTerms
-
-  const formattedPrice =
-    form.price && !isNaN(Number(form.price))
-      ? 'R$ ' + Number(form.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
-      : 'A combinar'
-
-  const shortDesc = form.description
-    ? form.description.slice(0, 120) + (form.description.length > 120 ? '…' : '')
-    : '(sem descrição)'
-
-  function handleBack() {
-    if (props.onBack) {
-      props.onBack()
-    } else {
-      router.push('/anunciar')
-    }
-  }
-
-  function handlePublish() {
-    if (!terms) return
-    if (props.onPublish) {
-      props.onPublish()
-    } else {
-      // Limpa o rascunho após publicar
-      sessionStorage.removeItem(AD_STORAGE_KEY)
-      router.push('/anuncio-finalizado')
-    }
-  }
+export default function MeusAnuncios() {
+  const router      = useRouter()
+  const { ads, deleteAd } = useAds()
 
   return (
-    <div className="animate-fadeUp">
+    <div className="min-h-screen flex flex-col">
       <Header />
-      <Navbar/>
+      <Navbar />
 
-      <div className="max-w-7xl mx-auto p-15">
+      <div className="flex-1  max-w-7xl mx-auto p-15 w-full">
 
-        <h2 className="text-xl font-black text-white mb-1">Revise seu anúncio</h2>
-        <p className="text-white text-sm mb-6">
-          Veja como ficará para os compradores antes de publicar.
-        </p>
-
-        {/* Visualização */}
-        <div className="bg-white rounded-2xl border-2 border-purple-600 shadow-sm overflow-hidden mb-10">
-          <div className="bg-gray-100 h-125 flex items-center justify-center text-gray-300 overflow-hidden">
-            {form.photos?.length > 0 ? (
-       
-              <img
-                src={form.photos[0]}
-                alt={form.title || 'Imagem do anúncio'}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-16 h-16 mx-auto"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14" />
-                </svg>
-                <p className="text-xs mt-2">Sem imagem</p>
-              </div>
-            )}
+        <div className="flex items-center justify-between mb-8">
+          <div className="border-l-4 border-purple-500 pl-4">
+            <h2 className="text-xl font-black text-white">Meus anúncios</h2>
+            <p className="text-white text-sm">
+              {ads.length === 0 ? 'Nenhum anúncio publicado ainda.' : `${ads.length} anúncio${ads.length > 1 ? 's' : ''} publicado${ads.length > 1 ? 's' : ''}`}
+            </p>
           </div>
+          <button
+            onClick={() => router.push('/anunciar')}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-3 rounded-full text-sm border-2 border-white transition-colors shadow-lg shadow-purple-500/30"
+          >
+            + Novo anúncio
+          </button>
+        </div>
 
-          <div className="p-5">
-            <p className="text-xl font-black text-gray-800 mb-1">
-              {form.title || '(sem título)'}
-            </p>
-
-            <p className="text-2xl font-black text-brand mb-2">
-              {formattedPrice}
-              {form.negotiable && (
-                <span className="ml-2 text-sm font-semibold text-gray-400">(negociável)</span>
-              )}
-            </p>
-
-            <p className="text-sm text-gray-500 font-semibold mb-3">
-              {shortDesc}
-            </p>
-
-            <div className="flex items-center gap-2 text-xs text-gray-400 font-bold">
-              📍 {form.city || 'Localização não informada'} · Agora
+        {/* Estado vazio */}
+        {ads.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mb-5 border-2 border-purple-500/30">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-purple-400"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                  d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z"/>
+              </svg>
             </div>
+            <h3 className="text-white font-black text-lg mb-2">Nenhum anúncio ainda</h3>
+            <p className="text-gray-400 text-sm mb-6">Crie seu primeiro anúncio e comece a vender!</p>
+            <button
+              onClick={() => router.push('/anunciar')}
+              className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3 rounded-full text-sm border-2 border-white transition-colors shadow-lg shadow-purple-500/30"
+            >
+              Criar anúncio
+            </button>
           </div>
-        </div>
+        )}
 
-        {/* Termos */}
-        <label className="flex items-start gap-3 cursor-pointer mb-6">
-          <input
-            type="checkbox"
-            checked={terms}
-            onChange={e => setTerms(e.target.checked)}
-            className="accent-purple-600 mt-0.5 w-4 h-4"
-          />
-          <span className="text-xs text-gray-500 font-semibold">
-            Li e aceito os{' '}
-            <a href="/termos" className="text-purple-400 underline hover:text-purple-300">
-              Termos de Uso
-            </a>{' '}
-            e{' '}
-            <a href="/privacidade" className="text-purple-400 underline hover:text-purple-300">
-              Política de Privacidade
-            </a>
-            .
-          </span>
-        </label>
+        {/* Grid de anúncios */}
+        {ads.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {ads.map(ad => (
+              <div key={ad.id}
+                className="bg-white rounded-2xl border-2 border-purple-500/30 overflow-hidden hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-200 group">
 
-        {/* Ações */}
-        <div className="flex justify-between mt-4">
-          <button
-            onClick={handleBack}
-            className="text-purple-400 font-bold px-6 py-3 rounded-full text-sm border-2 border-purple-500/40 bg-white hover:bg-purple-500/10 transition-colors"
-          >
-            ← Voltar
-          </button>
+                {/* Foto */}
+                <div className="relative h-48 bg-gray-100 overflow-hidden">
+                  {ad.photos?.length > 0 ? (
+                    <img src={ad.photos[0]} alt={ad.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14"/>
+                      </svg>
+                    </div>
+                  )}
+                  {ad.condition && (
+                    <span className="absolute top-2 left-2 text-xs font-black px-2 py-1 rounded-full bg-purple-100 text-purple-700">
+                      {ad.condition}
+                    </span>
+                  )}
+                </div>
 
-          <button
-            onClick={handlePublish}
-            disabled={!terms}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3 rounded-full text-sm border-2 border-white transition-colors shadow-lg shadow-purple-500/30
-                       disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-purple-600"
-          >
-             Publicar anúncio
-          </button>
-        </div>
+                {/* Info */}
+                <div className="p-4">
+                  <h3 className="font-black text-gray-800 text-sm leading-tight mb-1 line-clamp-2">
+                    {ad.title || '(sem título)'}
+                  </h3>
+                  <p className="text-lg font-black text-purple-600 mb-1">
+                    {ad.price ? 'R$ ' + Number(ad.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : 'A combinar'}
+                    {ad.negotiable && <span className="ml-2 text-xs font-semibold text-gray-400">(neg.)</span>}
+                  </p>
+                  {ad.description && (
+                    <p className="text-xs text-gray-500 line-clamp-2 mb-3">{ad.description}</p>
+                  )}
+                  <div className="flex items-center justify-between text-xs text-gray-400 font-semibold mb-3">
+                    <span>📍 {ad.city || 'Local não informado'}</span>
+                  </div>
+
+                  <button
+                    onClick={() => deleteAd(ad.id)}
+                    className="w-full text-xs font-bold text-red-400 border-2 border-red-200 rounded-full py-2 hover:bg-red-50 hover:border-red-400 transition-colors"
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+
       <Footer />
     </div>
   )

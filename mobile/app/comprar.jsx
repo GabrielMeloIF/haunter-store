@@ -1,221 +1,255 @@
 import { useState, useEffect } from "react";
 import {
-    View,
-    Text,
-    Image,
-    TouchableOpacity,
-    ScrollView,
-    TextInput,
-    StyleSheet,
-    Alert,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  StyleSheet,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../src/components/header";
 import NavBar from "../src/components/navbar";
 import Footer from "../src/components/footer";
-import AntDesign from '@expo/vector-icons/AntDesign';
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { useRouter } from "expo-router";
 
 export default function Comprar() {
+  const router = useRouter();
 
-  const router = useRouter(); 
+  const [produtos, setProdutos] = useState([
+    {
+      id: 1,
+      nome: "Mouse Fortrek Spider",
+      descricao:
+        "Eleve sua experiência nos jogos e no dia a dia com design ergonômico.",
+      preco: "R$ 79,00",
+      imagens: [
+        require("../assets/mouse 1.png"),
+        require("../assets/headset 1.png"),
+        require("../assets/teclado 1.png"),
+      ],
+      comentario: "Muito bom!",
+      estrelas: 4,
+    },
+  ]);
 
-    const [produtos, setProdutos] = useState([
-        {
-            id: 1,
-            nome: "Mouse Fortrek Spider",
-            descricao:
-                "Eleve sua experiência nos jogos e no dia a dia com design ergonômico.",
-            preco: "R$ 79,00",
-            imagens: [
-                require("../assets/mouse 1.png"),
-                require("../assets/headset 1.png"),
-                require("../assets/teclado 1.png"),
-            ],
-            comentario: "Muito bom!",
-            estrelas: 4,
-        },
-    ]);
+  const [favoritos, setFavoritos] = useState([]);
+  const [rating, setRating] = useState(0);
+  const [novoComentario, setNovoComentario] = useState("");
+  const [currentImage, setCurrentImage] = useState(0);
+  const [toast, setToast] = useState(false);
 
-    const [favoritos, setFavoritos] = useState([]);
-    const [rating, setRating] = useState(0);
-    const [novoComentario, setNovoComentario] = useState("");
-    const [currentImage, setCurrentImage] = useState(0);
+  const produto = produtos[0];
 
-    const produto = produtos[0];
+  useEffect(() => {
+    carregarFavoritos();
+  }, []);
 
-    useEffect(() => {
-        carregarFavoritos();
-    }, []);
+  const carregarFavoritos = async () => {
+    const salvo = await AsyncStorage.getItem("favoritos");
+    setFavoritos(salvo ? JSON.parse(salvo) : []);
+  };
 
-    const carregarFavoritos = async () => {
-        const salvo = await AsyncStorage.getItem("favoritos");
-        setFavoritos(salvo ? JSON.parse(salvo) : []);
+  const toggleFavorito = async (id) => {
+    const novos = favoritos.includes(id)
+      ? favoritos.filter((f) => f !== id)
+      : [...favoritos, id];
+
+    setFavoritos(novos);
+    await AsyncStorage.setItem("favoritos", JSON.stringify(novos));
+  };
+
+  const adicionarAoCarrinho = async () => {
+    const salvo = await AsyncStorage.getItem("carrinho");
+    const ids = salvo ? JSON.parse(salvo) : [];
+
+    ids.push(produto.id);
+
+    await AsyncStorage.setItem("carrinho", JSON.stringify(ids));
+    setToast(true);
+    setTimeout(() => setToast(false), 2500);
+  };
+
+  const adicionarComentario = () => {
+    if (!novoComentario.trim()) return;
+
+    const novo = {
+      ...produto,
+      id: Date.now(),
+      comentario: novoComentario,
+      estrelas: rating,
     };
 
-    const toggleFavorito = async (id) => {
-        const novos = favoritos.includes(id)
-            ? favoritos.filter((f) => f !== id)
-            : [...favoritos, id];
+    setProdutos([...produtos, novo]);
+    setNovoComentario("");
+    setRating(0);
+  };
 
-        setFavoritos(novos);
-        await AsyncStorage.setItem("favoritos", JSON.stringify(novos));
-    };
+  const calculoRating = () => {
+    const total = produtos.reduce((acc, p) => acc + p.estrelas, 0);
+    return Math.round(total / produtos.length);
+  };
 
-    const adicionarAoCarrinho = async () => {
-        const salvo = await AsyncStorage.getItem("carrinho");
-        const ids = salvo ? JSON.parse(salvo) : [];
-
-        ids.push(produto.id);
-
-        await AsyncStorage.setItem("carrinho", JSON.stringify(ids));
-        Alert.alert("Sucesso", "Produto adicionado ao carrinho!");
-    };
-
-    const adicionarComentario = () => {
-        if (!novoComentario.trim()) return;
-
-        const novo = {
-            ...produto,
-            id: Date.now(),
-            comentario: novoComentario,
-            estrelas: rating,   
-        };
-
-        setProdutos([...produtos, novo]);
-        setNovoComentario("");
-        setRating(0);
-    };
-
-    const calculoRating = () => {
-        const total = produtos.reduce((acc, p) => acc + p.estrelas, 0);
-        return Math.round(total / produtos.length);
-    };
-
-    return (
-        <ScrollView
-            style={styles.container}
-            contentContainerStyle={styles.scrollContainer}
+  return (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContainer}
+    >
+      {toast && (
+        <View
+          style={{
+            position: "absolute",
+            bottom: 40,
+            alignSelf: "center",
+            backgroundColor: "#A636E9",
+            paddingHorizontal: 20,
+            paddingVertical: 12,
+            borderRadius: 99,
+            zIndex: 999,
+          }}
         >
-            <View style={styles.content}>
-                <Header />
-                <NavBar />
+          <Text style={{ color: "#fff", fontWeight: "bold" }}>
+            ✓ Produto adicionado ao carrinho!
+          </Text>
+        </View>
+      )}
+      <View style={styles.content}>
+        <Header />
+        <NavBar />
 
-                {/* IMAGENS */}
-                <View style={styles.imageContainer}>
-                    <Image source={produto.imagens[currentImage]} style={styles.mainImg} />
+        {/* IMAGENS */}
+        <View style={styles.imageContainer}>
+          <Image
+            source={produto.imagens[currentImage]}
+            style={styles.mainImg}
+          />
 
-                    <View style={styles.thumbRow}>
-                        <TouchableOpacity onPress={() =>
-                            setCurrentImage(currentImage === 0 ? produto.imagens.length - 1 : currentImage - 1)
-                        }>
-                            <Text style={styles.arrow}>{"<"}</Text>
-                        </TouchableOpacity>
+          <View style={styles.thumbRow}>
+            <TouchableOpacity
+              onPress={() =>
+                setCurrentImage(
+                  currentImage === 0
+                    ? produto.imagens.length - 1
+                    : currentImage - 1,
+                )
+              }
+            >
+              <Text style={styles.arrow}>{"<"}</Text>
+            </TouchableOpacity>
 
-                        {produto.imagens.map((img, index) => (
-                            <TouchableOpacity key={index} onPress={() => setCurrentImage(index)}>
-                                <Image
-                                    source={img}
-                                    style={[
-                                        styles.thumb,
-                                        index === currentImage && styles.thumbActive,
-                                    ]}
-                                />
-                            </TouchableOpacity>
-                        ))}
+            {produto.imagens.map((img, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => setCurrentImage(index)}
+              >
+                <Image
+                  source={img}
+                  style={[
+                    styles.thumb,
+                    index === currentImage && styles.thumbActive,
+                  ]}
+                />
+              </TouchableOpacity>
+            ))}
 
-                        <TouchableOpacity onPress={() =>
-                            setCurrentImage((currentImage + 1) % produto.imagens.length)
-                        }>
-                            <Text style={styles.arrow}>{">"}</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
+            <TouchableOpacity
+              onPress={() =>
+                setCurrentImage((currentImage + 1) % produto.imagens.length)
+              }
+            >
+              <Text style={styles.arrow}>{">"}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
-                {/* DETALHES */}
-                <View style={styles.card}>
-                    <Text style={styles.nome}>{produto.nome}</Text>
+        {/* DETALHES */}
+        <View style={styles.card}>
+          <Text style={styles.nome}>{produto.nome}</Text>
 
-                    {/* estrelas */}
-                    <View style={styles.stars}>
-                        {[1, 2, 3, 4, 5].map((star) => (
-                            <Text
-                                key={star}
-                                style={[
-                                    styles.star,
-                                    star <= rating && { color: "yellow" },
-                                ]}
-                                onPress={() => setRating(star)}
-                            >
-                                ★
-                            </Text>
-                        ))}
-                    </View>
+          {/* estrelas */}
+          <View style={styles.stars}>
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Text
+                key={star}
+                style={[styles.star, star <= rating && { color: "yellow" }]}
+                onPress={() => setRating(star)}
+              >
+                ★
+              </Text>
+            ))}
+          </View>
 
-                    <Text style={styles.desc}>{produto.descricao}</Text>
-                    <Text style={styles.preco}>{produto.preco}</Text>
+          <Text style={styles.desc}>{produto.descricao}</Text>
+          <Text style={styles.preco}>{produto.preco}</Text>
 
-                    <View style={styles.btnRow}>
-                        <TouchableOpacity
-                            style={styles.btn}
-                            onPress={adicionarAoCarrinho}
-                        >
-                            <Text style={styles.btnText}>Adicionar</Text>
-                        </TouchableOpacity>
+          <View style={styles.btnRow}>
+            <TouchableOpacity style={styles.btn} onPress={adicionarAoCarrinho}>
+              <Text style={styles.btnText}>Adicionar</Text>
+            </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.btn}>
-                            <Text style={styles.btnText} onPress={()=> router.push("/finalizar")}>Comprar</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
+            <TouchableOpacity style={styles.btn}>
+              <Text
+                style={styles.btnText}
+                onPress={() => router.push("/finalizar")}
+              >
+                Comprar
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
-                {/* FAVORITO */}
-                <TouchableOpacity
-                    onPress={() => toggleFavorito(produto.id)}
-                    style={styles.fav}
-                >
-                    <Text style={{ fontSize: 30 }}>
-                        {favoritos.includes(produto.id) ? <AntDesign name="star" size={24} color="yellow" /> : "☆"}
-                    </Text>
-                    <Text style={{ color: "#fff" }}>Favoritar</Text>
-                </TouchableOpacity>
+        {/* FAVORITO */}
+        <TouchableOpacity
+          onPress={() => toggleFavorito(produto.id)}
+          style={styles.fav}
+        >
+          <Text style={{ fontSize: 30 }}>
+            {favoritos.includes(produto.id) ? (
+              <AntDesign name="star" size={24} color="yellow" />
+            ) : (
+              "☆"
+            )}
+          </Text>
+          <Text style={{ color: "#fff" }}>Favoritar</Text>
+        </TouchableOpacity>
 
-                {/* COMENTÁRIOS */}
-                <View style={styles.comentarios}>
-                    <Text style={styles.titulo}>Comentários</Text>
+        {/* COMENTÁRIOS */}
+        <View style={styles.comentarios}>
+          <Text style={styles.titulo}>Comentários</Text>
 
-                    <View style={styles.inputRow}>
-                        <TextInput
-                            value={novoComentario}
-                            onChangeText={setNovoComentario}
-                            placeholder="Escreva..."
-                            style={styles.input}
-                        />
+          <View style={styles.inputRow}>
+            <TextInput
+              value={novoComentario}
+              onChangeText={setNovoComentario}
+              placeholder="Escreva..."
+              style={styles.input}
+            />
 
-                        <TouchableOpacity
-                            onPress={adicionarComentario}
-                            style={styles.btn}
-                        >
-                            <Text style={styles.btnText}>Enviar</Text>
-                        </TouchableOpacity>
-                    </View>
+            <TouchableOpacity onPress={adicionarComentario} style={styles.btn}>
+              <Text style={styles.btnText}>Enviar</Text>
+            </TouchableOpacity>
+          </View>
 
-                    {produtos.map((p) => (
-                        <View key={p.id} style={styles.comentario}>
-                            <Text style={{ color: "#fff" }}>{p.comentario}</Text>
-                            <Text style={styles.estrela}>{p.estrelas} <AntDesign name="star" size={24} color="yellow" /></Text>
-                        </View>
-                    ))}
-
-                    <Text style={{ color: "#fff", marginTop: 10 }}>
-                        Média: {calculoRating()} <AntDesign name="star" size={24} color="yellow" />
-                    </Text>
-                </View>
+          {produtos.map((p) => (
+            <View key={p.id} style={styles.comentario}>
+              <Text style={{ color: "#fff" }}>{p.comentario}</Text>
+              <Text style={styles.estrela}>
+                {p.estrelas} <AntDesign name="star" size={24} color="yellow" />
+              </Text>
             </View>
+          ))}
 
-       
-        </ScrollView>
-    );
+          <Text style={{ color: "#fff", marginTop: 10 }}>
+            Média: {calculoRating()}{" "}
+            <AntDesign name="star" size={24} color="yellow" />
+          </Text>
+        </View>
+      </View>
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -301,8 +335,8 @@ const styles = StyleSheet.create({
 
   /* ESTRELAS */
   stars: {
-     display: "flex",
-     alignItems: "center",
+    display: "flex",
+    alignItems: "center",
     flexDirection: "row",
     marginTop: 10,
   },
