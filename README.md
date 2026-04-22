@@ -52,7 +52,7 @@ O objetivo é conectar compradores e vendedores da comunidade gamer em um único
 
 | | Perfil |
 |---|---|
-| ![giovannieli2000-code](https://github.com/giovannieli2000-code.png?size=60) | [giovannieli2000-code](https://github.com/Giovanni12344) |
+| ![Giovanni12344](https://github.com/Giovanni12344-code.png?size=60) | [Giovanni12344](https://github.com/Giovanni12344) |
 | ![GabrielMeloIF](https://github.com/GabrielMeloIF.png?size=60) | [GabrielMeloIF](https://github.com/GabrielMeloIF) |
 | ![Lzk26](https://github.com/Lzk26.png?size=60) | [Lzk26](https://github.com/Lzk26) |
 | ![Preto-ai](https://github.com/Preto-ai.png?size=60) | [Preto-ai](https://github.com/Preto-ai) |
