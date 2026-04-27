@@ -6,7 +6,7 @@ import Image from "next/image";
 import Header from "@/Components/Header/Header";
 import Footer from "@/Components/Footer/Footer";
 import NavBar from "@/Components/Navbar/NavBar";
-import { toast } from "react-toastify"; // importa o toast
+import { toast } from "react-toastify"; 
 
 interface User {
   name: string;
