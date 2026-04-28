@@ -5,10 +5,12 @@ import NavBar from "../src/components/navbar";
 import Carrossel from "../src/components/carrossel";
 import Cards from "../src/components/card";
 import Filtro from "../src/components/filtro";
+import { UserProvider } from "../src/components/context/userContext";
 
 
 export default function Home() {
   return (
+    <UserProvider>
 
     <View style={styles.container}>
       <StatusBar style="auto" />
@@ -19,13 +21,13 @@ export default function Home() {
           <Cards />
       </ScrollView>
     </View>
+    </UserProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
     backgroundColor: "#303030",
   },
 });

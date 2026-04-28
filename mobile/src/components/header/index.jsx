@@ -7,19 +7,21 @@ import {
   Image,
   useWindowDimensions,
 } from "react-native";
+
 import { useState } from "react";
 import Feather from "@expo/vector-icons/Feather";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useRouter } from "expo-router";
-import { useUser } from "../../components/context/userContext";
+import { useUser } from "../context/userContext";
 const Logo = require("../../../assets/logo.png");
 
 export default function Header() {
   const router = useRouter();
 
-  const { userImage } = useUser();
+ const { userImage } = useUser();
+ 
 
 
   const [busca, setBusca] = useState("");

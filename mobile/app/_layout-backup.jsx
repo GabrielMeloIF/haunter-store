@@ -51,8 +51,7 @@ export default function Layout() {
       <Tabs.Screen name="finalizar" options={{ href: null}} />
       <Tabs.Screen name="pagamento" options={{ href: null}} />
       <Tabs.Screen name="confirmacao" options={{ href: null}} />
-      <Tabs.Screen name="anunciar" options={{ href: null}} />
-      <Tabs.Screen name="anunciar2" options={{ href: null}} />
+      {/* <Tabs.Screen name="anunciar2" options={{ href: null}} /> */}
       <Tabs.Screen name="revisar-anuncios" options={{ href: null}} />
     </Tabs>
     </UserProvider>
