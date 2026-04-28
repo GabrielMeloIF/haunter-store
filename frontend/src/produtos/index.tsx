@@ -9,6 +9,7 @@ export type Produto = {
   descricao: string;
   imagem: StaticImageData | string;
   preco: string;
+  imagens?: string[];
 };
 
 export const perifericos: Produto[] = [

@@ -6,6 +6,7 @@ import Image from "next/image";
 import Header from "@/Components/Header/Header";
 import Footer from "@/Components/Footer/Footer";
 import NavBar from "@/Components/Navbar/NavBar";
+import { toast } from "react-toastify"; 
 
 interface User {
   name: string;
@@ -43,7 +44,10 @@ export default function ProfilePage() {
   // Salva alterações
   const handleSave = () => {
     if (!name.trim() || !email.trim()) {
-      alert("Nome e email são obrigatórios!");
+      toast.error("Nome e email são obrigatórios!", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
       return;
     }
 
@@ -60,7 +64,12 @@ export default function ProfilePage() {
     localStorage.setItem("users", JSON.stringify(updatedUsers));
 
     setUser(updatedUser);
-    alert("Dados atualizados!");
+
+    // toast no lugar do alert
+    toast.success("Dados atualizados com sucesso!", {
+      position: "bottom-right",
+      autoClose: 3000,
+    });
   };
 
   // Logout

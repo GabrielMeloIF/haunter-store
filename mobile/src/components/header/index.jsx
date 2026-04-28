@@ -23,14 +23,12 @@ export default function Header() {
  const { userImage } = useUser();
  
 
-
   const [busca, setBusca] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const { width } = useWindowDimensions();
   const isMobile = width < 1024;
 
   const handleBuscar = () => {
-
     const query = busca.trim().toLowerCase();
     if (!query) return;
     console.log("Buscar:", query);
@@ -42,7 +40,7 @@ export default function Header() {
       {/*  busca */}
 
       <View style={styles.side}>
-        <TouchableOpacity onPress={handleBuscar}>
+        <TouchableOpacity onPress={() => setShowSearch(!showSearch)}>
           <EvilIcons name="search" size={20} color="white" />
         </TouchableOpacity>
         {showSearch && (
@@ -80,16 +78,16 @@ export default function Header() {
           style={styles.userBtn}
           onPress={() => router.push("/register")}
         >
-
           {userImage ? (
             <Image source={{ uri: userImage }} style={styles.userImage} />
           ) : (
             <Feather name="user" size={20} color="white" />
           )}
-
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.anunciarBtn} onPress={() => router.push("/anunciar")}
+        <TouchableOpacity
+          style={styles.anunciarBtn}
+          onPress={() => router.push("/anunciar")}
         >
           <Feather name="plus-circle" size={20} color="white" />
           {!isMobile && <Text style={styles.anunciarText}>Anunciar</Text>}
@@ -155,7 +153,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
-
   side: {
     flexDirection: "row",
     alignItems: "center",
@@ -174,5 +171,4 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 13,
   },
-
 });

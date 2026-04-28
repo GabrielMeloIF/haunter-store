@@ -27,7 +27,7 @@ export default function Header() {
 
   const [user, setUser] = useState<User | null>(null);
 
-  //  Carrega usuário e atualizar automaticamente
+  
   useEffect(() => {
     const loadUser = () => {
       if (typeof window !== "undefined") {
@@ -55,7 +55,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-[#A636E9] flex items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10 2xl:gap-15 w-full px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12">
+    <header className="bg-[#A636E9] h-20 flex items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10 2xl:gap-15 w-full px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12">
       
       {/* Logo */}
       <Link href="/" className="shrink-0">
