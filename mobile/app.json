@@ -31,8 +31,7 @@
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router",
-      "expo-image"
+      "expo-router"
     ]
   }
 }

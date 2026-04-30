@@ -20,7 +20,8 @@ const Logo = require("../../../assets/logo.png");
 export default function Header() {
   const router = useRouter();
 
- const { userImage } = useUser();
+  const userContext = useUser();
+  const userImage = userContext?.userImage;
  
 
   const [busca, setBusca] = useState("");
