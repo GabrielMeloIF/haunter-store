@@ -1,9 +1,9 @@
 import { 
     View,
     Text,
-    StyleSheet
+    StyleSheet,
+    TextInput
 } from "react-native";
-import { TextInput } from "react-native-web"
 import { useRouter } from "expo-router";
 //import { useState } from "react";
 

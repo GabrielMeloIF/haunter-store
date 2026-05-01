@@ -106,6 +106,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     width: "100%",
+    marginTop: 30,
   },
   userImage: {
     width: 28,

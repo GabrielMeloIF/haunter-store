@@ -47,12 +47,19 @@ const categories = [
   { icon: "headphones", lib: "feather", label: "Periféricos" },
   { icon: "store", lib: "material", label: "Loja", sublabel: "100% Oficial" },
   { icon: "gamepad-variant", lib: "material", label: "Games" },
-  { icon: "shield-outline", lib: "material", label: "Experiência", sublabel: "Segura e simples" },
+  {
+    icon: "shield-outline",
+    lib: "material",
+    label: "Experiência",
+    sublabel: "Segura e simples",
+  },
 ];
 
 function CategoryIcon({ icon, lib }) {
-  if (lib === "feather") return <Feather name={icon} size={40} color="#6b7280" />;
-  if (lib === "material") return <MaterialCommunityIcons name={icon} size={40} color="#6b7280" />;
+  if (lib === "feather")
+    return <Feather name={icon} size={40} color="#6b7280" />;
+  if (lib === "material")
+    return <MaterialCommunityIcons name={icon} size={40} color="#6b7280" />;
   return <Ionicons name={icon} size={40} color="#6b7280" />;
 }
 
@@ -64,8 +71,16 @@ export default function Carrossel() {
   const irPara = (index) => {
     if (index === atual) return;
     Animated.sequence([
-      Animated.timing(opacity, { toValue: 0, duration: 200, useNativeDriver: true }),
-      Animated.timing(opacity, { toValue: 1, duration: 200, useNativeDriver: true }),
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
     ]).start();
     setTimeout(() => setAtual(index), 200);
   };
@@ -77,7 +92,6 @@ export default function Carrossel() {
 
   return (
     <View style={styles.container}>
-
       {/* Carrossel */}
       <View style={[styles.carrossel, { width: width - 32 }]}>
         <Animated.View style={[styles.imageWrapper, { opacity }]}>
@@ -94,12 +108,18 @@ export default function Carrossel() {
         </Animated.View>
 
         {/* Botão Anterior */}
-        <TouchableOpacity style={[styles.navBtn, { left: 12 }]} onPress={anterior}>
+        <TouchableOpacity
+          style={[styles.navBtn, { left: 12 }]}
+          onPress={anterior}
+        >
           <Feather name="chevron-left" size={20} color="white" />
         </TouchableOpacity>
 
         {/* Botão Próximo */}
-        <TouchableOpacity style={[styles.navBtn, { right: 12 }]} onPress={proximo}>
+       <TouchableOpacity 
+  style={[styles.navBtn, { right: 12 }]}
+  onPress={proximo}
+>
           <Feather name="chevron-right" size={20} color="white" />
         </TouchableOpacity>
 
@@ -109,7 +129,10 @@ export default function Carrossel() {
             <TouchableOpacity
               key={i}
               onPress={() => irPara(i)}
-              style={[styles.dot, i === atual ? styles.dotAtivo : styles.dotInativo]}
+              style={[
+                styles.dot,
+                i === atual ? styles.dotAtivo : styles.dotInativo,
+              ]}
             />
           ))}
         </View>
@@ -127,11 +150,12 @@ export default function Carrossel() {
               <CategoryIcon icon={cat.icon} lib={cat.lib} />
             </View>
             <Text style={styles.categoryLabel}>{cat.label}</Text>
-            {cat.sublabel && <Text style={styles.categorySublabel}>{cat.sublabel}</Text>}
+            {cat.sublabel && (
+              <Text style={styles.categorySublabel}>{cat.sublabel}</Text>
+            )}
           </TouchableOpacity>
         ))}
       </ScrollView>
-
     </View>
   );
 }

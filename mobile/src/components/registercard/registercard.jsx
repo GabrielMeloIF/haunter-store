@@ -1,9 +1,9 @@
 import { 
     View,
     Text,
-    StyleSheet
+    StyleSheet,
+    TextInput
 } from "react-native";
-import { TextInput } from "react-native-web"
 import { useRouter } from "expo-router";
 //import { useState } from "react";
 
@@ -62,9 +62,11 @@ const styles = StyleSheet.create({
         fontSize: 24,
         color: '#fff',
         marginBottom: 20,
+        position: 'absolute',
+        top: -150,
     },
     inputs: {
-        width: '100%',
+        width: '100px',
         padding: 10,
         backgroundColor: '#D9D9D9',
         marginBottom: 10,
