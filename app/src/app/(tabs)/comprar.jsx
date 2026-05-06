@@ -10,7 +10,7 @@ import {
   Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Header from "../components/header";
+import Header from "../../components/header";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useRouter } from "expo-router";
 
@@ -25,9 +25,9 @@ export default function Comprar() {
         "Eleve sua experiência nos jogos e no dia a dia com design ergonômico.",
       preco: "R$ 79,00",
       imagens: [
-        require("../../assets/mouse 1.png"),
-        require("../../assets/headset 1.png"),
-        require("../../assets/teclado 1.png"),
+        require("../../../assets/mouse 1.png"),
+        require("../../../assets/headset 1.png"),
+        require("../../../assets/teclado 1.png"),
       ],
       comentario: "Muito bom!",
       estrelas: 4,
