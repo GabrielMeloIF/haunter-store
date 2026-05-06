@@ -6,8 +6,8 @@ export default function Layout() {
     <UserProvider>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
-        {/* <Stack.Screen name="comprar" options={{ headerShown: false }} />
-        <Stack.Screen name="jogos" options={{ headerShown: false }} />
+        <Stack.Screen name="comprar" options={{ headerShown: false }} />
+        {/* <Stack.Screen name="jogos" options={{ headerShown: false }} />
         <Stack.Screen name="perifericos" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="register" options={{ headerShown: false }} />
