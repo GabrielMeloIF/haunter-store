@@ -114,18 +114,18 @@ export default function Cards() {
   ];
 
   return (
-    <FlatList
-      data={secoes}
-      keyExtractor={(item) => item.key}
-      contentContainerStyle={styles.container}
-      renderItem={({ item }) => (
-        <View style={styles.secao}>
-          <Text style={styles.sectionTitle}>{item.titulo}</Text>
-          <Carrossel data={item.data} />
-        </View>
-      )}
-    />
-  );
+  <View style={styles.container}>
+    {secoes.map((item) => (
+      <View style={styles.secao} key={item.key}>
+        <Text style={styles.sectionTitle}>
+          {item.titulo}
+        </Text>
+
+        <Carrossel data={item.data} />
+      </View>
+    ))}
+  </View>
+);
 }
 
 const styles = StyleSheet.create({

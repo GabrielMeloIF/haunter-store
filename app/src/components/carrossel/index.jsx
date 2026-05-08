@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -84,6 +84,14 @@ export default function Carrossel() {
     ]).start();
     setTimeout(() => setAtual(index), 200);
   };
+
+      useEffect(() => {
+    const interval = setInterval(() => {
+      proximo();
+    }, 3000); // troca a cada 3 segundos
+
+    return () => clearInterval(interval);
+  }, [atual]);
 
   const proximo = () => irPara((atual + 1) % slides.length);
   const anterior = () => irPara((atual - 1 + slides.length) % slides.length);
