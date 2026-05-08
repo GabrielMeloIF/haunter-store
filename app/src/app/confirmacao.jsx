@@ -65,7 +65,7 @@ export default function ConfirmacaoProduto() {
             style={styles.nextButton}
             onPress={() => router.push("/carrinho")}
           >
-            <Text style={styles.nextText} onPress={() => router.push("/")} >Finalizar</Text>
+            <Text style={styles.nextText} onPress={() => router.push("/(tabs)")} >Finalizar</Text>
           </TouchableOpacity>
         </View>
       </View>

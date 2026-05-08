@@ -57,24 +57,13 @@ export default function Header() {
       </View>
 
       {/*  logo */}
-      <TouchableOpacity onPress={() => router.push("/")}>
+      <TouchableOpacity onPress={() => router.push("/(tabs)")}>
         <Image source={Logo} style={styles.logo} resizeMode="contain" />
       </TouchableOpacity>
 
       {/* ícones */}
       <View style={[styles.side, { justifyContent: "flex-end" }]}>
-        {!isMobile && (
-          <>
-            {["Meus anúncios", "Mensagens", "Notificações", "Carrinho"].map(
-              (item) => (
-                <TouchableOpacity key={item} style={styles.navLink}>
-                  <Text style={styles.navLinkText}>{item}</Text>
-                </TouchableOpacity>
-              ),
-            )}
-          </>
-        )}
-
+       
         <TouchableOpacity
           style={styles.userBtn}
           onPress={() => router.push("/register")}
@@ -91,7 +80,6 @@ export default function Header() {
           onPress={() => router.push("/anunciar")}
         >
           <Feather name="plus-circle" size={20} color="white" />
-          {!isMobile && <Text style={styles.anunciarText}>Anunciar</Text>}
         </TouchableOpacity>
       </View>
     </View>
@@ -106,7 +94,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     width: "100%",
-    marginTop: 30,
+    height: 90,
   },
   userImage: {
     width: 28,
@@ -120,6 +108,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   logo: {
+    marginTop: 30,
     marginRight: 5,
     width: 48,
     height: 48,
@@ -160,6 +149,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 6,
     flex: 1,
+    marginTop: 25,
   },
 
   input: {

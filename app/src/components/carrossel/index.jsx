@@ -139,11 +139,7 @@ export default function Carrossel() {
       </View>
 
       {/* Categorias */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categories}
-      >
+          <View style={styles.categorias}>
         {categories.map((cat, index) => (
           <TouchableOpacity key={index} style={styles.categoryItem}>
             <View style={styles.categoryCircle}>
@@ -155,7 +151,7 @@ export default function Carrossel() {
             )}
           </TouchableOpacity>
         ))}
-      </ScrollView>
+      </View>
     </View>
   );
 }
@@ -264,4 +260,9 @@ const styles = StyleSheet.create({
     fontSize: 11,
     textAlign: "center",
   },
+  categorias:{
+    flexDirection: "row",
+    gap: 20,
+    marginTop: 24,
+  }
 });

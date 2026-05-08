@@ -132,7 +132,7 @@ export default function Carrinho() {
                 </Text>
 
                 <TouchableOpacity style={styles.btnFinalizar}>
-                  <Text style={styles.btnTexto} onPress={() => router.push("pagamento")}>
+                  <Text style={styles.btnTexto} onPress={() => router.push("/pagamento")}>
                     Finalizar compra
                   </Text>
                 </TouchableOpacity>

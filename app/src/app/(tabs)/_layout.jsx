@@ -5,7 +5,7 @@ import { UserProvider } from '../../components/context/userContext';
 
 export default function Layout() {
   return (
-   <UserProvider>
+   
     <Tabs
       screenOptions={({ route }) => ({
         headerShown: false,
@@ -44,15 +44,9 @@ export default function Layout() {
        <Tabs.Screen name="carrinho" options={{ title: 'Carrinho' }} />
        <Tabs.Screen name="conversas" options={{ title: 'Conversas' }} />
        <Tabs.Screen name="user" options={{ title: 'Perfil' }} />
-       {/*<Tabs.Screen name="jogos" options={{ href: null}} />
+      <Tabs.Screen name="jogos" options={{ href: null}} />
       <Tabs.Screen name="perifericos" options={{ href: null}} />
-      <Tabs.Screen name="login" options={{ href: null}} />
-      <Tabs.Screen name="register" options={{ href: null}} />
-      <Tabs.Screen name="finalizar" options={{ href: null}} />
-      <Tabs.Screen name="pagamento" options={{ href: null}} />
-      <Tabs.Screen name="confirmacao" options={{ href: null}} />
-      <Tabs.Screen name="revisar-anuncios" options={{ href: null}} /> */}
     </Tabs>
-    </UserProvider>
+  
   );
 }

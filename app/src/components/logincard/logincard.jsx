@@ -25,10 +25,10 @@ export default function Login() {
                 secureTextEntry
             />
             <View style={styles.buttonContainer}>
-                <Text style={styles.backButton} onPress={() => router.push('/')}>
+                <Text style={styles.backButton} onPress={() => router.push('/(tabs)')}>
                     Voltar
                 </Text>
-                <Text style={styles.loginButton} onPress={() => router.push('/')}>
+                <Text style={styles.loginButton} onPress={() => router.push('/(tabs)')}>
                     Logar
                 </Text>
             </View>

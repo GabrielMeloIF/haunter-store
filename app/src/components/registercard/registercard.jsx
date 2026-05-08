@@ -35,7 +35,7 @@ export default function Register() {
                 secureTextEntry
             />
             <View style={styles.buttonContainer}>
-                <Text style={styles.backButton} onPress={() => router.push('/')}>
+                <Text style={styles.backButton} onPress={() => router.push('/(tabs)')}>
                     Voltar
                 </Text>
                 <Text style={styles.registerButton} onPress={() => router.push('/user')}>
