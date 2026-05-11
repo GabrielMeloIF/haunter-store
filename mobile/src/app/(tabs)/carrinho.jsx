@@ -10,7 +10,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../../components/header";
 import { useRouter } from "expo-router";
-import { todosProdutos } from "../produtos/index";
+
 
 export default function Carrinho() {
   const [itens, setItens] = useState([]);

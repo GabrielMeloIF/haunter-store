@@ -7,14 +7,14 @@ export class PedidosService {
 
   findAll() {
     return this.prisma.pedido.findMany({
-      include: { itensPedido: { include: { produto: true } }, usuario: { select: { id_usuario: true, nome: true, email: true } } },
+      include: { itempedido: { include: { produto: true } }, usuario: { select: { id_usuario: true, nome: true, email: true } } },
     });
   }
 
   async findOne(id: number) {
     const pedido = await this.prisma.pedido.findUnique({
       where: { id_pedido: id },
-      include: { itensPedido: { include: { produto: true } }, usuario: { select: { id_usuario: true, nome: true, email: true } } },
+      include: { itempedido: { include: { produto: true } }, usuario: { select: { id_usuario: true, nome: true, email: true } } },
     });
     if (!pedido) throw new NotFoundException(`Pedido #${id} não encontrado`);
     return pedido;
@@ -23,7 +23,7 @@ export class PedidosService {
   findByUsuario(id_usuario: number) {
     return this.prisma.pedido.findMany({
       where: { id_usuario },
-      include: { itensPedido: { include: { produto: true } } },
+      include: { itempedido: { include: { produto: true } } },
       orderBy: { data_pedido: 'desc' },
     });
   }
@@ -51,7 +51,7 @@ export class PedidosService {
         data: {
           id_usuario,
           valor_total,
-          itensPedido: {
+          itempedido: {
             create: itensCarrinho.map((item) => ({
               id_produto: item.id_produto,
               quantidade: item.quantidade,
@@ -59,7 +59,7 @@ export class PedidosService {
             })),
           },
         },
-        include: { itensPedido: true },
+        include: { itempedido: true },
       });
 
       // Limpa carrinho

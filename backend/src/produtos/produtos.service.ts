@@ -17,6 +17,35 @@ export class ProdutosService {
     if (!produto) throw new NotFoundException(`Produto #${id} não encontrado`);
     return produto;
   }
+  async updateMany(
+  produtos: {
+    id: number;
+    imagem_url?: string;
+    nome?: string;
+    descricao?: string;
+    preco?: number;
+    estoque?: number;
+    categoriaId?: number;
+  }[],
+) {
+  const updates = await Promise.all(
+    produtos.map((produto) =>
+      this.prisma.produto.update({
+        where: { id: produto.id },
+        data: {
+          nome: produto.nome,
+          descricao: produto.descricao,
+          preco: produto.preco,
+          estoque: produto.estoque,
+          categoriaId: produto.categoriaId,
+          imagem_url: produto.imagem_url,
+        },
+      }),
+    ),
+  );
+
+  return updates;
+}
 
   create(data: {
     nome: string;
@@ -25,6 +54,7 @@ export class ProdutosService {
     estoque: number;
     tipo_produto?: string;
     categoriaId: number;
+    imagem_url: string;
   }) {
     return this.prisma.produto.create({ data });
   }
@@ -38,6 +68,7 @@ export class ProdutosService {
       estoque: number;
       tipo_produto: string;
       categoriaId: number;
+      imagem_url: string;
     }>,
   ) {
     return this.prisma.produto.update({ where: { id }, data });

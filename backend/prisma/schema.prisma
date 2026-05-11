@@ -7,78 +7,165 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Usuario {
-  id_usuario    Int         @id @default(autoincrement())
-  nome          String
-  email         String      @unique
-  senha         String
-  cpf           String      @unique
-  telefone      String
-  endereco      String
-  data_cadastro DateTime    @default(now())
-  tipo_usuario  TipoUsuario @default(CLIENTE)
+model avaliacao {
+  id_avaliacao Int      @id @default(autoincrement())
+  id_usuario   Int
+  id_produto   Int
+  nota         Int
+  comentario   String   @db.Text
+  avaliada_em  DateTime @default(now())
+  produto      produto  @relation(fields: [id_produto], references: [id], map: "Avaliacao_id_produto_fkey")
+  usuario      usuario  @relation(fields: [id_usuario], references: [id_usuario], map: "Avaliacao_id_usuario_fkey")
 
-  avaliacoes   Avaliacao[]
-  cupons       CupomUsuario[]
-  carrinhos    Carrinho[]
-  pedidos      Pedido[]
-  conversas    Conversa[]     @relation("UsuarioConversas")
-  mensagens    Mensagem[]
-  notificacoes Notificacao[]
+  @@index([id_produto], map: "Avaliacao_id_produto_fkey")
+  @@index([id_usuario], map: "Avaliacao_id_usuario_fkey")
 }
 
-enum TipoUsuario {
-  CLIENTE
-  ADMIN
-}
-
-model Categoria {
-  id_categoria   Int    @id @default(autoincrement())
-  nome_categoria String @unique
-  descricao      String
-
-  produtos Produto[]
-}
-
-model Produto {
-  id            Int       @id @default(autoincrement())
-  nome          String
-  descricao     String
-  preco         Float
-  estoque       Int
-  tipo_produto  String?
-  data_cadastro DateTime  @default(now())
-  categoriaId   Int
-  categoria     Categoria @relation(fields: [categoriaId], references: [id_categoria])
-
-  avaliacoes    Avaliacao[]
-  itensCarrinho Carrinho[]
-  itensPedido   ItemPedido[]
-}
-
-model Carrinho {
+model carrinho {
   id_carrinho     Int      @id @default(autoincrement())
   id_usuario      Int
   id_produto      Int
   quantidade      Int
   data_adicionado DateTime @default(now())
+  produto         produto  @relation(fields: [id_produto], references: [id], map: "Carrinho_id_produto_fkey")
+  usuario         usuario  @relation(fields: [id_usuario], references: [id_usuario], map: "Carrinho_id_usuario_fkey")
 
-  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
-  produto Produto @relation(fields: [id_produto], references: [id])
+  @@index([id_produto], map: "Carrinho_id_produto_fkey")
+  @@index([id_usuario], map: "Carrinho_id_usuario_fkey")
 }
 
-model Pedido {
-  id_pedido   Int          @id @default(autoincrement())
+model categoria {
+  id_categoria   Int       @id @default(autoincrement())
+  nome_categoria String    @unique(map: "Categoria_nome_categoria_key")
+  descricao      String
+  produto        produto[]
+}
+
+model conversa {
+  id_conversa Int        @id @default(autoincrement())
+  criada_em   DateTime   @default(now())
+  mensagem    mensagem[]
+  usuario     usuario[]  @relation("usuarioconversas")
+}
+
+model cupom {
+  id_cupom     Int            @id @default(autoincrement())
+  codigo       String         @unique(map: "Cupom_codigo_key")
+  descricao    String         @db.Text
+  desconto     Float
+  validade     DateTime
+  criado_em    DateTime       @default(now())
+  cupomusuario cupomusuario[]
+}
+
+model cupomusuario {
+  id_cupom_usuario Int       @id @default(autoincrement())
+  id_usuario       Int
+  id_cupom         Int
+  utilizado        Boolean   @default(false)
+  utilizado_em     DateTime?
+  cupom            cupom     @relation(fields: [id_cupom], references: [id_cupom], map: "CupomUsuario_id_cupom_fkey")
+  usuario          usuario   @relation(fields: [id_usuario], references: [id_usuario], map: "CupomUsuario_id_usuario_fkey")
+
+  @@index([id_cupom], map: "CupomUsuario_id_cupom_fkey")
+  @@index([id_usuario], map: "CupomUsuario_id_usuario_fkey")
+}
+
+model itempedido {
+  id_item        Int     @id @default(autoincrement())
+  id_pedido      Int
+  id_produto     Int
+  quantidade     Int
+  preco_unitario Float
+  pedido         pedido  @relation(fields: [id_pedido], references: [id_pedido], map: "ItemPedido_id_pedido_fkey")
+  produto        produto @relation(fields: [id_produto], references: [id], map: "ItemPedido_id_produto_fkey")
+
+  @@index([id_pedido], map: "ItemPedido_id_pedido_fkey")
+  @@index([id_produto], map: "ItemPedido_id_produto_fkey")
+}
+
+model mensagem {
+  id_mensagem  Int      @id @default(autoincrement())
+  id_conversa  Int
+  id_remetente Int
+  conteudo     String   @db.Text
+  lida         Boolean  @default(false)
+  enviada_em   DateTime @default(now())
+  conversa     conversa @relation(fields: [id_conversa], references: [id_conversa], map: "Mensagem_id_conversa_fkey")
+  usuario      usuario  @relation(fields: [id_remetente], references: [id_usuario], map: "Mensagem_id_remetente_fkey")
+
+  @@index([id_conversa], map: "Mensagem_id_conversa_fkey")
+  @@index([id_remetente], map: "Mensagem_id_remetente_fkey")
+}
+
+model notificacao {
+  id_notificacao Int              @id @default(autoincrement())
+  id_usuario     Int
+  tipo           notificacao_tipo
+  titulo         String
+  descricao      String           @db.Text
+  lida           Boolean          @default(false)
+  criada_em      DateTime         @default(now())
+  usuario        usuario          @relation(fields: [id_usuario], references: [id_usuario], map: "Notificacao_id_usuario_fkey")
+
+  @@index([id_usuario], map: "Notificacao_id_usuario_fkey")
+}
+
+model pedido {
+  id_pedido   Int           @id @default(autoincrement())
   id_usuario  Int
-  data_pedido DateTime     @default(now())
+  data_pedido DateTime      @default(now())
   valor_total Float
-  status      StatusPedido @default(PENDENTE)
+  status      pedido_status @default(PENDENTE)
+  itempedido  itempedido[]
+  usuario     usuario       @relation(fields: [id_usuario], references: [id_usuario], map: "Pedido_id_usuario_fkey")
 
-  usuario     Usuario      @relation(fields: [id_usuario], references: [id_usuario])
-  itensPedido ItemPedido[]
+  @@index([id_usuario], map: "Pedido_id_usuario_fkey")
 }
 
-enum StatusPedido {
+model produto {
+  id            Int          @id @default(autoincrement())
+  nome          String
+  descricao     String
+  preco         Float
+  estoque       Int
+  imagem_url    String
+  data_cadastro DateTime     @default(now())
+  categoriaId   Int
+  avaliacao     avaliacao[]
+  carrinho      carrinho[]
+  itempedido    itempedido[]
+  categoria     categoria    @relation(fields: [categoriaId], references: [id_categoria], map: "Produto_categoriaId_fkey")
+
+  @@index([categoriaId], map: "Produto_categoriaId_fkey")
+}
+
+model usuario {
+  id_usuario    Int                  @id @default(autoincrement())
+  nome          String
+  email         String               @unique(map: "Usuario_email_key")
+  senha         String
+  cpf           String               @unique(map: "Usuario_cpf_key")
+  telefone      String
+  endereco      String
+  data_cadastro DateTime             @default(now())
+  tipo_usuario  usuario_tipo_usuario @default(CLIENTE)
+  avaliacao     avaliacao[]
+  carrinho      carrinho[]
+  cupomusuario  cupomusuario[]
+  mensagem      mensagem[]
+  notificacao   notificacao[]
+  pedido        pedido[]
+  conversa      conversa[]           @relation("usuarioconversas")
+}
+
+enum notificacao_tipo {
+  MENSAGEM
+  CONVERSA
+  SISTEMA
+}
+
+enum pedido_status {
   PENDENTE
   CONFIRMADO
   ENVIADO
@@ -86,85 +173,7 @@ enum StatusPedido {
   CANCELADO
 }
 
-model ItemPedido {
-  id_item        Int   @id @default(autoincrement())
-  id_pedido      Int
-  id_produto     Int
-  quantidade     Int
-  preco_unitario Float
-
-  pedido  Pedido  @relation(fields: [id_pedido], references: [id_pedido])
-  produto Produto @relation(fields: [id_produto], references: [id])
-}
-
-model Conversa {
-  id_conversa Int      @id @default(autoincrement())
-  criada_em   DateTime @default(now())
-
-  participantes Usuario[]  @relation("UsuarioConversas")
-  mensagens     Mensagem[]
-}
-
-model Mensagem {
-  id_mensagem  Int      @id @default(autoincrement())
-  id_conversa  Int
-  id_remetente Int
-  conteudo     String   @db.Text
-  lida         Boolean  @default(false)
-  enviada_em   DateTime @default(now())
-
-  conversa  Conversa @relation(fields: [id_conversa], references: [id_conversa])
-  remetente Usuario  @relation(fields: [id_remetente], references: [id_usuario])
-}
-
-model Notificacao {
-  id_notificacao Int             @id @default(autoincrement())
-  id_usuario     Int
-  tipo           TipoNotificacao
-  titulo         String
-  descricao      String          @db.Text
-  lida           Boolean         @default(false)
-  criada_em      DateTime        @default(now())
-
-  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
-}
-
-enum TipoNotificacao {
-  MENSAGEM
-  CONVERSA
-  SISTEMA
-}
-
-model Avaliacao {
-  id_avaliacao Int      @id @default(autoincrement())
-  id_usuario   Int
-  id_produto   Int
-  nota         Int
-  comentario   String   @db.Text
-  avaliada_em  DateTime @default(now())
-
-  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
-  produto Produto @relation(fields: [id_produto], references: [id])
-}
-
-model Cupom {
-  id_cupom  Int      @id @default(autoincrement())
-  codigo    String   @unique
-  descricao String   @db.Text
-  desconto  Float
-  validade  DateTime
-  criado_em DateTime @default(now())
-
-  usuarios CupomUsuario[]
-}
-
-model CupomUsuario {
-  id_cupom_usuario Int       @id @default(autoincrement())
-  id_usuario       Int
-  id_cupom         Int
-  utilizado        Boolean   @default(false)
-  utilizado_em     DateTime?
-
-  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
-  cupom   Cupom   @relation(fields: [id_cupom], references: [id_cupom])
+enum usuario_tipo_usuario {
+  CLIENTE
+  ADMIN
 }

@@ -45,7 +45,7 @@ export default function Cards() {
     async function buscarProdutos() {
       try {
         const response = await fetch(
-          "http://192.168.0.10:4000/produtos"
+          "http://192.168.56.1:4000/produtos"
         );
 
         const data = await response.json();
@@ -78,7 +78,7 @@ export default function Cards() {
     <View style={styles.card}>
       <View style={styles.imageContainer}>
         <Image
-          source={{ uri: produto.imagem }}
+          source={{ uri: produto.imagem_url }}
           style={styles.image}
           resizeMode="cover"
         />
@@ -119,7 +119,7 @@ export default function Cards() {
                   nome: produto.nome,
                   preco: produto.preco,
                   descricao: produto.descricao,
-                  imagem: produto.imagem,
+                  imagem: produto.imagem_url,
                 },
               })
             }

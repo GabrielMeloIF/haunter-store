@@ -25,10 +25,27 @@ export class ProdutosController {
       estoque: number;
       tipo_produto?: string;
       categoriaId: number;
+      imagem_url: string;
     },
   ) {
     return this.produtosService.create(body);
   }
+
+  @Put('lote')
+updateMany(
+  @Body()
+  body: {
+    id: number;
+    imagem_url?: string;
+    nome?: string;
+    descricao?: string;
+    preco?: number;
+    estoque?: number;
+    categoriaId?: number;
+  }[],
+) {
+  return this.produtosService.updateMany(body);
+}
 
   @Put(':id')
   update(
@@ -45,6 +62,7 @@ export class ProdutosController {
   ) {
     return this.produtosService.update(+id, body);
   }
+  
 
   @Delete(':id')
   remove(@Param('id') id: string) {

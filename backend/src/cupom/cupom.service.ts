@@ -26,7 +26,7 @@ export class CupomService {
     if (!cupom) throw new NotFoundException(`Cupom "${codigo}" não encontrado`);
     if (new Date() > cupom.validade) throw new BadRequestException('Cupom expirado');
 
-    const uso = await this.prisma.cupomUsuario.findFirst({
+    const uso = await this.prisma.cupomusuario.findFirst({
       where: { id_cupom: cupom.id_cupom, id_usuario, utilizado: true },
     });
     if (uso) throw new BadRequestException('Cupom já utilizado por este usuário');
@@ -38,18 +38,18 @@ export class CupomService {
     await this.validar(codigo, id_usuario);
     const cupom = await this.prisma.cupom.findUnique({ where: { codigo } });
 
-    const existente = await this.prisma.cupomUsuario.findFirst({
+    const existente = await this.prisma.cupomusuario.findFirst({
       where: { id_cupom: cupom!.id_cupom, id_usuario },
     });
 
     if (existente) {
-      return this.prisma.cupomUsuario.update({
+      return this.prisma.cupomusuario.update({
         where: { id_cupom_usuario: existente.id_cupom_usuario },
         data: { utilizado: true, utilizado_em: new Date() },
       });
     }
 
-    return this.prisma.cupomUsuario.create({
+    return this.prisma.cupomusuario.create({
       data: {
         id_usuario,
         id_cupom: cupom!.id_cupom,
@@ -60,7 +60,7 @@ export class CupomService {
   }
 
   findByUsuario(id_usuario: number) {
-    return this.prisma.cupomUsuario.findMany({
+    return this.prisma.cupomusuario.findMany({
       where: { id_usuario },
       include: { cupom: true },
       orderBy: { utilizado_em: 'desc' },

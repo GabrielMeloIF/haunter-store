@@ -13,7 +13,7 @@ export class MensagemService {
         conteudo: data.conteudo,
       },
       include: {
-        remetente: { select: { id_usuario: true, nome: true, email: true } },
+        usuario: { select: { id_usuario: true, nome: true, email: true } },
       },
     });
   }
@@ -22,7 +22,7 @@ export class MensagemService {
     return this.prisma.mensagem.findMany({
       where: { id_conversa },
       include: {
-        remetente: { select: { id_usuario: true, nome: true, email: true } },
+        usuario: { select: { id_usuario: true, nome: true, email: true } },
       },
       orderBy: { enviada_em: 'asc' },
     });
@@ -32,7 +32,7 @@ export class MensagemService {
     const mensagem = await this.prisma.mensagem.findUnique({
       where: { id_mensagem: id },
       include: {
-        remetente: { select: { id_usuario: true, nome: true, email: true } },
+        usuario: { select: { id_usuario: true, nome: true, email: true } },
       },
     });
     if (!mensagem) throw new NotFoundException(`Mensagem #${id} não encontrada`);

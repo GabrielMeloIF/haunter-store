@@ -5,15 +5,16 @@ import { PrismaService } from '../prisma.service';
 export class ConversaService {
   constructor(private prisma: PrismaService) {}
 
-  create(participantes: number[]) {
+  create(usuario: number[]) {
     return this.prisma.conversa.create({
       data: {
-        participantes: {
-          connect: participantes.map((id) => ({ id_usuario: id })),
+        usuario
+: {
+          connect: usuario.map((id) => ({ id_usuario: id })),
         },
       },
       include: {
-        participantes: { select: { id_usuario: true, nome: true, email: true } },
+        usuario: { select: { id_usuario: true, nome: true, email: true } },
       },
     });
   }
@@ -21,8 +22,8 @@ export class ConversaService {
   findAll() {
     return this.prisma.conversa.findMany({
       include: {
-        participantes: { select: { id_usuario: true, nome: true, email: true } },
-        mensagens: { orderBy: { enviada_em: 'desc' }, take: 1 },
+        usuario: { select: { id_usuario: true, nome: true, email: true } },
+        mensagem: { orderBy: { enviada_em: 'desc' }, take: 1 },
       },
     });
   }
@@ -31,8 +32,8 @@ export class ConversaService {
     const conversa = await this.prisma.conversa.findUnique({
       where: { id_conversa: id },
       include: {
-        participantes: { select: { id_usuario: true, nome: true, email: true } },
-        mensagens: { orderBy: { enviada_em: 'asc' } },
+        usuario: { select: { id_usuario: true, nome: true, email: true } },
+        mensagem: { orderBy: { enviada_em: 'asc' } },
       },
     });
     if (!conversa) throw new NotFoundException(`Conversa #${id} não encontrada`);
@@ -41,10 +42,10 @@ export class ConversaService {
 
   findByUsuario(id_usuario: number) {
     return this.prisma.conversa.findMany({
-      where: { participantes: { some: { id_usuario } } },
+      where: { usuario: { some: { id_usuario } } },
       include: {
-        participantes: { select: { id_usuario: true, nome: true, email: true } },
-        mensagens: { orderBy: { enviada_em: 'desc' }, take: 1 },
+        usuario: { select: { id_usuario: true, nome: true, email: true } },
+        mensagem: { orderBy: { enviada_em: 'desc' }, take: 1 },
       },
       orderBy: { criada_em: 'desc' },
     });

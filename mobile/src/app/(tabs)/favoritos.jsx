@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../../components/header";
-import { todosProdutos } from "../produtos/index";
+
 
 export default function Favoritos() {
   const [produtosFavoritos, setProdutosFavoritos] = useState([]);
