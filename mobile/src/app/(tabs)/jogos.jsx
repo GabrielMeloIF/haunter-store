@@ -13,7 +13,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import Header from "../../components/header";
 
-import Filtro from "../../components/filtro";
 
 const { width } = Dimensions.get("window");
 const CARD_GAP = 16;
@@ -91,7 +90,7 @@ export default function Jogos() {
   return (
     <View style={styles.container}>
       <Header />
-      <Filtro />
+  
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.sectionTitle}>Jogos</Text>
 

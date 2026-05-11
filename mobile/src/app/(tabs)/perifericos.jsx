@@ -12,7 +12,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import Header from "../../components/header";
-import Filtro from "../../components/filtro";
+
 
 
 const { width } = Dimensions.get("window");
@@ -136,7 +136,7 @@ export default function Perifericos() {
   return (
     <View style={styles.container}>
     <Header />
-    <Filtro />
+
 
     <ScrollView contentContainerStyle={styles.content}>
       <Text style={styles.sectionTitle}>Periféricos</Text>

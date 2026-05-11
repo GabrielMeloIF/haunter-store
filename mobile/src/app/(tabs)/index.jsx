@@ -3,7 +3,7 @@ import { StyleSheet, Text, View,  ScrollView,} from "react-native";
 import Header from "../../components/header";
 import Carrossel from "../../components/carrossel";
 import Cards from "../../components/card";
-import Filtro from "../../components/filtro";
+
 
 
 

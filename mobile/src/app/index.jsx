@@ -3,7 +3,7 @@ import { StyleSheet, Text, View,  ScrollView,} from "react-native";
 import Header from "../components/header";
 import Carrossel from "../components/carrossel";
 import Cards from "../components/card";
-import Filtro from "../components/filtro";
+
 
 
 
@@ -16,7 +16,7 @@ export default function Home() {
       <Header />
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         <Carrossel />
-          <Filtro />
+       
           <Cards />
       </ScrollView>
     </View>
