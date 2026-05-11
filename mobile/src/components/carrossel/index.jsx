@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
 import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useRouter } from "expo-router";
 
 const slides = [
   {
@@ -43,16 +44,11 @@ const slides = [
   },
 ];
 
-const categories = [
-  { icon: "headphones", lib: "feather", label: "Periféricos" },
-  { icon: "store", lib: "material", label: "Loja", sublabel: "100% Oficial" },
-  { icon: "gamepad-variant", lib: "material", label: "Games" },
-  { icon: "shield-outline", lib: "material", label: "Experiência", sublabel: "Segura e simples" },
-];
-
 function CategoryIcon({ icon, lib }) {
-  if (lib === "feather") return <Feather name={icon} size={40} color="#6b7280" />;
-  if (lib === "material") return <MaterialCommunityIcons name={icon} size={40} color="#6b7280" />;
+  if (lib === "feather")
+    return <Feather name={icon} size={40} color="#6b7280" />;
+  if (lib === "material")
+    return <MaterialCommunityIcons name={icon} size={40} color="#6b7280" />;
   return <Ionicons name={icon} size={40} color="#6b7280" />;
 }
 
@@ -64,20 +60,37 @@ export default function Carrossel() {
   const irPara = (index) => {
     if (index === atual) return;
     Animated.sequence([
-      Animated.timing(opacity, { toValue: 0, duration: 200, useNativeDriver: true }),
-      Animated.timing(opacity, { toValue: 1, duration: 200, useNativeDriver: true }),
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
     ]).start();
     setTimeout(() => setAtual(index), 200);
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      proximo();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [atual]);
 
   const proximo = () => irPara((atual + 1) % slides.length);
   const anterior = () => irPara((atual - 1 + slides.length) % slides.length);
 
   const slide = slides[atual];
 
+    const router = useRouter();
+
   return (
     <View style={styles.container}>
-
       {/* Carrossel */}
       <View style={[styles.carrossel, { width: width - 32 }]}>
         <Animated.View style={[styles.imageWrapper, { opacity }]}>
@@ -94,12 +107,18 @@ export default function Carrossel() {
         </Animated.View>
 
         {/* Botão Anterior */}
-        <TouchableOpacity style={[styles.navBtn, { left: 12 }]} onPress={anterior}>
+        <TouchableOpacity
+          style={[styles.navBtn, { left: 12 }]}
+          onPress={anterior}
+        >
           <Feather name="chevron-left" size={20} color="white" />
         </TouchableOpacity>
 
         {/* Botão Próximo */}
-        <TouchableOpacity style={[styles.navBtn, { right: 12 }]} onPress={proximo}>
+        <TouchableOpacity
+          style={[styles.navBtn, { right: 12 }]}
+          onPress={proximo}
+        >
           <Feather name="chevron-right" size={20} color="white" />
         </TouchableOpacity>
 
@@ -109,29 +128,42 @@ export default function Carrossel() {
             <TouchableOpacity
               key={i}
               onPress={() => irPara(i)}
-              style={[styles.dot, i === atual ? styles.dotAtivo : styles.dotInativo]}
+              style={[
+                styles.dot,
+                i === atual ? styles.dotAtivo : styles.dotInativo,
+              ]}
             />
           ))}
         </View>
       </View>
 
       {/* Categorias */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categories}
-      >
-        {categories.map((cat, index) => (
-          <TouchableOpacity key={index} style={styles.categoryItem}>
+      <View style={styles.categorias}>
+          <TouchableOpacity style={styles.categoryItem} onPress={() => router.push("/(tabs)/perifericos")}>
             <View style={styles.categoryCircle}>
-              <CategoryIcon icon={cat.icon} lib={cat.lib} />
+              <CategoryIcon icon="headphones" lib="feather" />
             </View>
-            <Text style={styles.categoryLabel}>{cat.label}</Text>
-            {cat.sublabel && <Text style={styles.categorySublabel}>{cat.sublabel}</Text>}
+            <Text style={styles.categoryLabel}>Periféricos</Text>
           </TouchableOpacity>
-        ))}
-      </ScrollView>
-
+           <TouchableOpacity style={styles.categoryItem} onPress={() => router.push("/(tabs)/jogos")}>
+            <View style={styles.categoryCircle}>
+              <CategoryIcon icon="gamepad-variant" lib="material" label="Games" />
+            </View>
+            <Text style={styles.categoryLabel}>Jogos</Text>
+          </TouchableOpacity>
+           <TouchableOpacity style={styles.categoryItem} onPress={() => router.push("/(tabs)/consoles")}>
+            <View style={styles.categoryCircle}>
+            <CategoryIcon icon="gamepad" lib="material" />
+            </View>
+            <Text style={styles.categoryLabel}>Consoles</Text>
+          </TouchableOpacity>
+           <TouchableOpacity style={styles.categoryItem} onPress={() => router.push("/(tabs)/pcs")}>
+            <View style={styles.categoryCircle}>
+              <CategoryIcon  icon= "monitor" lib= "feather" />
+            </View>
+            <Text style={styles.categoryLabel}>Pcs</Text>
+          </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -239,5 +271,10 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 11,
     textAlign: "center",
+  },
+  categorias: {
+    flexDirection: "row",
+    gap: 20,
+    marginTop: 24,
   },
 });

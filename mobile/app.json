@@ -1,11 +1,16 @@
 {
   "expo": {
-    "name": "Haunter Store",
+    "name": "haunter-store",
     "slug": "haunter-store",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+      "scheme": "haunter-store",
+  "experiments": {
+    "typedRoutes": true
+  },
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -14,25 +19,19 @@
     "ios": {
       "supportsTablet": true
     },
-    "scheme": "haunter-store",
-    "experiments": {
-      "typedRoutes": true
-    },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/favicon-16x16.png",
+      "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router",
-      "expo-image"
+      "expo-router"
     ]
   }
 }

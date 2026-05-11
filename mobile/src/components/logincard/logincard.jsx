@@ -1,11 +1,10 @@
 import { 
     View,
     Text,
-    StyleSheet
+    StyleSheet,
+    TextInput
 } from "react-native";
-import { TextInput } from "react-native-web"
 import { useRouter } from "expo-router";
-//import { useState } from "react";
 
 
 export default function Login() {
@@ -14,7 +13,7 @@ export default function Login() {
 
     return (
     <View style={styles.container}>
-        <Text style={styles.title}>Log-in</Text>
+        <Text style={styles.title}>Entrar</Text>
         <View>
             <TextInput 
                 style={styles.inputs} 
@@ -26,10 +25,10 @@ export default function Login() {
                 secureTextEntry
             />
             <View style={styles.buttonContainer}>
-                <Text style={styles.backButton} onPress={() => router.push('/')}>
+                <Text style={styles.backButton} onPress={() => router.push('/(tabs)')}>
                     Voltar
                 </Text>
-                <Text style={styles.loginButton} onPress={() => router.push('/')}>
+                <Text style={styles.loginButton} onPress={() => router.push('/(tabs)')}>
                     Logar
                 </Text>
             </View>
@@ -46,8 +45,9 @@ const styles = StyleSheet.create({
       backgroundColor: '#7D7D7D',
       alignItems: 'center',
       justifyContent: 'center',
-      maxHeight: '10%',
+      maxHeight: '100%',
       padding: 20,
+      borderRadius: 30,
     },
     title: {
         fontSize: 24,
@@ -55,7 +55,6 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     inputs: {
-        width: '100%',
         padding: 10,
         backgroundColor: '#D9D9D9',
         marginBottom: 10,

@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 
 export default function TesteScroll() {
   return (
-    <div style={{
+    <View style={{
       display: "flex",
       flexDirection: "row",
       overflowX: "scroll",
@@ -11,7 +11,7 @@ export default function TesteScroll() {
       backgroundColor: "#222",
     }}>
       {[1,2,3,4,5].map((n) => (
-        <div key={n} style={{
+        <View key={n} style={{
           minWidth: 200,
           height: 200,
           backgroundColor: "#A636E9",
@@ -24,8 +24,8 @@ export default function TesteScroll() {
           fontSize: 24,
         }}>
           Card {n}
-        </div>
+        </View>
       ))}
-    </div>
+    </View>
   );
 }

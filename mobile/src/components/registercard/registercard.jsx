@@ -1,11 +1,10 @@
 import { 
     View,
     Text,
-    StyleSheet
+    StyleSheet,
+    TextInput
 } from "react-native";
-import { TextInput } from "react-native-web"
 import { useRouter } from "expo-router";
-//import { useState } from "react";
 
 
 export default function Register() {
@@ -36,7 +35,7 @@ export default function Register() {
                 secureTextEntry
             />
             <View style={styles.buttonContainer}>
-                <Text style={styles.backButton} onPress={() => router.push('/')}>
+                <Text style={styles.backButton} onPress={() => router.push('/(tabs)')}>
                     Voltar
                 </Text>
                 <Text style={styles.registerButton} onPress={() => router.push('/user')}>
@@ -55,16 +54,18 @@ const styles = StyleSheet.create({
       backgroundColor: '#7D7D7D',
       alignItems: 'center',
       justifyContent: 'center',
-      maxHeight: '10%',
+      maxHeight: '20%',
       padding: 20,
     },
     title: {
         fontSize: 24,
         color: '#fff',
         marginBottom: 20,
+        position: 'absolute',
+        top: -150,
     },
     inputs: {
-        width: '100%',
+        width: '100px',
         padding: 10,
         backgroundColor: '#D9D9D9',
         marginBottom: 10,
