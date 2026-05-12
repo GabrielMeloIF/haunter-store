@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  Image,
   TouchableOpacity,
   StyleSheet,
   FlatList,
@@ -13,17 +12,17 @@ import { useState, useEffect } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
+import { Image } from "expo-image";
 
 const { width } = Dimensions.get("window");
 
 const CARD_GAP = 12;
-const CARD_WIDTH = width < 400 ? width * 0.45 : width * 0.45;
+const CARD_WIDTH = width * 0.48;
 
 export default function Cards() {
   const router = useRouter();
 
   const [favoritos, setFavoritos] = useState([]);
-
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -40,7 +39,7 @@ export default function Cards() {
     carregarFavoritos();
   }, []);
 
-  // buscar produtos do backend
+  // buscar produtos
   useEffect(() => {
     async function buscarProdutos() {
       try {
@@ -80,7 +79,8 @@ export default function Cards() {
         <Image
           source={{ uri: produto.imagem_url }}
           style={styles.image}
-          resizeMode="cover"
+          contentFit="contain"
+          transition={200}
         />
 
         <TouchableOpacity
@@ -89,7 +89,7 @@ export default function Cards() {
         >
           <AntDesign
             name="star"
-            size={22}
+            size={18}
             color={
               favoritos.includes(produto.id)
                 ? "#facc15"
@@ -100,45 +100,48 @@ export default function Cards() {
       </View>
 
       <View style={styles.info}>
-        <Text style={styles.nome}>
+        <Text
+          style={styles.nome}
+          numberOfLines={2}
+        >
           {produto.nome}
         </Text>
 
-        <View style={styles.footer}>
-          <Text style={styles.preco}>
-            {produto.preco}
-          </Text>
+        <Text style={styles.preco}>
+          R$ {produto.preco}
+        </Text>
 
-          <TouchableOpacity
-            style={styles.comprarBtn}
-            onPress={() =>
-              router.push({
-                pathname: "/comprar",
-                params: {
-                  id: produto.id,
-                  nome: produto.nome,
-                  preco: produto.preco,
-                  descricao: produto.descricao,
-                  imagem: produto.imagem_url,
-                },
-              })
-            }
-          >
-            <Text style={styles.comprarText}>
-              Comprar
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={styles.comprarBtn}
+          onPress={() =>
+            router.push({
+              pathname: "/comprar",
+              params: {
+                id: produto.id,
+                nome: produto.nome,
+                preco: produto.preco,
+                descricao: produto.descricao,
+                imagem: produto.imagem_url,
+              },
+            })
+          }
+        >
+          <Text style={styles.comprarText}>
+            Comprar
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 
   if (loading) {
     return (
-      <ActivityIndicator
-        size="large"
-        color="#A636E9"
-      />
+      <View style={{ paddingTop: 40 }}>
+        <ActivityIndicator
+          size="large"
+          color="#A636E9"
+        />
+      </View>
     );
   }
 
@@ -154,14 +157,12 @@ export default function Cards() {
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          paddingLeft: 16,
-          paddingRight: 40,
+          paddingHorizontal: 16,
           paddingBottom: 8,
         }}
         renderItem={({ item }) => (
           <View
             style={{
-              width: CARD_WIDTH,
               marginRight: CARD_GAP,
             }}
           >
@@ -176,7 +177,6 @@ export default function Cards() {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 24,
-    gap: 16,
   },
 
   sectionTitle: {
@@ -184,20 +184,24 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     paddingHorizontal: 16,
-    marginBottom: 4,
+    marginBottom: 16,
   },
 
   card: {
     width: CARD_WIDTH,
-    borderRadius: 12,
+    borderRadius: 18,
     overflow: "hidden",
     backgroundColor: "#3a3a3a",
   },
 
   imageContainer: {
     width: "100%",
-    height: 160,
+    height: 180,
     backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+    padding: 10,
   },
 
   image: {
@@ -209,48 +213,39 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 10,
     right: 10,
-    backgroundColor: "rgba(0,0,0,0.4)",
+    backgroundColor: "rgba(0,0,0,0.5)",
     borderRadius: 20,
-    padding: 4,
+    padding: 6,
   },
 
   info: {
-    padding: 12,
-    backgroundColor: "#4a4a4a",
+    padding: 14,
     gap: 12,
   },
 
   nome: {
     color: "#fff",
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "bold",
-    lineHeight: 20,
-  },
-
-  footer: {
-    gap: 11,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 4,
+    minHeight: 36,
   },
 
   preco: {
-    color: "#fff",
-    fontSize: 12,
+    color: "#A636E9",
+    fontSize: 18,
     fontWeight: "bold",
   },
 
   comprarBtn: {
     backgroundColor: "#A636E9",
-    paddingHorizontal: 20,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 10,
+    alignItems: "center",
   },
 
   comprarText: {
     color: "#fff",
-    fontSize: 10,
+    fontSize: 13,
     fontWeight: "bold",
   },
 });

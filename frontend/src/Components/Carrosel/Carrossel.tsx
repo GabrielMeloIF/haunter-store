@@ -1,4 +1,4 @@
- import { useState } from "react";
+ import { useState, useEffect } from "react";
 import { Icon } from '@iconify/react';
  
 const slides = [
@@ -47,6 +47,14 @@ export default function Carrossel({ className = "" }) {
       setAnimando(false);
     }, 400);    
   };
+
+  useEffect(() => {
+      const interval = setInterval(() => {
+        proximo();
+      }, 3000);
+  
+      return () => clearInterval(interval);
+    }, [atual]);
  
   const proximo = () => irPara((atual + 1) % slides.length);
   const anterior = () => irPara((atual - 1 + slides.length) % slides.length);
