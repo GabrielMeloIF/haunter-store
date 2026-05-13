@@ -10,26 +10,56 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../../components/header";
 
-
 export default function Favoritos() {
   const [produtosFavoritos, setProdutosFavoritos] = useState([]);
+  const [todosProdutos, setTodosProdutos] = useState([]);
 
   useEffect(() => {
-    carregarFavoritos();
+    fetchProdutos();
   }, []);
 
+  useEffect(() => {
+    if (todosProdutos.length > 0) {
+      carregarFavoritos();
+    }
+  }, [todosProdutos]);
+
+  async function fetchProdutos() {
+    try {
+      const response = await fetch("http://SEU_IP:4000/produtos");
+      const data = await response.json();
+
+      setTodosProdutos(data);
+    } catch (error) {
+      console.log("Erro ao buscar produtos:", error);
+    }
+  }
+
   const carregarFavoritos = async () => {
-    const salvo = await AsyncStorage.getItem("favoritos");
-    const ids = salvo ? JSON.parse(salvo) : [];
-    setProdutosFavoritos(todosProdutos.filter((p) => ids.includes(p.id)));
+    try {
+      const salvo = await AsyncStorage.getItem("favoritos");
+
+      const ids = salvo ? JSON.parse(salvo) : [];
+
+      const filtrados = todosProdutos.filter((p) => ids.includes(p.id));
+
+      setProdutosFavoritos(filtrados);
+    } catch (error) {
+      console.log("Erro ao carregar favoritos:", error);
+    }
   };
+  const filtrados = todosProdutos.filter((p) =>
+  ids.includes(Number(p.id))
+);
 
   const removerFavorito = async (id) => {
     const novos = produtosFavoritos.filter((p) => p.id !== id);
+
     setProdutosFavoritos(novos);
+
     await AsyncStorage.setItem(
       "favoritos",
-      JSON.stringify(novos.map((p) => p.id))
+      JSON.stringify(novos.map((p) => Number(p.id))),
     );
   };
 
@@ -39,7 +69,6 @@ export default function Favoritos() {
       contentContainerStyle={styles.scrollContainer}
     >
       <View style={styles.content}>
-        
         <Header />
 
         <View style={styles.main}>
@@ -52,15 +81,16 @@ export default function Favoritos() {
               {produtosFavoritos.map((produto) => (
                 <View key={produto.id} style={styles.card}>
                   <Image
-                    source={produto.imagem}
+                    source={{ uri: produto.imagem_url }}
                     style={styles.imagem}
                     resizeMode="cover"
                   />
+
                   <Text style={styles.nome}>{produto.nome}</Text>
-                  <Text style={styles.descricao}>
-                    {produto.descricao}
-                  </Text>
-                  <Text style={styles.preco}>{produto.preco}</Text>
+
+                  <Text style={styles.descricao}>{produto.descricao}</Text>
+
+                  <Text style={styles.preco}>R$ {produto.preco}</Text>
 
                   <View style={styles.botoes}>
                     <TouchableOpacity
@@ -80,12 +110,9 @@ export default function Favoritos() {
           )}
         </View>
       </View>
-
-    
     </ScrollView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

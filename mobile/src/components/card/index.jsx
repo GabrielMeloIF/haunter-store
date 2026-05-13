@@ -1,3 +1,4 @@
+
 import {
   View,
   Text,
@@ -17,41 +18,75 @@ import { Image } from "expo-image";
 const { width } = Dimensions.get("window");
 
 const CARD_GAP = 12;
-const CARD_WIDTH = width * 0.48;
+const CARD_WIDTH = width * 0.45;
+
+const API_URL = "http://192.168.56.1:4000";
 
 export default function Cards() {
   const router = useRouter();
 
   const [favoritos, setFavoritos] = useState([]);
-  const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState(null);
 
-  // carregar favoritos
+  const [perifericos, setPerifericos] = useState([]);
+  const [games, setGames] = useState([]);
+  const [consoles, setConsoles] = useState([]);
+  const [pcs, setPcs] = useState([]);
+
+  // FAVORITOS
   useEffect(() => {
-    const carregarFavoritos = async () => {
-      const salvo = await AsyncStorage.getItem("favoritos");
+    async function carregarFavoritos() {
+      try {
+        const salvo = await AsyncStorage.getItem("favoritos");
 
-      if (salvo) {
-        setFavoritos(JSON.parse(salvo));
+        if (salvo) {
+          setFavoritos(JSON.parse(salvo));
+        }
+      } catch (error) {
+        console.log("Erro ao carregar favoritos:", error);
       }
-    };
+    }
 
     carregarFavoritos();
   }, []);
 
-  // buscar produtos
+  // PRODUTOS
   useEffect(() => {
     async function buscarProdutos() {
       try {
-        const response = await fetch(
-          "http://192.168.56.1:4000/produtos"
+        const response = await fetch(`${API_URL}/produtos`);
+
+        const dados = await response.json();
+
+        console.log("PRODUTOS:", dados);
+
+        const lista = Array.isArray(dados)
+          ? dados
+          : dados.produtos || [];
+
+        // DEBUG
+        console.log("TOTAL:", lista.length);
+
+        setPerifericos(
+          lista.filter((p) => Number(p.categoriaId) === 1)
         );
 
-        const data = await response.json();
+        setGames(
+          lista.filter((p) => Number(p.categoriaId) === 2)
+        );
 
-        setProdutos(data);
+        setConsoles(
+          lista.filter((p) => Number(p.categoriaId) === 3)
+        );
+
+        setPcs(
+          lista.filter((p) => Number(p.categoriaId) === 4)
+        );
+
       } catch (error) {
         console.log("Erro ao buscar produtos:", error);
+        setErro("Erro ao carregar produtos");
       } finally {
         setLoading(false);
       }
@@ -61,17 +96,37 @@ export default function Cards() {
   }, []);
 
   const toggleFavorito = async (id) => {
-    const novos = favoritos.includes(id)
-      ? favoritos.filter((f) => f !== id)
-      : [...favoritos, id];
+    try {
+      const novos = favoritos.includes(id)
+        ? favoritos.filter((f) => f !== id)
+        : [...favoritos, id];
 
-    setFavoritos(novos);
+      setFavoritos(novos);
 
-    await AsyncStorage.setItem(
-      "favoritos",
-      JSON.stringify(novos)
-    );
+      await AsyncStorage.setItem(
+        "favoritos",
+        JSON.stringify(novos)
+      );
+    } catch (error) {
+      console.log("Erro ao salvar favorito:", error);
+    }
   };
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#A636E9" />
+      </View>
+    );
+  }
+
+  if (erro) {
+    return (
+      <View style={styles.center}>
+        <Text style={{ color: "#fff" }}>{erro}</Text>
+      </View>
+    );
+  }
 
   const CardItem = ({ produto }) => (
     <View style={styles.card}>
@@ -79,8 +134,7 @@ export default function Cards() {
         <Image
           source={{ uri: produto.imagem_url }}
           style={styles.image}
-          contentFit="contain"
-          transition={200}
+          contentFit="cover"
         />
 
         <TouchableOpacity
@@ -89,7 +143,7 @@ export default function Cards() {
         >
           <AntDesign
             name="star"
-            size={18}
+            size={22}
             color={
               favoritos.includes(produto.id)
                 ? "#facc15"
@@ -100,69 +154,68 @@ export default function Cards() {
       </View>
 
       <View style={styles.info}>
-        <Text
-          style={styles.nome}
-          numberOfLines={2}
-        >
+        <Text style={styles.nome} numberOfLines={2}>
           {produto.nome}
         </Text>
 
-        <Text style={styles.preco}>
-          R$ {produto.preco}
-        </Text>
-
-        <TouchableOpacity
-          style={styles.comprarBtn}
-          onPress={() =>
-            router.push({
-              pathname: "/comprar",
-              params: {
-                id: produto.id,
-                nome: produto.nome,
-                preco: produto.preco,
-                descricao: produto.descricao,
-                imagem: produto.imagem_url,
-              },
-            })
-          }
-        >
-          <Text style={styles.comprarText}>
-            Comprar
+        <View style={styles.footer}>
+          <Text style={styles.preco}>
+            R$ {produto.preco}
           </Text>
-        </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.comprarBtn}
+            onPress={() =>
+              router.push({
+                pathname: "/comprar",
+                params: {
+                  id: produto.id,
+                  nome: produto.nome,
+                  preco: produto.preco,
+                  descricao: produto.descricao,
+                  imagem: produto.imagem_url,
+                },
+              })
+            }
+          >
+            <Text style={styles.comprarText}>
+              Comprar
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
 
-  if (loading) {
+  const Carrossel = ({ data }) => {
+    if (!data || data.length === 0) {
+      return (
+        <Text
+          style={{
+            color: "#888",
+            paddingHorizontal: 16,
+          }}
+        >
+          Nenhum produto encontrado
+        </Text>
+      );
+    }
+
     return (
-      <View style={{ paddingTop: 40 }}>
-        <ActivityIndicator
-          size="large"
-          color="#A636E9"
-        />
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.sectionTitle}>
-        Produtos
-      </Text>
-
       <FlatList
-        data={produtos}
-        keyExtractor={(item) => String(item.id)}
+        data={data}
         horizontal
+        keyExtractor={(item) => String(item.id)}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          paddingHorizontal: 16,
+          paddingLeft: 16,
+          paddingRight: 40,
           paddingBottom: 8,
         }}
         renderItem={({ item }) => (
           <View
             style={{
+              width: CARD_WIDTH,
               marginRight: CARD_GAP,
             }}
           >
@@ -170,6 +223,43 @@ export default function Cards() {
           </View>
         )}
       />
+    );
+  };
+
+  const secoes = [
+    {
+      key: "perifericos",
+      titulo: "Periféricos",
+      data: perifericos,
+    },
+    {
+      key: "jogos",
+      titulo: "Jogos",
+      data: games,
+    },
+    {
+      key: "consoles",
+      titulo: "Consoles",
+      data: consoles,
+    },
+    {
+      key: "pcs",
+      titulo: "PCs",
+      data: pcs,
+    },
+  ];
+
+  return (
+    <View style={styles.container}>
+      {secoes.map((item) => (
+        <View key={item.key} style={styles.secao}>
+          <Text style={styles.sectionTitle}>
+            {item.titulo}
+          </Text>
+
+          <Carrossel data={item.data} />
+        </View>
+      ))}
     </View>
   );
 }
@@ -177,6 +267,17 @@ export default function Cards() {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 24,
+    gap: 16,
+  },
+
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  secao: {
+    gap: 8,
   },
 
   sectionTitle: {
@@ -184,24 +285,19 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     paddingHorizontal: 16,
-    marginBottom: 16,
   },
 
   card: {
     width: CARD_WIDTH,
-    borderRadius: 18,
+    borderRadius: 12,
     overflow: "hidden",
     backgroundColor: "#3a3a3a",
   },
 
   imageContainer: {
     width: "100%",
-    height: 180,
+    height: 160,
     backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-    position: "relative",
-    padding: 10,
   },
 
   image: {
@@ -213,39 +309,47 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 10,
     right: 10,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.4)",
     borderRadius: 20,
-    padding: 6,
+    padding: 4,
   },
 
   info: {
-    padding: 14,
+    padding: 12,
+    backgroundColor: "#4a4a4a",
     gap: 12,
   },
 
   nome: {
     color: "#fff",
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "bold",
+    lineHeight: 18,
     minHeight: 36,
   },
 
+  footer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
   preco: {
-    color: "#A636E9",
-    fontSize: 18,
+    color: "#fff",
+    fontSize: 12,
     fontWeight: "bold",
   },
 
   comprarBtn: {
     backgroundColor: "#A636E9",
+    paddingHorizontal: 20,
     paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: "center",
+    borderRadius: 8,
   },
 
   comprarText: {
     color: "#fff",
-    fontSize: 13,
+    fontSize: 10,
     fontWeight: "bold",
   },
 });
