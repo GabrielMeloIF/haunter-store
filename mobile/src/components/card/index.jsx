@@ -9,10 +9,10 @@ import {
   ActivityIndicator,
 } from "react-native";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { Image } from "expo-image";
 
 const { width } = Dimensions.get("window");
@@ -35,21 +35,31 @@ export default function Cards() {
   const [pcs, setPcs] = useState([]);
 
   // FAVORITOS
-  useEffect(() => {
-    async function carregarFavoritos() {
-      try {
-        const salvo = await AsyncStorage.getItem("favoritos");
+  const carregarFavoritos = async () => {
+  try {
+    const salvo = await AsyncStorage.getItem(
+      "favoritos"
+    );
 
-        if (salvo) {
-          setFavoritos(JSON.parse(salvo));
-        }
-      } catch (error) {
-        console.log("Erro ao carregar favoritos:", error);
-      }
+    if (salvo) {
+      setFavoritos(JSON.parse(salvo));
+    } else {
+      setFavoritos([]);
     }
 
+  } catch (error) {
+    console.log(
+      "Erro ao carregar favoritos:",
+      error
+    );
+  }
+};
+
+useFocusEffect(
+  useCallback(() => {
     carregarFavoritos();
-  }, []);
+  }, [])
+);
 
   // PRODUTOS
   useEffect(() => {

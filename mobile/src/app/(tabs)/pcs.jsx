@@ -6,71 +6,70 @@ import {
   StyleSheet,
   Dimensions,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useCallback } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 
 import Header from "../../components/header";
 
-
 const { width } = Dimensions.get("window");
+
 const CARD_GAP = 16;
 const NUM_COLUMNS = 2;
-const CARD_WIDTH = (width - CARD_GAP * (NUM_COLUMNS + 1)) / NUM_COLUMNS;
 
-const pcs = [
-  {
-    id: 1,
-    nome: "PC Gamer RTX 4060",
-    preco: "R$ 5.499,00",
-    imagem: require("../../../assets/pc1.png"),
-  },
-  {
-    id: 2,
-    nome: "PC Gamer Ryzen 7",
-    preco: "R$ 6.299,00",
-    imagem: require("../../../assets/pc2.png"),
-  },
-  {
-    id: 3,
-    nome: "PC Gamer Intel i5",
-    preco: "R$ 4.199,00",
-    imagem: require("../../../assets/pc3.png"),
-  },
-  {
-    id: 4,
-    nome: "Setup Gamer RGB",
-    preco: "R$ 7.999,00",
-    imagem: require("../../../assets/pc4.png"),
-  },
-  {
-    id: 5,
-    nome: "PC Gamer RTX 4070",
-    preco: "R$ 8.499,00",
-    imagem: require("../../../assets/pc1.png"),
-  },
-  {
-    id: 6,
-    nome: "PC Gamer Water Cooler",
-    preco: "R$ 6.999,00",
-    imagem: require("../../../assets/pc2.png"),
-  },
-];
+const CARD_WIDTH = (width - CARD_GAP * (NUM_COLUMNS + 1)) / NUM_COLUMNS;
 
 export default function Pcs() {
   const router = useRouter();
+
   const [favoritos, setFavoritos] = useState([]);
+  const [pcs, setPcs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const carregar = async () => {
-      const salvo = await AsyncStorage.getItem("favoritos");
-      if (salvo) setFavoritos(JSON.parse(salvo));
-    };
+  useFocusEffect(
+    useCallback(() => {
+      carregarFavoritos();
+      buscarProdutos();
+    }, [])
+  );
 
-    carregar();
-  }, []);
+  const carregarFavoritos = async () => {
+  const salvo = await AsyncStorage.getItem(
+    "favoritos"
+  );
+
+  if (salvo) {
+    setFavoritos(JSON.parse(salvo));
+  } else {
+    setFavoritos([]);
+  }
+};
+
+  const buscarProdutos = async () => {
+    try {
+      const response = await fetch("http://192.168.56.1:4000/produtos");
+
+      const data = await response.json();
+
+      console.log(JSON.stringify(data[0], null, 2));
+
+      const produtosArray = Array.isArray(data) ? data : [];
+
+      const apenasPcs = data.filter(
+        (produto) => produto.categoria?.nome_categoria?.toLowerCase() === "pcs",
+      );
+
+      setPcs(apenasPcs);
+    } catch (error) {
+      console.log("Erro ao buscar produtos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const toggleFavorito = async (id) => {
     const novos = favoritos.includes(id)
@@ -79,17 +78,14 @@ export default function Pcs() {
 
     setFavoritos(novos);
 
-    await AsyncStorage.setItem(
-      "favoritos",
-      JSON.stringify(novos)
-    );
+    await AsyncStorage.setItem("favoritos", JSON.stringify(novos));
   };
 
   const CardItem = ({ produto }) => (
     <View style={styles.card}>
       <View style={styles.imageContainer}>
         <Image
-          source={produto.imagem}
+          source={{ uri: produto.imagem_url }}
           style={styles.image}
           resizeMode="cover"
         />
@@ -101,55 +97,54 @@ export default function Pcs() {
           <AntDesign
             name="star"
             size={22}
-            color={
-              favoritos.includes(produto.id)
-                ? "#facc15"
-                : "#fff"
-            }
+            color={favoritos.includes(produto.id) ? "#facc15" : "#fff"}
           />
         </TouchableOpacity>
       </View>
 
       <View style={styles.info}>
-        <Text style={styles.nome}>
-          {produto.nome}
-        </Text>
+        <Text style={styles.nome}>{produto.nome}</Text>
 
         <View style={styles.footer}>
-          <Text style={styles.preco}>
-            {produto.preco}
-          </Text>
+          <Text style={styles.preco}>R$ {produto.preco}</Text>
 
           <TouchableOpacity
             style={styles.comprarBtn}
             onPress={() => router.push("/comprar")}
           >
-            <Text style={styles.comprarText}>
-              Comprar
-            </Text>
+            <Text style={styles.comprarText}>Comprar</Text>
           </TouchableOpacity>
         </View>
       </View>
     </View>
   );
 
+  if (loading) {
+    return (
+      <View
+        style={[
+          styles.container,
+          {
+            justifyContent: "center",
+            alignItems: "center",
+          },
+        ]}
+      >
+        <ActivityIndicator size="large" color="#A636E9" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Header />
 
-
-
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.sectionTitle}>
-          Pcs
-        </Text>
+        <Text style={styles.sectionTitle}>PCs</Text>
 
         <View style={styles.grid}>
           {pcs.map((produto) => (
-            <CardItem
-              key={produto.id}
-              produto={produto}
-            />
+            <CardItem key={produto.id} produto={produto} />
           ))}
         </View>
       </ScrollView>

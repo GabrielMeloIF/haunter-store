@@ -1,74 +1,259 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import React, {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  TextInput,
+  Alert,
+} from "react-native";
+
 import { useRouter } from "expo-router";
+
 import * as ImagePicker from "expo-image-picker";
-import { useUser } from "../context/userContext";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const API_URL =
+  "http://192.168.56.1:4000";
 
 export default function UserCard() {
   const router = useRouter();
-  const [imageUri, setImageUri] = useState(null);
-  const { setUserImage } = useUser();
 
-  const handleImagePicker = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+  const [usuario, setUsuario] =
+    useState(null);
 
-    if (!result.canceled) {
-      const uri = result.assets[0].uri;
-      setImageUri(uri);
-      setUserImage(uri);
-    }
-  };
+  const [email, setEmail] =
+    useState("");
+
+  const [senha, setSenha] =
+    useState("");
+
+  const [imageUri, setImageUri] =
+    useState(null);
+
+  useEffect(() => {
+    carregarUsuario();
+  }, []);
+
+  const carregarUsuario =
+    async () => {
+      try {
+        // pega id salvo login
+        const userId =
+          await AsyncStorage.getItem(
+            "userId"
+          );
+
+        if (!userId) return;
+
+        const response =
+          await fetch(
+            `${API_URL}/usuarios/${userId}`
+          );
+
+        const data =
+          await response.json();
+
+        setUsuario(data);
+
+        setEmail(data.email);
+
+        setSenha(data.senha);
+
+        setImageUri(data.foto);
+
+      } catch (error) {
+        console.log(
+          "Erro ao carregar usuário:",
+          error
+        );
+      }
+    };
+
+  const handleImagePicker =
+    async () => {
+      const result =
+        await ImagePicker.launchImageLibraryAsync(
+          {
+            mediaTypes:
+              ImagePicker
+                .MediaTypeOptions
+                .Images,
+
+            allowsEditing: true,
+
+            aspect: [4, 3],
+
+            quality: 1,
+          }
+        );
+
+      if (!result.canceled) {
+        setImageUri(
+          result.assets[0].uri
+        );
+      }
+    };
+
+  const atualizarUsuario =
+    async () => {
+      try {
+        if (!usuario) return;
+
+        const response =
+          await fetch(
+            `${API_URL}/usuarios/${usuario.id}`,
+            {
+              method: "PATCH",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+
+              body: JSON.stringify({
+                email,
+                senha,
+                foto: imageUri,
+              }),
+            }
+          );
+
+        if (!response.ok) {
+          throw new Error(
+            "Erro ao atualizar"
+          );
+        }
+
+        Alert.alert(
+          "Sucesso",
+          "Conta atualizada!"
+        );
+
+      } catch (error) {
+        console.log(error);
+
+        Alert.alert(
+          "Erro",
+          "Não foi possível atualizar"
+        );
+      }
+    };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Conta</Text>
+      <Text style={styles.title}>
+        Conta
+      </Text>
 
       <View style={styles.card}>
-        <View style={styles.profileContainer}>
-          <TouchableOpacity onPress={handleImagePicker}>
+        <View
+          style={
+            styles.profileContainer
+          }
+        >
+          <TouchableOpacity
+            onPress={
+              handleImagePicker
+            }
+          >
             <Image
-              source={{ uri: imageUri || "https://via.placeholder.com/100" }} // Placeholder if no image is selected
-              style={styles.profileImage}
+              source={{
+                uri:
+                  imageUri ||
+                  "https://via.placeholder.com/100",
+              }}
+              style={
+                styles.profileImage
+              }
             />
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleImagePicker}>
-            <Text style={styles.changeImageText}>Alterar imagem</Text>
+
+          <TouchableOpacity
+            onPress={
+              handleImagePicker
+            }
+          >
+            <Text
+              style={
+                styles.changeImageText
+              }
+            >
+              Alterar imagem
+            </Text>
           </TouchableOpacity>
         </View>
 
         <View>
-          <Text style={styles.label}>Email cadastrado</Text>
-          <Text style={styles.value}>Exemplo@gmail.com</Text>
+          <Text style={styles.label}>
+            Email cadastrado
+          </Text>
 
-          <Text style={styles.label}>Senha cadastrada</Text>
-          <Text style={styles.value}>••••••••</Text>
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
+          />
+
+          <Text style={styles.label}>
+            Senha cadastrada
+          </Text>
+
+          <TextInput
+            value={senha}
+            onChangeText={setSenha}
+            secureTextEntry
+            style={styles.input}
+          />
         </View>
 
-        <View style={styles.buttonContainer}>
+        <View
+          style={
+            styles.buttonContainer
+          }
+        >
           <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.push("/")}
+            style={
+              styles.backButton
+            }
+            onPress={() =>
+              router.push("/")
+            }
           >
-            <Text style={styles.backText}>Voltar</Text>
+            <Text
+              style={styles.backText}
+            >
+              Voltar
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.patchButton}
-            onPress={() => router.push("/")}
+            style={
+              styles.patchButton
+            }
+            onPress={
+              atualizarUsuario
+            }
           >
-            <Text style={styles.patchText}>Alterar</Text>
+            <Text
+              style={
+                styles.patchText
+              }
+            >
+              Alterar
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -116,11 +301,12 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
 
-  value: {
-    color: "#000",
-    fontSize: 16,
+  input: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     marginTop: 5,
-    marginBottom: 20,
   },
 
   buttonContainer: {

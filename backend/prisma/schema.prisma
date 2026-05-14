@@ -141,14 +141,12 @@ model produto {
 }
 
 model usuario {
-  id_usuario    Int                  @id @default(autoincrement())
-  nome          String
-  email         String               @unique(map: "Usuario_email_key")
-  senha         String
-  cpf           String               @unique(map: "Usuario_cpf_key")
-  telefone      String
-  endereco      String
-  data_cadastro DateTime             @default(now())
+  id_usuario      Int                  @id @default(autoincrement())
+  nome            String
+  email           String               @unique(map: "Usuario_email_key")
+  senha           String
+  confirmar_senha String
+  data_cadastro   DateTime             @default(now())
   tipo_usuario  usuario_tipo_usuario @default(CLIENTE)
   avaliacao     avaliacao[]
   carrinho      carrinho[]

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
+
 import {
   View,
   Text,
@@ -7,50 +8,43 @@ import {
   ScrollView,
   StyleSheet,
 } from "react-native";
+
+import { useFocusEffect } from "expo-router";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import Header from "../../components/header";
 
 export default function Favoritos() {
   const [produtosFavoritos, setProdutosFavoritos] = useState([]);
+
   const [todosProdutos, setTodosProdutos] = useState([]);
 
-  useEffect(() => {
-    fetchProdutos();
-  }, []);
-
-  useEffect(() => {
-    if (todosProdutos.length > 0) {
-      carregarFavoritos();
-    }
-  }, [todosProdutos]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchProdutos();
+    }, []),
+  );
 
   async function fetchProdutos() {
     try {
-      const response = await fetch("http://SEU_IP:4000/produtos");
+      const response = await fetch("http://192.168.56.1:4000/produtos");
+
       const data = await response.json();
 
       setTodosProdutos(data);
-    } catch (error) {
-      console.log("Erro ao buscar produtos:", error);
-    }
-  }
 
-  const carregarFavoritos = async () => {
-    try {
       const salvo = await AsyncStorage.getItem("favoritos");
 
       const ids = salvo ? JSON.parse(salvo) : [];
 
-      const filtrados = todosProdutos.filter((p) => ids.includes(p.id));
+      const filtrados = data.filter((p) => ids.includes(Number(p.id)));
 
       setProdutosFavoritos(filtrados);
     } catch (error) {
-      console.log("Erro ao carregar favoritos:", error);
+      console.log("Erro ao buscar produtos:", error);
     }
-  };
-  const filtrados = todosProdutos.filter((p) =>
-  ids.includes(Number(p.id))
-);
+  }
 
   const removerFavorito = async (id) => {
     const novos = produtosFavoritos.filter((p) => p.id !== id);
@@ -81,7 +75,9 @@ export default function Favoritos() {
               {produtosFavoritos.map((produto) => (
                 <View key={produto.id} style={styles.card}>
                   <Image
-                    source={{ uri: produto.imagem_url }}
+                    source={{
+                      uri: produto.imagem_url,
+                    }}
                     style={styles.imagem}
                     resizeMode="cover"
                   />
@@ -113,11 +109,13 @@ export default function Favoritos() {
     </ScrollView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#303030",
   },
+
   scrollContainer: {
     flexGrow: 1,
     justifyContent: "space-between",

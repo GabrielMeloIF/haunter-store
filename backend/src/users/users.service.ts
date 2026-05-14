@@ -7,29 +7,40 @@ export class UsersService {
 
   async findAll() {
     return this.prisma.usuario.findMany({
-      select: { id_usuario: true, nome: true, email: true, telefone: true, endereco: true }
-      // senha e cpf nunca retornam na listagem
+      select: { id_usuario: true, nome: true, email: true,senha: true }
+    
     });
   }
 
   async findOne(id: number) {
     return this.prisma.usuario.findUnique({
       where: { id_usuario: id },
-      select: { id_usuario: true, nome: true, email: true, telefone: true, endereco: true }
+      select: { id_usuario: true, nome: true, email: true, senha: true }
     });
   }
 
-  async create(data: { nome: string; email: string; senha: string; cpf: string; telefone: string; endereco: string }) {
-    // hash da senha antes de salvar
-    const bcrypt = await import('bcrypt');
-    const senhaHash = await bcrypt.hash(data.senha, 10);
+  async create(data: {
+  nome: string;
+  email: string;
+  senha: string;
+  confirmar_senha: string;
+}) {
 
-    return this.prisma.usuario.create({
-      data: { ...data, senha: senhaHash }
-    });
-  }
+  const bcrypt = await import('bcrypt');
 
-  async update(id: number, data: Partial<{ nome: string; email: string; telefone: string; endereco: string }>) {
+  const senhaHash = await bcrypt.hash(data.senha, 10);
+
+  return this.prisma.usuario.create({
+    data: {
+      nome: data.nome,
+      email: data.email,
+      senha: senhaHash,
+      confirmar_senha: senhaHash,
+    },
+  });
+}
+
+  async update(id: number, data: Partial<{ nome: string; email: string; senha: string; confirmar_senha: string }>) {
     return this.prisma.usuario.update({
       where: { id_usuario: id },
       data,

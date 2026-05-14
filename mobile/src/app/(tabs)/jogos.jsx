@@ -7,42 +7,46 @@ import {
   Dimensions,
   ScrollView,
 } from "react-native";
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useCallback  } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
+
 import Header from "../../components/header";
 
-
 const { width } = Dimensions.get("window");
+
 const CARD_GAP = 16;
 const NUM_COLUMNS = 2;
-const CARD_WIDTH = (width - CARD_GAP * (NUM_COLUMNS + 1)) / NUM_COLUMNS;
 
-const jogos = [
-  { id: 1, nome: "God of War", preco: "R$ 199,00", imagem: require("../../../assets/god.webp") },
-  { id: 2, nome: "Forza", preco: "R$ 199,00", imagem: require("../../../assets/forza.png") },
-  { id: 3, nome: "God of War", preco: "R$ 199,00", imagem: require("../../../assets/god.webp") },
-  { id: 4, nome: "Forza", preco: "R$ 199,00", imagem: require("../../../assets/forza.png") },
-  { id: 5, nome: "Forza", preco: "R$ 199,00", imagem: require("../../../assets/forza.png") },
-  { id: 6, nome: "God of War", preco: "R$ 199,00", imagem: require("../../../assets/god.webp") },
-  { id: 7, nome: "Forza", preco: "R$ 199,00", imagem: require("../../../assets/forza.png") },
-  { id: 8, nome: "God of War", preco: "R$ 199,00", imagem: require("../../../assets/god.webp") },
-  { id: 9, nome: "Forza", preco: "R$ 199,00", imagem: require("../../../assets/forza.png") },
-  { id: 10, nome: "God of War", preco: "R$ 199,00", imagem: require("../../../assets/god.webp") },
-];
+const CARD_WIDTH =
+  (width - CARD_GAP * (NUM_COLUMNS + 1)) /
+  NUM_COLUMNS;
 
 export default function Jogos() {
   const router = useRouter();
-  const [favoritos, setFavoritos] = useState([]);
 
-  useEffect(() => {
-    const carregar = async () => {
-      const salvo = await AsyncStorage.getItem("favoritos");
-      if (salvo) setFavoritos(JSON.parse(salvo));
-    };
-    carregar();
-  }, []);
+  const [favoritos, setFavoritos] = useState([]);
+  const [jogos, setJogos] = useState([]);
+
+  useFocusEffect(
+  useCallback(() => {
+    carregarFavoritos();
+    buscarProdutos();
+  }, [])
+);
+  const carregarFavoritos = async () => {
+  const salvo = await AsyncStorage.getItem(
+    "favoritos"
+  );
+
+  if (salvo) {
+    setFavoritos(JSON.parse(salvo));
+  } else {
+    setFavoritos([]);
+  }
+};
 
   const toggleFavorito = async (id) => {
     const novos = favoritos.includes(id)
@@ -50,37 +54,92 @@ export default function Jogos() {
       : [...favoritos, id];
 
     setFavoritos(novos);
-    await AsyncStorage.setItem("favoritos", JSON.stringify(novos));
+
+    await AsyncStorage.setItem(
+      "favoritos",
+      JSON.stringify(novos)
+    );
+  };
+
+  const buscarProdutos = async () => {
+    try {
+      const response = await fetch(
+        "http://192.168.56.1:4000/produtos"
+      );
+
+      const data = await response.json();
+
+      console.log(data);
+
+      const produtosArray = Array.isArray(data)
+        ? data
+        : [];
+
+      const apenasJogos =
+        produtosArray.filter((produto) =>
+          produto.categoria?.nome_categoria
+            ?.toLowerCase()
+            .includes("jogo")
+        );
+
+      setJogos(apenasJogos);
+
+    } catch (error) {
+      console.log(
+        "Erro ao buscar produtos:",
+        error
+      );
+    }
   };
 
   const CardItem = ({ produto }) => (
     <View style={styles.card}>
       <View style={styles.imageContainer}>
-        <Image source={produto.imagem} style={styles.image} resizeMode="cover" />
+        <Image
+          source={{
+            uri: produto.imagem_url,
+          }}
+          style={styles.image}
+          resizeMode="cover"
+        />
 
         <TouchableOpacity
           style={styles.starBtn}
-          onPress={() => toggleFavorito(produto.id)}
+          onPress={() =>
+            toggleFavorito(produto.id)
+          }
         >
           <AntDesign
             name="star"
             size={22}
-            color={favoritos.includes(produto.id) ? "#facc15" : "#fff"}
+            color={
+              favoritos.includes(produto.id)
+                ? "#facc15"
+                : "#fff"
+            }
           />
         </TouchableOpacity>
       </View>
 
       <View style={styles.info}>
-        <Text style={styles.nome}>{produto.nome}</Text>
+        <Text style={styles.nome}>
+          {produto.nome}
+        </Text>
 
         <View style={styles.footer}>
-          <Text style={styles.preco}>{produto.preco}</Text>
+          <Text style={styles.preco}>
+            R$ {produto.preco}
+          </Text>
 
           <TouchableOpacity
             style={styles.comprarBtn}
-            onPress={() => router.push("/comprar")}
+            onPress={() =>
+              router.push("/comprar")
+            }
           >
-            <Text style={styles.comprarText}>Comprar</Text>
+            <Text style={styles.comprarText}>
+              Comprar
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -90,13 +149,20 @@ export default function Jogos() {
   return (
     <View style={styles.container}>
       <Header />
-  
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.sectionTitle}>Jogos</Text>
+
+      <ScrollView
+        contentContainerStyle={styles.content}
+      >
+        <Text style={styles.sectionTitle}>
+          Jogos
+        </Text>
 
         <View style={styles.grid}>
           {jogos.map((produto) => (
-            <CardItem key={produto.id} produto={produto} />
+            <CardItem
+              key={produto.id}
+              produto={produto}
+            />
           ))}
         </View>
       </ScrollView>

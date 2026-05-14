@@ -7,70 +7,48 @@ import {
   Dimensions,
   ScrollView,
 } from "react-native";
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useCallback } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 
 import Header from "../../components/header";
 
-
 const { width } = Dimensions.get("window");
+
 const CARD_GAP = 16;
 const NUM_COLUMNS = 2;
-const CARD_WIDTH = (width - CARD_GAP * (NUM_COLUMNS + 1)) / NUM_COLUMNS;
 
-const consoles = [
-  {
-    id: 1,
-    nome: "PlayStation 5",
-    preco: "R$ 3.999,00",
-    imagem: require("../../../assets/ps5.png"),
-  },
-  {
-    id: 2,
-    nome: "Xbox Series X",
-    preco: "R$ 4.299,00",
-    imagem: require("../../../assets/xbox.png"),
-  },
-  {
-    id: 3,
-    nome: "Nintendo Switch",
-    preco: "R$ 2.199,00",
-    imagem: require("../../../assets/switch.png"),
-  },
-  {
-    id: 4,
-    nome: "PlayStation 5 Slim",
-    preco: "R$ 4.199,00",
-    imagem: require("../../../assets/ps5.png"),
-  },
-  {
-    id: 5,
-    nome: "Xbox Series S",
-    preco: "R$ 2.799,00",
-    imagem: require("../../../assets/xbox.png"),
-  },
-  {
-    id: 6,
-    nome: "Nintendo Switch OLED",
-    preco: "R$ 2.599,00",
-    imagem: require("../../../assets/switch.png"),
-  },
-];
+const CARD_WIDTH =
+  (width - CARD_GAP * (NUM_COLUMNS + 1)) /
+  NUM_COLUMNS;
 
 export default function Consoles() {
   const router = useRouter();
+
   const [favoritos, setFavoritos] = useState([]);
+  const [consoles, setConsoles] = useState([]);
 
-  useEffect(() => {
-    const carregar = async () => {
-      const salvo = await AsyncStorage.getItem("favoritos");
-      if (salvo) setFavoritos(JSON.parse(salvo));
-    };
+  useFocusEffect(
+    useCallback(() => {
+      carregarFavoritos();
+      buscarProdutos();
+    }, [])
+  );
 
-    carregar();
-  }, []);
+  const carregarFavoritos = async () => {
+  const salvo = await AsyncStorage.getItem(
+    "favoritos"
+  );
+
+  if (salvo) {
+    setFavoritos(JSON.parse(salvo));
+  } else {
+    setFavoritos([]);
+  }
+};
+
 
   const toggleFavorito = async (id) => {
     const novos = favoritos.includes(id)
@@ -85,18 +63,53 @@ export default function Consoles() {
     );
   };
 
+  const buscarProdutos = async () => {
+    try {
+      const response = await fetch(
+        "http://192.168.56.1:4000/produtos"
+      );
+
+      const data = await response.json();
+
+      console.log(data);
+
+      const produtosArray = Array.isArray(data)
+        ? data
+        : [];
+
+      const apenasConsoles =
+        produtosArray.filter((produto) =>
+          produto.categoria?.nome_categoria
+            ?.toLowerCase()
+            .includes("console")
+        );
+
+      setConsoles(apenasConsoles);
+
+    } catch (error) {
+      console.log(
+        "Erro ao buscar produtos:",
+        error
+      );
+    }
+  };
+
   const CardItem = ({ produto }) => (
     <View style={styles.card}>
       <View style={styles.imageContainer}>
         <Image
-          source={produto.imagem}
+          source={{
+            uri: produto.imagem_url,
+          }}
           style={styles.image}
           resizeMode="cover"
         />
 
         <TouchableOpacity
           style={styles.starBtn}
-          onPress={() => toggleFavorito(produto.id)}
+          onPress={() =>
+            toggleFavorito(produto.id)
+          }
         >
           <AntDesign
             name="star"
@@ -117,12 +130,14 @@ export default function Consoles() {
 
         <View style={styles.footer}>
           <Text style={styles.preco}>
-            {produto.preco}
+            R$ {produto.preco}
           </Text>
 
           <TouchableOpacity
             style={styles.comprarBtn}
-            onPress={() => router.push("/comprar")}
+            onPress={() =>
+              router.push("/comprar")
+            }
           >
             <Text style={styles.comprarText}>
               Comprar
@@ -137,9 +152,9 @@ export default function Consoles() {
     <View style={styles.container}>
       <Header />
 
- 
-
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+      >
         <Text style={styles.sectionTitle}>
           Consoles
         </Text>

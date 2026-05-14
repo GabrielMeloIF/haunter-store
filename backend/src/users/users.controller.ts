@@ -16,12 +16,12 @@ export class UsersController {
   }
 
   @Post()
-  create(@Body() body: { nome: string; email: string; senha: string; cpf: string; telefone: string; endereco: string }) {
+  create(@Body() body: { nome: string; email: string; senha: string; confirmar_senha: string }) {
     return this.usersService.create(body);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() body: Partial<{ nome: string; email: string; telefone: string; endereco: string }>) {
+  update(@Param('id') id: string, @Body() body: Partial<{ nome: string; email: string; senha: string; }>) {
     return this.usersService.update(+id, body);
   }
 
