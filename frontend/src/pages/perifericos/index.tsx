@@ -3,7 +3,7 @@ import Link from "next/link";
 import { FaStar } from "react-icons/fa";
 import { useState } from "react";
 import { perifericos, games, Produto } from "../../produtos/index";
-import NavBar from "../../Components/Navbar/NavBar";
+
 import Carrossel from "@/Components/Carrosel/Carrossel";
 import Header from "@/Components/Header/Header";
 import Footer from "@/Components/Footer/Footer";
@@ -48,9 +48,6 @@ export default function Cards() {
   return (
     <>
     <Header/>
-    <nav>
-      <NavBar />
-    </nav>
     <Carrossel />
     <div className="flex flex-col items-center gap-10 py-8">
       <h2 className="text-white font-bold text-3xl self-start px-6">Periféricos</h2>

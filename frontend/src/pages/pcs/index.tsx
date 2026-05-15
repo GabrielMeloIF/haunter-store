@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaStar } from "react-icons/fa";
 import { useState } from "react";
-import { perifericos, games, Produto } from "../../produtos/index";
+import { pcs, Produto } from "../../produtos/index";
 
 import Carrossel from "@/Components/Carrosel/Carrossel";
 import Header from "@/Components/Header/Header";
@@ -48,12 +48,12 @@ export default function Cards() {
   return (
   <>
     <Header/>
-   
+
     <Carrossel />
     <div className="flex flex-col items-center gap-10 py-8">
       <h2 className="text-white font-bold text-3xl self-start px-6">Jogos</h2>
       <div className="grid grid-cols-3 gap-30 p-6">
-        {games.map((produto) => <CardItem key={produto.id} produto={produto} />)}
+        {pcs.map((produto) => <CardItem key={produto.id} produto={produto} />)}
       </div>
       </div>
     <Footer />

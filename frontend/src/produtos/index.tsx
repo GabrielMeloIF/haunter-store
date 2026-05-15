@@ -30,4 +30,24 @@ export const games: Produto[] = [
   { id: 12, nome: "God of War III Remasterizado", descricao: "Ação", imagem: "/god.webp", preco: "R$ 249" },
 ];
 
+export const consoles: Produto[] = [
+  { id: 7, nome: "Fortnite", descricao: "Ação e aventura", imagem: "/forza.png", preco: "R$ 199" },
+  { id: 8, nome: "God of War III Remasterizado", descricao: "Ação", imagem: "/god.webp", preco: "R$ 249" },
+  { id: 9, nome: "God of War III Remasterizado", descricao: "Ação", imagem: "/god.webp", preco: "R$ 249" },
+   { id: 10, nome: "Fortnite", descricao: "Ação e aventura", imagem: "/forza.png", preco: "R$ 199" },
+  { id: 11, nome: "God of War III Remasterizado", descricao: "Ação", imagem: "/god.webp", preco: "R$ 249" },
+  { id: 12, nome: "God of War III Remasterizado", descricao: "Ação", imagem: "/god.webp", preco: "R$ 249" },
+];
+
+
+export const pcs: Produto[] = [
+  { id: 7, nome: "Fortnite", descricao: "Ação e aventura", imagem: "/forza.png", preco: "R$ 199" },
+  { id: 8, nome: "God of War III Remasterizado", descricao: "Ação", imagem: "/god.webp", preco: "R$ 249" },
+  { id: 9, nome: "God of War III Remasterizado", descricao: "Ação", imagem: "/god.webp", preco: "R$ 249" },
+   { id: 10, nome: "Fortnite", descricao: "Ação e aventura", imagem: "/forza.png", preco: "R$ 199" },
+  { id: 11, nome: "God of War III Remasterizado", descricao: "Ação", imagem: "/god.webp", preco: "R$ 249" },
+  { id: 12, nome: "God of War III Remasterizado", descricao: "Ação", imagem: "/god.webp", preco: "R$ 249" },
+];
+
+
 export const todosProdutos = [...perifericos, ...games];

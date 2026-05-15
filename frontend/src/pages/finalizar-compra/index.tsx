@@ -1,6 +1,6 @@
 // pages/finalizar.tsx
 import Header from "@/Components/Header/Header";
-import NavBar from "@/Components/Navbar/NavBar";
+
 import Footer from "@/Components/Footer/Footer";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
@@ -93,7 +93,7 @@ useEffect(() => {
     return (
       <>
         <Header />
-        <NavBar />
+      
         <div className="min-h-[70vh] flex flex-col items-center justify-center gap-6 min-h-screen">
           <div className="w-20 h-20 rounded-full bg-green-500 flex items-center justify-center text-white text-4xl">
             ✓
@@ -118,7 +118,7 @@ useEffect(() => {
   return (
     <>
       <Header />
-      <NavBar />
+   
 
       <div className="max-w-6xl mx-auto px-6 py-10 min-h-screen">
         <h1 className="text-3xl font-bold text-white mb-8">Finalizar Compra</h1>
