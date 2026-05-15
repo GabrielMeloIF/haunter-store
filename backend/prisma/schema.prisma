@@ -146,15 +146,16 @@ model usuario {
   email           String               @unique(map: "Usuario_email_key")
   senha           String
   confirmar_senha String
+  foto            String?              @db.Text
   data_cadastro   DateTime             @default(now())
-  tipo_usuario  usuario_tipo_usuario @default(CLIENTE)
+  tipo_usuario  usuario_tipo_usuario   @default(CLIENTE)
   avaliacao     avaliacao[]
   carrinho      carrinho[]
   cupomusuario  cupomusuario[]
   mensagem      mensagem[]
   notificacao   notificacao[]
   pedido        pedido[]
-  conversa      conversa[]           @relation("usuarioconversas")
+  conversa      conversa[]             @relation("usuarioconversas")
 }
 
 enum notificacao_tipo {

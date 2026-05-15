@@ -8,6 +8,8 @@ import {
   useWindowDimensions,
 } from "react-native";
 
+import { useAuth } from "../context/authContext";
+
 import { useState } from "react";
 import Feather from "@expo/vector-icons/Feather";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
@@ -20,9 +22,7 @@ const Logo = require("../../../assets/logo.png");
 export default function Header() {
   const router = useRouter();
 
-  const userContext = useUser();
-  const userImage = userContext?.userImage;
- 
+  const { usuario, estaLogado } = useAuth();
 
   const [busca, setBusca] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -63,21 +63,20 @@ export default function Header() {
 
       {/* ícones */}
       <View style={[styles.side, { justifyContent: "flex-end" }]}>
-       
         <TouchableOpacity
           style={styles.userBtn}
-          onPress={() => router.push("/register")}
+          onPress={() => router.push(estaLogado ? "/(tabs)/user" : "/login")}
         >
-          {userImage ? (
-            <Image source={{ uri: userImage }} style={styles.userImage} />
+          {estaLogado && usuario?.foto ? (
+            <Image source={{ uri: usuario.foto }} style={styles.userImage} />
           ) : (
-            <Feather name="user" size={20} color="white" />
+            <Feather name="user" size={15} color="white" />
           )}
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.anunciarBtn}
-          onPress={() => router.push("/anunciar")}
+          onPress={() => router.push(estaLogado ? "/anunciar" : "/(tabs)/user")}
         >
           <Feather name="plus-circle" size={20} color="white" />
         </TouchableOpacity>
@@ -125,9 +124,8 @@ const styles = StyleSheet.create({
   },
   userBtn: {
     backgroundColor: "rgba(255,255,255,0.3)",
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    borderRadius: 9,
+    padding: 12,
   },
   anunciarBtn: {
     backgroundColor: "#430883",
