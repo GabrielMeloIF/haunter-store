@@ -95,6 +95,7 @@ export default function Register() {
   };
 
   return (
+  <View style={styles.screen}>
     <View style={styles.container}>
       <Text style={styles.title}>
         Registre-se
@@ -167,17 +168,26 @@ export default function Register() {
         </Text>
       </Text>
     </View>
+  </View>
   );
 }
 
 const styles = StyleSheet.create({
+
+  screen: {
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
+},
+
   container: {
-    flex: 1,
-    backgroundColor: "#7D7D7D",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
+  width: "90%",
+  backgroundColor: "#7D7D7D",
+  paddingVertical: 25,
+  paddingHorizontal: 20,
+  borderRadius: 30,
+  alignSelf: "center",  
+},
 
   title: {
     fontSize: 24,
@@ -186,12 +196,12 @@ const styles = StyleSheet.create({
   },
 
   inputs: {
-    width: 300,
-    padding: 12,
-    backgroundColor: "#D9D9D9",
-    marginBottom: 10,
-    borderRadius: 30,
-  },
+  width: "100%",
+  padding: 12,
+  backgroundColor: "#D9D9D9",
+  marginBottom: 10,
+  borderRadius: 30,
+},
 
   buttonContainer: {
     flexDirection: "row",

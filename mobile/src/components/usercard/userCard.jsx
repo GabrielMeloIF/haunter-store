@@ -221,7 +221,7 @@ export default function UserCard() {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.patchButton} onPress={salvarUsuario}>
-            <Text style={styles.patchText}>Alterar</Text>
+            <Text style={styles.patchText}>Alterar dados</Text>
           </TouchableOpacity>
         </View>
 
@@ -234,7 +234,7 @@ export default function UserCard() {
         >
           <Text style={styles.logoutText}>
             {confirmandoDeletar
-              ? "⚠️ Confirmar exclusão da conta"
+              ? "Confirmar exclusão da conta"
               : "Deletar conta"}
           </Text>
         </TouchableOpacity>
