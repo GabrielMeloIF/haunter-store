@@ -31,11 +31,25 @@ export default function Chat() {
   const [novaMensagem, setNovaMensagem] = useState("");
   const [menuAberto, setMenuAberto] = useState(null);
 
-  const enviarMensagem = () => {
-    if (!novaMensagem.trim()) return;
+  const enviarMensagem = async () => {
+  if (!novaMensagem.trim()) return;
+
+  try {
+    const response = await fetch(`${API_URL}/mensagem`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        usuario: chatSelecionado.usuario,
+        texto: novaMensagem,
+      }),
+    });
+
+    const data = await response.json();
 
     const novaMsg = {
-      id: Date.now(),
+      id: data.id,
       texto: novaMensagem,
       eu: true,
     };
@@ -51,15 +65,24 @@ export default function Chat() {
     );
 
     setChats(novosChats);
+
     setChatSelecionado({
       ...chatSelecionado,
       mensagens: [...chatSelecionado.mensagens, novaMsg],
     });
 
     setNovaMensagem("");
-  };
+  } catch (error) {
+    console.log("Erro ao enviar:", error);
+  }
+};
 
-  const excluirMensagem = (msgId) => {
+const excluirMensagem = async (msgId) => {
+  try {
+    await fetch(`${API_URL}/mensagens/${msgId}`, {
+      method: "DELETE",
+    });
+
     const novosChats = chats.map((c) =>
       c.id === chatSelecionado.id
         ? {
@@ -70,40 +93,71 @@ export default function Chat() {
     );
 
     setChats(novosChats);
+
     setChatSelecionado({
       ...chatSelecionado,
-      mensagens: chatSelecionado.mensagens.filter((m) => m.id !== msgId),
+      mensagens: chatSelecionado.mensagens.filter(
+        (m) => m.id !== msgId
+      ),
     });
 
     setMenuAberto(null);
-  };
+  } catch (error) {
+    console.log("Erro ao excluir:", error);
+  }
+};
 
-  const editarMensagem = (msgId, textoAtual) => {
-    Alert.prompt("Editar mensagem", "", (novoTexto) => {
+const editarMensagem = (msgId, textoAtual) => {
+  Alert.prompt(
+    "Editar mensagem",
+    "",
+    async (novoTexto) => {
       if (!novoTexto) return;
 
-      const novosChats = chats.map((c) =>
-        c.id === chatSelecionado.id
-          ? {
-              ...c,
-              mensagens: c.mensagens.map((m) =>
-                m.id === msgId ? { ...m, texto: novoTexto } : m
-              ),
-            }
-          : c
-      );
+      try {
+        await fetch(`${API_URL}/mensagens/${msgId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            texto: novoTexto,
+          }),
+        });
 
-      setChats(novosChats);
-      setChatSelecionado({
-        ...chatSelecionado,
-        mensagens: chatSelecionado.mensagens.map((m) =>
-          m.id === msgId ? { ...m, texto: novoTexto } : m
-        ),
-      });
+        const novosChats = chats.map((c) =>
+          c.id === chatSelecionado.id
+            ? {
+                ...c,
+                mensagens: c.mensagens.map((m) =>
+                  m.id === msgId
+                    ? { ...m, texto: novoTexto }
+                    : m
+                ),
+              }
+            : c
+        );
 
-      setMenuAberto(null);
-    });
-  };
+        setChats(novosChats);
+
+        setChatSelecionado({
+          ...chatSelecionado,
+          mensagens: chatSelecionado.mensagens.map((m) =>
+            m.id === msgId
+              ? { ...m, texto: novoTexto }
+              : m
+          ),
+        });
+
+        setMenuAberto(null);
+      } catch (error) {
+        console.log("Erro ao editar:", error);
+      }
+    },
+    "plain-text",
+    textoAtual
+  );
+};
 
   return (
     <View style={styles.container}>
