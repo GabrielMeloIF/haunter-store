@@ -5,19 +5,19 @@ import Register from '../components/registercard/registercard';
 
 
 
-// export default function App() {
-//   return (
-//     <View style={styles.container}>
-//       <Header />
-//       <View style={styles.card}>
-//         <Register />
-//       </View>
-//       <StatusBar style="auto" />
-//     </View>
-//   );
-// }
+ export default function App() {
+   return (
+    <View style={styles.container}>
+       <Header />
+       <View style={styles.card}>
+         <Register />
+       </View>
+            <StatusBar style="auto" />
+     </View>
+   );
+ }
 
-// const styles = StyleSheet.create({
+ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#303030',
