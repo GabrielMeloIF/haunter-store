@@ -9,6 +9,8 @@ import {
 
 import { useRouter } from "expo-router";
 
+import { useAuth } from "../context/authContext";
+
 import { useState } from "react";
 
 const API_URL = "http://192.168.56.1:4000";
@@ -20,6 +22,7 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
+  const { login } = useAuth();
 
   const cadastrar = async () => {
     try {
@@ -46,51 +49,25 @@ export default function Register() {
         return;
       }
 
-      const response = await fetch(
-        `${API_URL}/users`,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-
-          body: JSON.stringify({
-            nome,
-            email,
-            senha,
-            confirmar_senha:
-              confirmarSenha,
-          }),
-        }
-      );
+      const response = await fetch(`${API_URL}/users`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome, email, senha, confirmar_senha: confirmarSenha }),
+      });
 
       if (!response.ok) {
-        const erro =
-          await response.text();
-
+        const erro = await response.text();
         console.log(erro);
-
-        throw new Error(
-          "Erro ao cadastrar"
-        );
+        throw new Error("Erro ao cadastrar");
       }
 
-      Alert.alert(
-        "Sucesso",
-        "Conta criada!"
-      );
-
-      router.push("/login");
+      // ✅ Em vez de ir para /login, já loga direto:
+      await login(email, senha);
+      router.replace("/(tabs)");
 
     } catch (error) {
       console.log(error);
-
-      Alert.alert(
-        "Erro",
-        "Não foi possível cadastrar"
-      );
+      Alert.alert("Erro", "Não foi possível cadastrar");
     }
   };
 
