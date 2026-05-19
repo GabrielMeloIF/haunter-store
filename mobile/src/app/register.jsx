@@ -34,3 +34,8 @@ import Register from '../components/registercard/registercard';
     marginTop: '30%',
   }
 });
+
+
+
+
+// o tintim é viado
