@@ -187,11 +187,17 @@ export default function StepDetails() {
   }
 
   async function handleNext() {
-    try {
-      await AsyncStorage.setItem(AD_STORAGE_KEY, JSON.stringify(form));
-    } catch (_) {}
+  try {
+    await AsyncStorage.setItem(
+      AD_STORAGE_KEY,
+      JSON.stringify(form)
+    );
+
     router.push("/revisarAnuncio");
+  } catch (err) {
+    console.log(err);
   }
+}
 
   // ── Render ────────────────────────────────────────────────────────────────
 

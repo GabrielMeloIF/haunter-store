@@ -82,15 +82,15 @@ useFocusEffect(
           lista.filter((p) => Number(p.categoriaId) === 1)
         );
 
-        setGames(
+        setPcs(
           lista.filter((p) => Number(p.categoriaId) === 2)
         );
 
-        setConsoles(
+        setGames(
           lista.filter((p) => Number(p.categoriaId) === 3)
         );
 
-        setPcs(
+        setConsoles(
           lista.filter((p) => Number(p.categoriaId) === 4)
         );
 

@@ -128,16 +128,39 @@ export default function RevisarAnuncios(props) {
   }
 
   async function handlePublish() {
-    if (!terms) return;
-    if (props.onPublish) {
-      props.onPublish();
-    } else {
-      try {
-        await AsyncStorage.removeItem(AD_STORAGE_KEY);
-      } catch (_) {}
-      router.push("/");
+  if (!terms) return;
+
+  try {
+    const response = await fetch(
+      "http://192.168.56.1:4000/marketplace",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          ...form,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    console.log("STATUS:", response.status);
+    console.log("RESPOSTA:", data);
+
+    if (!response.ok) {
+      return;
     }
+
+    await AsyncStorage.removeItem(AD_STORAGE_KEY);
+
+    router.push("/");
+  } catch (err) {
+    console.log("ERRO:", err);
   }
+}
 
   // ── Render ────────────────────────────────────────────────────────────────
 

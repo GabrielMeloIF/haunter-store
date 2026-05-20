@@ -124,20 +124,41 @@ model pedido {
 }
 
 model produto {
-  id            Int          @id @default(autoincrement())
-  nome          String
-  descricao     String
-  preco         Float
-  estoque       Int
-  imagem_url    String
-  data_cadastro DateTime     @default(now())
-  categoriaId   Int
-  avaliacao     avaliacao[]
-  carrinho      carrinho[]
-  itempedido    itempedido[]
-  categoria     categoria    @relation(fields: [categoriaId], references: [id_categoria], map: "Produto_categoriaId_fkey")
+  id        Int    @id @default(autoincrement())
+  nome      String
+  descricao String
+  preco     Float
+
+  estoque    Int?
+  imagem_url String? @db.Text
+
+  imagens  Json?
+  contatos Json?
+
+  negociavel Boolean @default(false)
+  condicao   String?
+
+  cep    String?
+  cidade String?
+
+  marketplace Boolean @default(false)
+
+  data_cadastro DateTime @default(now())
+
+  categoriaId Int?
+
+  id_usuario Int?
+
+  usuario usuario? @relation(fields: [id_usuario], references: [id_usuario])
+
+  avaliacao  avaliacao[]
+  carrinho   carrinho[]
+  itempedido itempedido[]
+
+  categoria categoria? @relation(fields: [categoriaId], references: [id_categoria], map: "Produto_categoriaId_fkey")
 
   @@index([categoriaId], map: "Produto_categoriaId_fkey")
+  @@index([id_usuario])
 }
 
 model usuario {
@@ -146,16 +167,17 @@ model usuario {
   email           String               @unique(map: "Usuario_email_key")
   senha           String
   confirmar_senha String
-  foto            String?              @db.Text
+  foto            String?              @db.LongText
   data_cadastro   DateTime             @default(now())
-  tipo_usuario  usuario_tipo_usuario   @default(CLIENTE)
-  avaliacao     avaliacao[]
-  carrinho      carrinho[]
-  cupomusuario  cupomusuario[]
-  mensagem      mensagem[]
-  notificacao   notificacao[]
-  pedido        pedido[]
-  conversa      conversa[]             @relation("usuarioconversas")
+  tipo_usuario    usuario_tipo_usuario @default(CLIENTE)
+  produto         produto[]
+  avaliacao       avaliacao[]
+  carrinho        carrinho[]
+  cupomusuario    cupomusuario[]
+  mensagem        mensagem[]
+  notificacao     notificacao[]
+  pedido          pedido[]
+  conversa        conversa[]           @relation("usuarioconversas")
 }
 
 enum notificacao_tipo {

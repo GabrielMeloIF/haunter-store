@@ -60,7 +60,7 @@ export default function Pcs() {
       const produtosArray = Array.isArray(data) ? data : [];
 
       const apenasPcs = data.filter(
-        (produto) => produto.categoria?.nome_categoria?.toLowerCase() === "pcs",
+        (produto) => produto.categoria?.nome_categoria?.toLowerCase() === "pc",
       );
 
       setPcs(apenasPcs);

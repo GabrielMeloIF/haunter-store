@@ -8,6 +8,7 @@ import { PedidosModule } from './pedidos/pedidos.module';
 import { ConversaModule } from './conversa/conversa.module';
 import { MensagemModule } from './mensagem/mensagem.module';
 import { NotificacaoModule } from './notificacao/notificacao.module';
+import { MarketplaceModule } from './marketplace/marketplace.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -37,6 +38,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     ConversaModule,
     MensagemModule,
     NotificacaoModule,
+    MarketplaceModule,
   ],
 })
 export class AppModule {}
