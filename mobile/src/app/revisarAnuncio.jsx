@@ -10,75 +10,88 @@ import {
   Modal,
   Pressable,
 } from "react-native";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
+
 import Header from "../components/header";
 
-
-// ── Constantes — mesmos valores de anunciar.jsx ───────────────────────────────
+// ── Constantes ─────────────────────────────────────────────
 
 const AD_STORAGE_KEY = "ad_form_data";
 
 const INITIAL_FORM = {
-  category:    "",
+  category: "",
   subcategory: "",
-  title:       "",
+  title: "",
   description: "",
-  price:       "",
-  negotiable:  false,
-  condition:   "",
-  cep:         "",
-  city:        "",
-  contacts:    [],
-  photos:      [],
+  price: "",
+  negotiable: false,
+  condition: "",
+  cep: "",
+  city: "",
+  contacts: [],
+  photos: [],
 };
 
 const CONTACT_LABEL = {
-  chat:     "Chat",
+  chat: "Chat",
   whatsapp: "WhatsApp",
-  phone:    "Telefone",
+  phone: "Telefone",
 };
 
-// ── Componente principal ──────────────────────────────────────────────────────
+// ── Componente ─────────────────────────────────────────────
 
 export default function RevisarAnuncios(props) {
   const router = useRouter();
-  const [form, setForm]     = useState(INITIAL_FORM);
-  const [terms, setTerms]   = useState(false);
+
+  const [form, setForm] = useState(INITIAL_FORM);
+  const [terms, setTerms] = useState(false);
 
   // Lightbox
   const [lbVisible, setLbVisible] = useState(false);
-  const [lbIndex, setLbIndex]     = useState(0);
+  const [lbIndex, setLbIndex] = useState(0);
 
-  // ── Sincroniza props.form quando fornecido externamente ───────────────────
+  // ── Sincroniza props.form ───────────────────────────────
+
   useEffect(() => {
     if (props.form) {
       setForm({ ...INITIAL_FORM, ...props.form });
     }
   }, [props.form]);
 
-  // ── Sincroniza props.terms quando fornecido externamente ──────────────────
+  // ── Sincroniza props.terms ──────────────────────────────
+
   useEffect(() => {
     if (typeof props.terms === "boolean") {
       setTerms(props.terms);
     }
   }, [props.terms]);
 
-  // ── Carrega rascunho salvo (somente quando sem props.form) ─────────────────
+  // ── Carrega rascunho salvo ──────────────────────────────
+
   useEffect(() => {
     if (props.form) return;
+
     (async () => {
       try {
         const saved = await AsyncStorage.getItem(AD_STORAGE_KEY);
+
         if (saved) {
           const parsed = JSON.parse(saved);
-          setForm((prev) => ({ ...prev, ...parsed }));
+
+          setForm((prev) => ({
+            ...prev,
+            ...parsed,
+          }));
         }
-      } catch (_) {}
+      } catch (error) {
+        console.log(error);
+      }
     })();
   }, []);
 
-  // ── Formatações ───────────────────────────────────────────────────────────
+  // ── Formatação ──────────────────────────────────────────
 
   const formattedPrice =
     form.price && !isNaN(Number(form.price))
@@ -89,27 +102,38 @@ export default function RevisarAnuncios(props) {
       : "A combinar";
 
   const rawDesc = form.description ?? "";
-  const shortDesc = rawDesc.length > 0
-    ? rawDesc.slice(0, 120) + (rawDesc.length > 120 ? "…" : "")
-    : "(sem descrição)";
 
-  // ── Lightbox ──────────────────────────────────────────────────────────────
+  const shortDesc =
+    rawDesc.length > 0
+      ? rawDesc.slice(0, 120) +
+        (rawDesc.length > 120 ? "..." : "")
+      : "(sem descrição)";
+
+  // ── Lightbox ────────────────────────────────────────────
 
   function openLightbox(index) {
     if (!form.photos?.length) return;
-    setLbIndex(Math.min(index, form.photos.length - 1));
+
+    setLbIndex(
+      Math.min(index, form.photos.length - 1)
+    );
+
     setLbVisible(true);
   }
 
   function lbPrev() {
-    setLbIndex((i) => (i - 1 + form.photos.length) % form.photos.length);
+    setLbIndex(
+      (i) => (i - 1 + form.photos.length) % form.photos.length
+    );
   }
 
   function lbNext() {
-    setLbIndex((i) => (i + 1) % form.photos.length);
+    setLbIndex(
+      (i) => (i + 1) % form.photos.length
+    );
   }
 
-  // ── Ações ─────────────────────────────────────────────────────────────────
+  // ── Ações ───────────────────────────────────────────────
 
   function handleToggleTerms() {
     if (props.onTerms) {
@@ -128,41 +152,43 @@ export default function RevisarAnuncios(props) {
   }
 
   async function handlePublish() {
-  if (!terms) return;
+    if (!terms) return;
 
-  try {
-    const response = await fetch(
-      "http://192.168.56.1:4000/marketplace",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+    try {
+      const response = await fetch(
+        "http://192.168.56.1:4000/marketplace",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
 
-        body: JSON.stringify({
-          ...form,
-        }),
+          body: JSON.stringify({
+            ...form,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("STATUS:", response.status);
+      console.log("RESPOSTA:", data);
+
+      if (!response.ok) {
+        return;
       }
-    );
 
-    const data = await response.json();
+      await AsyncStorage.removeItem(
+        AD_STORAGE_KEY
+      );
 
-    console.log("STATUS:", response.status);
-    console.log("RESPOSTA:", data);
-
-    if (!response.ok) {
-      return;
+      router.push("/");
+    } catch (err) {
+      console.log("ERRO:", err);
     }
-
-    await AsyncStorage.removeItem(AD_STORAGE_KEY);
-
-    router.push("/");
-  } catch (err) {
-    console.log("ERRO:", err);
   }
-}
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  // ── Render ──────────────────────────────────────────────
 
   const photos = form.photos ?? [];
 
@@ -177,23 +203,24 @@ export default function RevisarAnuncios(props) {
           <Header />
 
           <View style={styles.main}>
-
             {/* Cabeçalho */}
             <View style={styles.hero}>
-              <Text style={styles.heroTitle}>Revise seu anúncio</Text>
+              <Text style={styles.heroTitle}>
+                Revise seu anúncio
+              </Text>
+
               <Text style={styles.heroSub}>
-                Veja como ficará para os compradores antes de publicar.
+                Veja como ficará para os compradores
+                antes de publicar.
               </Text>
             </View>
 
-            {/* ── Card de visualização ── */}
+            {/* Card */}
             <View style={styles.card}>
-
-              {/* ── Galeria de fotos ── */}
+              {/* Fotos */}
               <View style={styles.photoBox}>
                 {photos.length > 0 ? (
                   <>
-                    {/* Foto principal clicável */}
                     <TouchableOpacity
                       onPress={() => openLightbox(0)}
                       activeOpacity={0.9}
@@ -203,213 +230,207 @@ export default function RevisarAnuncios(props) {
                         style={styles.photoMain}
                         resizeMode="cover"
                       />
+
                       {photos.length > 1 && (
                         <View style={styles.photoBadge}>
-                          <Text style={styles.photoBadgeText}>
+                          <Text
+                            style={styles.photoBadgeText}
+                          >
                             📷 {photos.length}
                           </Text>
                         </View>
                       )}
                     </TouchableOpacity>
 
-                    {/* Miniaturas extras clicáveis */}
                     {photos.length > 1 && (
                       <ScrollView
                         horizontal
-                        showsHorizontalScrollIndicator={false}
+                        showsHorizontalScrollIndicator={
+                          false
+                        }
                         style={styles.photoStrip}
-                        contentContainerStyle={styles.photoStripContent}
+                        contentContainerStyle={
+                          styles.photoStripContent
+                        }
                       >
-                        {photos.slice(1).map((uri, i) => (
-                          <TouchableOpacity
-                            key={`strip-${i}`}
-                            onPress={() => openLightbox(i + 1)}
-                            activeOpacity={0.85}
-                          >
-                            <Image
-                              source={{ uri }}
-                              style={styles.photoThumb}
-                              resizeMode="cover"
-                            />
-                          </TouchableOpacity>
-                        ))}
+                        {photos
+                          .slice(1)
+                          .map((uri, i) => (
+                            <TouchableOpacity
+                              key={`strip-${i}`}
+                              onPress={() =>
+                                openLightbox(i + 1)
+                              }
+                              activeOpacity={0.85}
+                            >
+                              <Image
+                                source={{ uri }}
+                                style={styles.photoThumb}
+                                resizeMode="cover"
+                              />
+                            </TouchableOpacity>
+                          ))}
                       </ScrollView>
                     )}
                   </>
                 ) : (
                   <View style={styles.photoEmpty}>
-                    <Text style={styles.photoEmptyIcon}>🖼️</Text>
-                    <Text style={styles.photoEmptyText}>Sem imagem</Text>
+                    <Text style={styles.photoEmptyIcon}>
+                      🖼️
+                    </Text>
+
+                    <Text style={styles.photoEmptyText}>
+                      Sem imagem
+                    </Text>
                   </View>
                 )}
               </View>
 
-              {/* Detalhes do anúncio */}
+              {/* Conteúdo */}
               <View style={styles.cardBody}>
-
                 <Text style={styles.adTitle}>
                   {form.title || "(sem título)"}
                 </Text>
 
                 <View style={styles.priceRow}>
-                  <Text style={styles.adPrice}>{formattedPrice}</Text>
+                  <Text style={styles.adPrice}>
+                    {formattedPrice}
+                  </Text>
+
                   {form.negotiable && (
-                    <Text style={styles.negotiableBadge}>negociável</Text>
-                  )}
-                </View>
-
-                <Text style={styles.adDesc}>{shortDesc}</Text>
-
-                <View style={styles.metaRow}>
-                  {form.city || form.cep ? (
-                    <Text style={styles.metaText}>
-                      📍 {[form.city, form.cep].filter(Boolean).join(" · ")}
+                    <Text
+                      style={styles.negotiableBadge}
+                    >
+                      negociável
                     </Text>
-                  ) : (
-                    <Text style={styles.metaText}>📍 Localização não informada</Text>
                   )}
-                  <Text style={styles.metaDot}>·</Text>
-                  <Text style={styles.metaText}>Agora</Text>
                 </View>
 
-                <View style={styles.chipsRow}>
-                  {form.condition ? (
-                    <View style={styles.chip}>
-                      <Text style={styles.chipText}>{form.condition}</Text>
-                    </View>
-                  ) : null}
-                  {(form.contacts ?? []).map((c) => (
-                    <View key={c} style={styles.chip}>
-                      <Text style={styles.chipText}>
-                        {CONTACT_LABEL[c] ?? c}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-
+                <Text style={styles.adDesc}>
+                  {shortDesc}
+                </Text>
               </View>
             </View>
 
-            {/* ── Termos ── */}
+            {/* Termos */}
             <TouchableOpacity
               style={styles.termsRow}
               onPress={handleToggleTerms}
-              activeOpacity={0.8}
             >
-              <View style={[styles.checkbox, terms && styles.checkboxChecked]}>
-                {terms && <Text style={styles.checkmark}>✓</Text>}
+              <View
+                style={[
+                  styles.checkbox,
+                  terms && styles.checkboxChecked,
+                ]}
+              >
+                {terms && (
+                  <Text style={styles.checkmark}>
+                    ✓
+                  </Text>
+                )}
               </View>
+
               <Text style={styles.termsText}>
                 Li e aceito os{" "}
                 <Text
                   style={styles.termsLink}
-                  onPress={() => Linking.openURL("https://seusite.com/termos")}
+                  onPress={() =>
+                    Linking.openURL(
+                      "https://seusite.com/termos"
+                    )
+                  }
                 >
                   Termos de Uso
                 </Text>
-                {" "}e{" "}
-                <Text
-                  style={styles.termsLink}
-                  onPress={() => Linking.openURL("https://seusite.com/privacidade")}
-                >
-                  Política de Privacidade
-                </Text>
-                .
               </Text>
             </TouchableOpacity>
 
-            {/* ── Ações ── */}
+            {/* Botões */}
             <View style={styles.navRow}>
-              <TouchableOpacity style={styles.btnBack} onPress={handleBack}>
-                <Text style={styles.btnBackText}>← Voltar</Text>
+              <TouchableOpacity
+                style={styles.btnBack}
+                onPress={handleBack}
+              >
+                <Text style={styles.btnBackText}>
+                  ← Voltar
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.btnPublish, !terms && styles.btnPublishDisabled]}
+                style={[
+                  styles.btnPublish,
+                  !terms &&
+                    styles.btnPublishDisabled,
+                ]}
                 onPress={handlePublish}
                 disabled={!terms}
               >
-                <Text style={styles.btnPublishText}>Publicar anúncio</Text>
+                <Text style={styles.btnPublishText}>
+                  Publicar anúncio
+                </Text>
               </TouchableOpacity>
             </View>
-
           </View>
         </View>
       </ScrollView>
 
-      {/* ── Lightbox ── */}
+      {/* Lightbox */}
       <Modal
         visible={lbVisible}
         transparent
         animationType="fade"
-        onRequestClose={() => setLbVisible(false)}
-        statusBarTranslucent
+        onRequestClose={() =>
+          setLbVisible(false)
+        }
       >
         <Pressable
           style={styles.lbOverlay}
           onPress={() => setLbVisible(false)}
         >
           <Pressable style={styles.lbContainer}>
-            {photos[lbIndex] ? (
+            {photos[lbIndex] && (
               <Image
                 source={{ uri: photos[lbIndex] }}
                 style={styles.lbImage}
                 resizeMode="contain"
               />
-            ) : null}
-
-            <Text style={styles.lbCounter}>
-              {lbIndex + 1} / {photos.length}
-            </Text>
+            )}
 
             <TouchableOpacity
               style={styles.lbClose}
               onPress={() => setLbVisible(false)}
             >
-              <Text style={styles.lbCloseText}>×</Text>
+              <Text style={styles.lbCloseText}>
+                ×
+              </Text>
             </TouchableOpacity>
 
             {photos.length > 1 && (
               <>
                 <TouchableOpacity
-                  style={[styles.lbArrow, styles.lbArrowLeft]}
+                  style={[
+                    styles.lbArrow,
+                    styles.lbArrowLeft,
+                  ]}
                   onPress={lbPrev}
                 >
-                  <Text style={styles.lbArrowText}>‹</Text>
+                  <Text style={styles.lbArrowText}>
+                    ‹
+                  </Text>
                 </TouchableOpacity>
+
                 <TouchableOpacity
-                  style={[styles.lbArrow, styles.lbArrowRight]}
+                  style={[
+                    styles.lbArrow,
+                    styles.lbArrowRight,
+                  ]}
                   onPress={lbNext}
                 >
-                  <Text style={styles.lbArrowText}>›</Text>
+                  <Text style={styles.lbArrowText}>
+                    ›
+                  </Text>
                 </TouchableOpacity>
               </>
-            )}
-
-            {photos.length > 1 && (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.lbStrip}
-                contentContainerStyle={styles.lbStripContent}
-              >
-                {photos.map((uri, i) => (
-                  <TouchableOpacity
-                    key={`lb-${i}`}
-                    onPress={() => setLbIndex(i)}
-                    style={[
-                      styles.lbThumb,
-                      i === lbIndex && styles.lbThumbActive,
-                    ]}
-                  >
-                    <Image
-                      source={{ uri }}
-                      style={styles.lbThumbImg}
-                      resizeMode="cover"
-                    />
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
             )}
           </Pressable>
         </Pressable>

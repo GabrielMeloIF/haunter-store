@@ -19,6 +19,7 @@ export default function Layout() {
     favoritos: 'heart',
     user: 'person',
     conversas: 'chatbubbles',
+    meusAnuncios: 'home',
   };
   
   return (
@@ -48,7 +49,9 @@ export default function Layout() {
        <Tabs.Screen name="perifericos" options={{ href: null }} />
         <Tabs.Screen name="consoles" options={{ href: null }} />
         <Tabs.Screen name="pcs" options={{ href: null }} />
+        <Tabs.Screen name="meusAnuncios" options={{ href: null }} />
     </Tabs>
   
   );
 }
+
