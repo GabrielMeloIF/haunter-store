@@ -2,9 +2,10 @@
 
 import Image from "next/image"
 import { useState } from "react"
-import { Heart, MessageCircle, Share2, Eye, EyeOff } from "lucide-react"
+import { Heart, MessageCircle, Share2, Eye, EyeOff, Icon } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation" 
+import { Icon } from '@iconify/react';
 
 function Input({
   error,
@@ -23,7 +24,7 @@ function Button(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       {...props}
-      className="w-full h-12 rounded-lg bg-purple-600 text-white font-semibold hover:opacity-90"
+      className="w-full h-12 rounded-lg bg-[#A636E9] text-white font-semibold hover:bg-[#430883] transition-colors"
     />
   )
 }
@@ -73,7 +74,7 @@ export default function AuthPage() {
       const newUser = {
         name: formData.name,
         email: formData.email,
-        password: formData.password, // ⚠️ demo, não armazenar senha em texto puro
+        password: formData.password,
         uid: Date.now().toString(),
         photoURL: "",
       }
@@ -118,6 +119,8 @@ export default function AuthPage() {
         <div className="relative z-10 flex flex-col justify-between h-full p-10 text-white">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-lg font-bold">Haunter Store</Link>
+              <Icon icon="ic:baseline-headset" width="48" height="48" className="text-gray-500" />
+      </div>
           </div>
 
           <div className="flex flex-col gap-6">
@@ -141,7 +144,7 @@ export default function AuthPage() {
       <div className="flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
           <div className="mb-8 text-center">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-500 to-purple-900 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-purple-500 bg-clip-text text-transparent">
               Haunter Store
             </h1>
             <p className="mt-2 text-gray-500 text-sm">
@@ -198,9 +201,9 @@ export default function AuthPage() {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm">
+          <p className="mt-6 text-center text-sm text-white">
             {mode === "login" ? "Não tem conta?" : "Já tem conta?"}
-            <button onClick={toggleMode} className="ml-2 text-purple-600">
+            <button onClick={toggleMode} className="ml-2 text-purple-500">
               {mode === "login" ? "Criar" : "Entrar"}
             </button>
           </p>

@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaStar } from "react-icons/fa";
 import { useState } from "react";
-import { perifericos, games, Produto } from "../../produtos/index";
+import { perifericos, games, pcs, consoles, Produto } from "../../produtos/index";
 
 export default function Cards() {
   const [favoritos, setFavoritos] = useState<number[]>(() => {
@@ -51,6 +51,14 @@ export default function Cards() {
       <h2 className="text-white font-bold text-3xl self-start px-6">Jogos</h2>
       <div className="grid grid-cols-3 gap-30 p-6">
         {games.map((produto) => <CardItem key={produto.id} produto={produto} />)}
+      </div>
+       <h2 className="text-white font-bold text-3xl self-start px-6">PCs</h2>
+      <div className="grid grid-cols-3 gap-30 p-6">
+        {pcs.map((produto) => <CardItem key={produto.id} produto={produto} />)}
+      </div>
+       <h2 className="text-white font-bold text-3xl self-start px-6">Consoles</h2>
+      <div className="grid grid-cols-3 gap-30 p-6">
+        {consoles.map((produto) => <CardItem key={produto.id} produto={produto} />)}
       </div>
     </div>
   );

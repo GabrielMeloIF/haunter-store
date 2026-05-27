@@ -1,5 +1,6 @@
  import { useState, useEffect } from "react";
 import { Icon } from '@iconify/react';
+import Link from "next/link";
  
 const slides = [
   {
@@ -125,21 +126,62 @@ export default function Carrossel({ className = "" }) {
 
       {/* Categorias */}
       <div className="flex flex-wrap justify-center gap-8 mt-6">
-        {categories.map((cat, index) => (
-          <div key={index} className="flex flex-col items-center">
-            {/* Círculo com hover na borda */}
-            <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center border-0 hover:border-3 hover:border-purple-800">
-              <Icon icon={cat.icon} width="48" height="48" className="text-gray-500" />
-            </div>
-
-            {/* Texto abaixo do círculo */}
-            <div className="text-center mt-2">
-              <span className="block text-sm font-medium text-white">{cat.label}</span>
-              {cat.sublabel && <span className="block text-xs text-white">{cat.sublabel}</span>}
-            </div>
-          </div>
-        ))}
+  {/* Categoria 1 */}
+  <Link href="/perifericos">
+    <div className="flex flex-col items-center">
+      <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center border-0 hover:border-3 hover:border-purple-800">
+        <Icon icon="ic:baseline-headset" width="48" height="48" className="text-gray-500" />
       </div>
+
+    <div className="text-center mt-2">
+      <span className="block text-sm font-medium text-white">Perifericos</span>
+     
+    </div>
+  </div>
+  </Link>
+
+  {/* Categoria 2 */}
+  <Link href="/jogos">
+    <div className="flex flex-col items-center">
+      <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center border-0 hover:border-3 hover:border-purple-800">
+        <Icon icon="solar:gamepad-bold" width="48" height="48" className="text-gray-500" />
+      </div>
+
+    <div className="text-center mt-2">
+      <span className="block text-sm font-medium text-white">Jogos</span>
+     
+    </div>
+  </div>
+  </Link>
+
+  {/* Categoria 3 */}
+  <Link href="/pcs">
+    <div className="flex flex-col items-center">
+      <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center border-0 hover:border-3 hover:border-purple-800">
+      <Icon icon="raphael:pc" width="48" height="48" className="text-gray-500" />
+    </div>
+
+      <div className="text-center mt-2">
+        <span className="block text-sm font-medium text-white">PCs</span>
+       
+      </div>
+    </div>
+  </Link>
+
+  {/* Categoria 4 */}
+  <Link href="/consoles">
+  <div className="flex flex-col items-center">
+    <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center border-0 hover:border-3 hover:border-purple-800">
+      <Icon icon="game-icons:game-console" width="48" height="48" className="text-gray-500" />
+    </div>
+
+    <div className="text-center mt-2">
+      <span className="block text-sm font-medium text-white">Consoles</span>
+     
+    </div>
+  </div>
+  </Link>
+</div>
     </div>
   );
 }
