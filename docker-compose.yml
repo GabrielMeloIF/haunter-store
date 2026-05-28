@@ -18,6 +18,7 @@ services:
     depends_on:
       - db
     environment:
+      - DATABASE_URL=mysql://root:aluno@db:3306/haunter_store
       - DB_HOST=db
       - DB_PORT=3306
       - DB_USERNAME=root

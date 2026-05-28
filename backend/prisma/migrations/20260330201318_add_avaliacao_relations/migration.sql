@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE `Avaliacao` (
+CREATE TABLE `avaliacao` (
     `id_avaliacao` INTEGER NOT NULL AUTO_INCREMENT,
     `id_usuario` INTEGER NOT NULL,
     `id_produto` INTEGER NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE `Avaliacao` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Cupom` (
+CREATE TABLE `cupom` (
     `id_cupom` INTEGER NOT NULL AUTO_INCREMENT,
     `codigo` VARCHAR(191) NOT NULL,
     `descricao` TEXT NOT NULL,
@@ -19,12 +19,12 @@ CREATE TABLE `Cupom` (
     `validade` DATETIME(3) NOT NULL,
     `criado_em` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
-    UNIQUE INDEX `Cupom_codigo_key`(`codigo`),
+    UNIQUE INDEX `cupom_codigo_key`(`codigo`),
     PRIMARY KEY (`id_cupom`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `CupomUsuario` (
+CREATE TABLE `cupomusuario` (
     `id_cupom_usuario` INTEGER NOT NULL AUTO_INCREMENT,
     `id_usuario` INTEGER NOT NULL,
     `id_cupom` INTEGER NOT NULL,
@@ -35,13 +35,13 @@ CREATE TABLE `CupomUsuario` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `Avaliacao` ADD CONSTRAINT `Avaliacao_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario`(`id_usuario`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `avaliacao` ADD CONSTRAINT `avaliacao_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `usuario`(`id_usuario`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Avaliacao` ADD CONSTRAINT `Avaliacao_id_produto_fkey` FOREIGN KEY (`id_produto`) REFERENCES `Produto`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `avaliacao` ADD CONSTRAINT `avaliacao_id_produto_fkey` FOREIGN KEY (`id_produto`) REFERENCES `produto`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `CupomUsuario` ADD CONSTRAINT `CupomUsuario_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario`(`id_usuario`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `cupomusuario` ADD CONSTRAINT `cupomusuario_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `usuario`(`id_usuario`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `CupomUsuario` ADD CONSTRAINT `CupomUsuario_id_cupom_fkey` FOREIGN KEY (`id_cupom`) REFERENCES `Cupom`(`id_cupom`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `cupomusuario` ADD CONSTRAINT `cupomusuario_id_cupom_fkey` FOREIGN KEY (`id_cupom`) REFERENCES `cupom`(`id_cupom`) ON DELETE RESTRICT ON UPDATE CASCADE;
