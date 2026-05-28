@@ -193,7 +193,7 @@ export default function StepDetails() {
       JSON.stringify(form)
     );
 
-    router.push("/revisarAnuncio");
+    router.push("/revisa=Anuncio");
   } catch (err) {
     console.log(err);
   }
