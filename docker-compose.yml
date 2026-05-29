@@ -1,18 +1,19 @@
 services:
   db:
     image: mysql:8
-    ports:
-      - "3307:3306"
+    # ports:
+    #   - "3307:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=aluno
       - MYSQL_DATABASE=haunter_store
     volumes:
-      - mysql_data:/var/lib/mysql
+      - ./mysql_data:/var/lib/mysql
     restart: unless-stopped
 
   backend:
-    image: backend-test
-    build: ./backend
+    image: backend:v1
+    # image: backend-test
+    # build: ./backend
     ports:
       - "4000:4000"
     depends_on:
@@ -23,6 +24,7 @@ services:
       - DB_USERNAME=root
       - DB_PASSWORD=aluno
       - DB_NAME=haunter_store
+      - DATABASE_URL=mysql://root:aluno@db:3306/haunter_store
     restart: unless-stopped
 
   frontend:
@@ -42,7 +44,7 @@ services:
     depends_on:
       - backend
     environment:
-      - API_URL=http://192.168.56.1:4000
+      - API_URL=http://backend:4000
     restart: unless-stopped
 
 volumes:

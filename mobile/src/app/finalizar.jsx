@@ -136,48 +136,40 @@ export default function RevisarAnuncios(props) {
     }
   }
 
-   function handlePublish() {
-  if (props.onPublish) {
+   async function handlePublish() {
+  try {
+    const response = await fetch(
+      "http://backend:4000/marketplace",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...form }),
+      }
+    );
+
+    const data = await response.json();
+
+    console.log("STATUS:", response.status);
+    console.log("RESPOSTA:", data);
+
+    if (!response.ok) {
+      return;
+    }
+
+    await AsyncStorage.removeItem(AD_STORAGE_KEY);
+
+    if (props.onPublish) {
       props.onPublish();
     } else {
       router.push("/meus-anuncios");
     }
 
-    try {
-      const response = await fetch(
-        "http://192.168.56.1:4000/marketplace",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-
-          body: JSON.stringify({
-            ...form,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      console.log("STATUS:", response.status);
-      console.log("RESPOSTA:", data);
-
-      if (!response.ok) {
-        return;
-      }
-
-      await AsyncStorage.removeItem(
-        AD_STORAGE_KEY
-      );
-
-      router.push("/meus-anuncios");
-    } catch (err) {
-      console.log("ERRO:", err);
-    }
+  } catch (err) {
+    console.log("ERRO:", err);
   }
-
+}
   const photos = form.photos ?? [];
 
   return (
