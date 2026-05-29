@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE `Conversa` (
+CREATE TABLE `conversa` (
     `id_conversa` INTEGER NOT NULL AUTO_INCREMENT,
     `criada_em` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
@@ -7,7 +7,7 @@ CREATE TABLE `Conversa` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Mensagem` (
+CREATE TABLE `mensagem` (
     `id_mensagem` INTEGER NOT NULL AUTO_INCREMENT,
     `id_conversa` INTEGER NOT NULL,
     `id_remetente` INTEGER NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE `Mensagem` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Notificacao` (
+CREATE TABLE `notificacao` (
     `id_notificacao` INTEGER NOT NULL AUTO_INCREMENT,
     `id_usuario` INTEGER NOT NULL,
     `tipo` ENUM('MENSAGEM', 'CONVERSA', 'SISTEMA') NOT NULL,
@@ -32,25 +32,25 @@ CREATE TABLE `Notificacao` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `_UsuarioConversas` (
+CREATE TABLE `_usuarioconversas` (
     `A` INTEGER NOT NULL,
     `B` INTEGER NOT NULL,
 
-    UNIQUE INDEX `_UsuarioConversas_AB_unique`(`A`, `B`),
-    INDEX `_UsuarioConversas_B_index`(`B`)
+    UNIQUE INDEX `_usuarioconversas_AB_unique`(`A`, `B`),
+    INDEX `_usuarioconversas_B_index`(`B`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `Mensagem` ADD CONSTRAINT `Mensagem_id_conversa_fkey` FOREIGN KEY (`id_conversa`) REFERENCES `Conversa`(`id_conversa`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `mensagem` ADD CONSTRAINT `mensagem_id_conversa_fkey` FOREIGN KEY (`id_conversa`) REFERENCES `conversa`(`id_conversa`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Mensagem` ADD CONSTRAINT `Mensagem_id_remetente_fkey` FOREIGN KEY (`id_remetente`) REFERENCES `Usuario`(`id_usuario`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `mensagem` ADD CONSTRAINT `mensagem_id_remetente_fkey` FOREIGN KEY (`id_remetente`) REFERENCES `usuario`(`id_usuario`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Notificacao` ADD CONSTRAINT `Notificacao_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario`(`id_usuario`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `notificacao` ADD CONSTRAINT `notificacao_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `usuario`(`id_usuario`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `_UsuarioConversas` ADD CONSTRAINT `_UsuarioConversas_A_fkey` FOREIGN KEY (`A`) REFERENCES `Conversa`(`id_conversa`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `_usuarioconversas` ADD CONSTRAINT `_usuarioconversas_A_fkey` FOREIGN KEY (`A`) REFERENCES `conversa`(`id_conversa`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `_UsuarioConversas` ADD CONSTRAINT `_UsuarioConversas_B_fkey` FOREIGN KEY (`B`) REFERENCES `Usuario`(`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `_usuarioconversas` ADD CONSTRAINT `_usuarioconversas_B_fkey` FOREIGN KEY (`B`) REFERENCES `usuario`(`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;

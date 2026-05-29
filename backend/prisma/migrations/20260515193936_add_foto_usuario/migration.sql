@@ -10,7 +10,7 @@
 
 */
 -- DropIndex
-DROP INDEX `Usuario_cpf_key` ON `usuario`;
+DROP INDEX `usuario_cpf_key` ON `usuario`;
 
 -- AlterTable
 ALTER TABLE `produto` DROP COLUMN `tipo_produto`,
