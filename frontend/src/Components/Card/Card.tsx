@@ -15,7 +15,9 @@ export default function Cards() {
 
   const toggleFavorito = (id: number) => {
     setFavoritos((prev) => {
-      const novos = prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id];
+      const novos = prev.includes(id)
+        ? prev.filter((f) => f !== id)
+        : [...prev, id];
       localStorage.setItem("favoritos", JSON.stringify(novos));
       return novos;
     });
@@ -27,7 +29,9 @@ export default function Cards() {
         <FaStar
           onClick={() => toggleFavorito(produto.id)}
           className={`absolute top-2 right-2 text-2xl cursor-pointer ${
-            favoritos.includes(produto.id) ? "text-yellow-400" : "text-black"
+            favoritos.includes(produto.id)
+              ? "text-yellow-400"
+              : "text-black"
           }`}
         />
         <Image
@@ -40,11 +44,21 @@ export default function Cards() {
           }}
         />
       </div>
-      <h2 className="text-white text-xl font-bold mb-2 mt-5">{produto.nome}</h2>
+
+      <h2 className="text-white text-xl font-bold mb-2 mt-5">
+        {produto.nome}
+      </h2>
       <p className="text-white">{produto.descricao}</p>
+
       <div className="flex gap-30 items-center mt-2">
-        <p className="text-white font-bold text-xl">R$ {produto.preco?.toFixed(2).replace(".", ",")}</p>
-        <Link href={`/comprar?id=${produto.id}`} className="bg-[#A636E9] text-white px-4 py-2 rounded hover:bg-[#430883]">
+        <p className="text-white font-bold text-xl">
+          R$ {produto.preco?.toFixed(2).replace(".", ",")}
+        </p>
+
+        <Link
+          href={`/comprar?id=${produto.id}`}
+          className="bg-[#A636E9] text-white px-4 py-2 rounded hover:bg-[#430883]"
+        >
           Comprar
         </Link>
       </div>
@@ -52,34 +66,87 @@ export default function Cards() {
   );
 
   if (loading) {
-    return <div className="text-white text-center py-8">Carregando produtos...</div>;
+    return (
+      <div className="text-white text-center py-8">
+        Carregando produtos...
+      </div>
+    );
   }
 
-  const perifericos = produtos.filter((p) => p.categoria?.nome_categoria === "Periféricos");
-  const jogos = produtos.filter((p) => p.categoria?.nome_categoria === "Jogos");
+  const perifericos = produtos.filter(
+    (p) => p.categoria?.nome_categoria === "Periféricos"
+  );
+
+  const jogos = produtos.filter(
+    (p) => p.categoria?.nome_categoria === "Jogos"
+  );
+
+  const consoles = produtos.filter(
+    (p) => p.categoria?.nome_categoria === "Consoles"
+  );
+
+  const pcs = produtos.filter(
+    (p) => p.categoria?.nome_categoria === "PCs"
+  );
 
   return (
     <div className="flex flex-col items-center gap-10 py-8">
       {perifericos.length > 0 && (
         <>
-          <h2 className="text-white font-bold text-3xl self-start px-6">Periféricos</h2>
+          <h2 className="text-white font-bold text-3xl self-start px-6">
+            Periféricos
+          </h2>
           <div className="grid grid-cols-3 gap-30 p-6">
-            {perifericos.map((produto) => <CardItem key={produto.id} produto={produto} />)}
+            {perifericos.map((produto) => (
+              <CardItem key={produto.id} produto={produto} />
+            ))}
           </div>
         </>
       )}
 
       {jogos.length > 0 && (
         <>
-          <h2 className="text-white font-bold text-3xl self-start px-6">Jogos</h2>
+          <h2 className="text-white font-bold text-3xl self-start px-6">
+            Jogos
+          </h2>
           <div className="grid grid-cols-3 gap-30 p-6">
-            {jogos.map((produto) => <CardItem key={produto.id} produto={produto} />)}
+            {jogos.map((produto) => (
+              <CardItem key={produto.id} produto={produto} />
+            ))}
+          </div>
+        </>
+      )}
+
+      {consoles.length > 0 && (
+        <>
+          <h2 className="text-white font-bold text-3xl self-start px-6">
+            Consoles
+          </h2>
+          <div className="grid grid-cols-3 gap-30 p-6">
+            {consoles.map((produto) => (
+              <CardItem key={produto.id} produto={produto} />
+            ))}
+          </div>
+        </>
+      )}
+
+      {pcs.length > 0 && (
+        <>
+          <h2 className="text-white font-bold text-3xl self-start px-6">
+            PCs
+          </h2>
+          <div className="grid grid-cols-3 gap-30 p-6">
+            {pcs.map((produto) => (
+              <CardItem key={produto.id} produto={produto} />
+            ))}
           </div>
         </>
       )}
 
       {produtos.length === 0 && !loading && (
-        <p className="text-white text-center py-8">Nenhum produto disponível</p>
+        <p className="text-white text-center py-8">
+          Nenhum produto disponível
+        </p>
       )}
     </div>
   );
