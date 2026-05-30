@@ -4,7 +4,9 @@ import Image from "next/image"
 import { useState } from "react"
 import { Heart, MessageCircle, Share2, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from "next/navigation" 
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/context/AuthContext"
+import { toast } from "react-toastify"
 
 function Input({
   error,
@@ -13,7 +15,7 @@ function Input({
   return (
     <input
       {...props}
-      className={`w-full h-12 px-4 rounded-lg border bg-white/50 focus:outline-none 
+      className={`w-full h-12 px-4 rounded-lg border bg-white/50 focus:outline-none
       ${error ? "border-red-500" : "border-gray-300"}`}
     />
   )
@@ -33,7 +35,8 @@ type AuthMode = "login" | "register"
 export default function AuthPage() {
   const [mode, setMode] = useState<AuthMode>("login")
   const [showPassword, setShowPassword] = useState(false)
-  const router = useRouter() 
+  const router = useRouter()
+  const { login, register, loading } = useAuth()
 
   const [formData, setFormData] = useState({
     email: "",
@@ -47,7 +50,7 @@ export default function AuthPage() {
     name: false,
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     // validação
@@ -59,41 +62,18 @@ export default function AuthPage() {
     setErrors(newErrors)
     if (Object.values(newErrors).some(Boolean)) return
 
-    // busca usuários salvos
-    const storedUsers = JSON.parse(localStorage.getItem("users") || "[]")
-
-    if (mode === "register") {
-      // verifica se email já existe
-      const exists = storedUsers.some((u: any) => u.email === formData.email)
-      if (exists) {
-        alert("Já existe um usuário com esse e-mail!")
-        return
+    try {
+      if (mode === "register") {
+        await register(formData.name, formData.email, formData.password, formData.password)
+        toast.success("Cadastro realizado com sucesso!")
+        router.push("/")
+      } else {
+        await login(formData.email, formData.password)
+        toast.success("Login realizado com sucesso!")
+        router.push("/")
       }
-
-      const newUser = {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password, // ⚠️ demo, não armazenar senha em texto puro
-        uid: Date.now().toString(),
-        photoURL: "",
-      }
-
-      storedUsers.push(newUser)
-      localStorage.setItem("users", JSON.stringify(storedUsers))
-      localStorage.setItem("user", JSON.stringify(newUser))
-      router.push("/") 
-    } else {
-      // login
-      const user = storedUsers.find(
-        (u: any) => u.email === formData.email && u.password === formData.password
-      )
-      if (!user) {
-        alert("E-mail ou senha incorretos!")
-        return
-      }
-
-      localStorage.setItem("user", JSON.stringify(user))
-      router.push("/")
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao autenticar")
     }
   }
 
@@ -193,8 +173,8 @@ export default function AuthPage() {
               </button>
             </div>
 
-            <Button type="submit">
-              {mode === "login" ? "Entrar" : "Cadastrar"}
+            <Button type="submit" disabled={loading}>
+              {loading ? "Carregando..." : (mode === "login" ? "Entrar" : "Cadastrar")}
             </Button>
           </form>
 

@@ -1,11 +1,12 @@
-<<<<<<< HEAD
 import Image from "next/image";
 import Link from "next/link";
 import { FaStar } from "react-icons/fa";
 import { useState } from "react";
-import { perifericos, games, Produto } from "../../produtos/index";
+import { useProdutos } from "@/context/ProdutosContext";
+import { Produto } from "@/context/ProdutosContext";
 
 export default function Cards() {
+  const { produtos, loading } = useProdutos();
   const [favoritos, setFavoritos] = useState<number[]>(() => {
     if (typeof window === "undefined") return [];
     const salvo = localStorage.getItem("favoritos");
@@ -29,164 +30,57 @@ export default function Cards() {
             favoritos.includes(produto.id) ? "text-yellow-400" : "text-black"
           }`}
         />
-        <Image src={produto.imagem} alt={produto.nome} width={300} height={200} />
+        <Image
+          src={produto.imagem_url || "/mouse 1.png"}
+          alt={produto.nome}
+          width={300}
+          height={200}
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = "/mouse 1.png";
+          }}
+        />
       </div>
       <h2 className="text-white text-xl font-bold mb-2 mt-5">{produto.nome}</h2>
       <p className="text-white">{produto.descricao}</p>
       <div className="flex gap-30 items-center mt-2">
-        <p className="text-white font-bold text-xl">{produto.preco}</p>
-        <Link href="/comprar" className="bg-[#A636E9] text-white px-4 py-2 rounded hover:bg-[#430883]">
+        <p className="text-white font-bold text-xl">R$ {produto.preco?.toFixed(2).replace(".", ",")}</p>
+        <Link href={`/comprar?id=${produto.id}`} className="bg-[#A636E9] text-white px-4 py-2 rounded hover:bg-[#430883]">
           Comprar
         </Link>
       </div>
     </div>
   );
 
-  return (
-    <div className="flex flex-col items-center gap-10 py-8">
-      <h2 className="text-white font-bold text-3xl self-start px-6">Periféricos</h2>
-      <div className="grid grid-cols-3 gap-30 p-6">
-        {perifericos.map((produto) => <CardItem key={produto.id} produto={produto} />)}
-      </div>
+  if (loading) {
+    return <div className="text-white text-center py-8">Carregando produtos...</div>;
+  }
 
-      <h2 className="text-white font-bold text-3xl self-start px-6">Jogos</h2>
-      <div className="grid grid-cols-3 gap-30 p-6">
-        {games.map((produto) => <CardItem key={produto.id} produto={produto} />)}
-      </div>
-    </div>
-  );
-=======
-import Image from "next/image";
-import Link from "next/link";
-import { FaStar, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { useState, useRef } from "react";
-import { perifericos, games, Produto } from "../../produtos/index";
-
-const CardItem = ({
-  produto,
-  favoritos,
-  toggleFavorito,
-}: {
-  produto: Produto;
-  favoritos: number[];
-  toggleFavorito: (id: number) => void;
-}) => (
-  <div className="rounded-lg shadow-md p-4 border-2 border-white w-80 flex-shrink-0 transition-transform duration-300 hover:scale-105">
-    <div className="relative">
-      <FaStar
-        onClick={() => toggleFavorito(produto.id)}
-        className={`absolute top-2 right-2 text-2xl cursor-pointer z-10 ${
-          favoritos.includes(produto.id) ? "text-yellow-400" : "text-black"
-        }`}
-      />
-      <Image src={produto.imagem} alt={produto.nome} width={300} height={200} />
-    </div>
-    <h2 className="text-white text-xl font-bold mb-2 mt-5">{produto.nome}</h2>
-    <p className="text-white">{produto.descricao}</p>
-    <div className="flex gap-8 items-center mt-2">
-      <p className="text-white font-bold text-xl">{produto.preco}</p>
-      <Link
-        href="/comprar"
-        className="bg-[#A636E9] text-white px-4 py-2 rounded hover:bg-[#430883]"
-      >
-        Comprar
-      </Link>
-    </div>
-  </div>
-);
-
-const Carrossel = ({
-  produtos,
-  favoritos,
-  toggleFavorito,
-}: {
-  produtos: Produto[];
-  favoritos: number[];
-  toggleFavorito: (id: number) => void;
-}) => {
-  const ref = useRef<HTMLDivElement>(null);
-
-  const scroll = (direcao: "esquerda" | "direita") => {
-    if (!ref.current) return;
-    const largura = ref.current.offsetWidth;
-    ref.current.scrollBy({
-      left: direcao === "direita" ? largura : -largura,
-      behavior: "smooth",
-    });
-  };
-
-  return (
-    <div className="relative w-full px-6">
-      {/* Botão esquerda */}
-      <button
-        onClick={() => scroll("esquerda")}
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-[#A636E9] hover:bg-[#430883] text-white p-3 rounded-full shadow-lg transition-colors duration-200"
-        aria-label="Anterior"
-      >
-        <FaChevronLeft />
-      </button>
-
-      {/* Faixa rolável */}
-      <div
-        ref={ref}
-        className="flex gap-6 overflow-x-auto scroll-smooth px-10 pb-4
-                   [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-      >
-        {produtos.map((produto) => (
-          <CardItem
-            key={produto.id}
-            produto={produto}
-            favoritos={favoritos}
-            toggleFavorito={toggleFavorito}
-          />
-        ))}
-      </div>
-
-      {/* Botão direita */}
-      <button
-        onClick={() => scroll("direita")}
-        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-[#A636E9] hover:bg-[#430883] text-white p-3 rounded-full shadow-lg transition-colors duration-200"
-        aria-label="Próximo"
-      >
-        <FaChevronRight />
-      </button>
-    </div>
-  );
-};
-
-export default function Cards() {
-  const [favoritos, setFavoritos] = useState<number[]>(() => {
-    if (typeof window === "undefined") return [];
-    const salvo = localStorage.getItem("favoritos");
-    return salvo ? JSON.parse(salvo) : [];
-  });
-
-  const toggleFavorito = (id: number) => {
-    setFavoritos((prev) => {
-      const novos = prev.includes(id)
-        ? prev.filter((f) => f !== id)
-        : [...prev, id];
-      localStorage.setItem("favoritos", JSON.stringify(novos));
-      return novos;
-    });
-  };
+  const perifericos = produtos.filter((p) => p.categoria?.nome_categoria === "Periféricos");
+  const jogos = produtos.filter((p) => p.categoria?.nome_categoria === "Jogos");
 
   return (
     <div className="flex flex-col items-center gap-10 py-8">
-      <h2 className="text-white font-bold text-3xl self-start px-6">Periféricos</h2>
-      <Carrossel
-        produtos={perifericos}
-        favoritos={favoritos}
-        toggleFavorito={toggleFavorito}
-      />
+      {perifericos.length > 0 && (
+        <>
+          <h2 className="text-white font-bold text-3xl self-start px-6">Periféricos</h2>
+          <div className="grid grid-cols-3 gap-30 p-6">
+            {perifericos.map((produto) => <CardItem key={produto.id} produto={produto} />)}
+          </div>
+        </>
+      )}
 
-      <h2 className="text-white font-bold text-3xl self-start px-6">Jogos</h2>
-      <Carrossel
-        produtos={games}
-        favoritos={favoritos}
-        toggleFavorito={toggleFavorito}
-      />
+      {jogos.length > 0 && (
+        <>
+          <h2 className="text-white font-bold text-3xl self-start px-6">Jogos</h2>
+          <div className="grid grid-cols-3 gap-30 p-6">
+            {jogos.map((produto) => <CardItem key={produto.id} produto={produto} />)}
+          </div>
+        </>
+      )}
+
+      {produtos.length === 0 && !loading && (
+        <p className="text-white text-center py-8">Nenhum produto disponível</p>
+      )}
     </div>
   );
->>>>>>> ee0de581ae518dcc1fb8e0fd775f727150b27981
 }

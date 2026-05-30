@@ -4,11 +4,13 @@ import { IoIosSearch } from "react-icons/io";
 import { BsBell, BsBorderAll, BsCart2, BsEnvelope } from "react-icons/bs";
 import { CgAdd } from "react-icons/cg";
 import Link from "next/link";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/router";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Header() {
   const router = useRouter();
+  const { usuario } = useAuth();
   const [busca, setBusca] = useState("");
 
   const handleBuscar = useCallback(() => {
@@ -18,45 +20,13 @@ export default function Header() {
     setBusca("");
   }, [busca, router]);
 
-  interface User {
-    name: string;
-    email: string;
-    photoURL: string;
-    uid: string;
-  }
-
-  const [user, setUser] = useState<User | null>(null);
-
-  
-  useEffect(() => {
-    const loadUser = () => {
-      if (typeof window !== "undefined") {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        } else {
-          setUser(null);
-        }
-      }
-    };
-
-    loadUser();
-
-   
-    window.addEventListener("userChange", loadUser);
-
-    return () => {
-      window.removeEventListener("userChange", loadUser);
-    };
-  }, []);
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") handleBuscar();
   };
 
   return (
     <header className="bg-[#A636E9] h-20 flex items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10 2xl:gap-15 w-full px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12">
-      
+
       {/* Logo */}
       <Link href="/" className="shrink-0">
         <Image
@@ -115,25 +85,14 @@ export default function Header() {
 
       {/* Usuário */}
       <div className="hidden md:flex flex-shrink-0 bg-white/50 rounded-xl px-2 lg:px-4 xl:px-6 py-1 border border-transparent hover:border-[#430883] transition duration-300">
-        {user ? (
+        {usuario ? (
           <Link href="/perfil">
-            {user.photoURL ? (
-              <Image
-                src={user.photoURL}
-                alt="Foto do usuário"
-                width={32}
-                height={32}
-                className="rounded-full object-cover cursor-pointer max-w-8 max-h-8 min-w-8 min-h-8"
-                title="Minha conta"
-              />
-            ) : (
-              <div
-                className="w-8 h-8 rounded-full bg-purple-700 flex items-center justify-center text-white font-bold cursor-pointer"
-                title="Minha conta"
-              >
-                {user.name?.[0]?.toUpperCase() || "U"}
-              </div>
-            )}
+            <div
+              className="w-8 h-8 rounded-full bg-purple-700 flex items-center justify-center text-white font-bold cursor-pointer"
+              title="Minha conta"
+            >
+              {usuario.nome?.[0]?.toUpperCase() || "U"}
+            </div>
           </Link>
         ) : (
           <Link href="/entrar" className="text-white hover:text-[#430883] transition duration-300">
