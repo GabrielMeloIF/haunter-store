@@ -17,10 +17,10 @@ export default function Footer() {
 
         {/* Links */}
         <ul className="flex flex-wrap gap-3 md:gap-6 text-white justify-center text-xs md:text-sm">
-          <li><Link href="/contact" className="hover:text-[#430883]">Ajuda</Link></li>
-          <li><Link href="/contact" className="hover:text-[#430883]">Fale conosco</Link></li>
-          <li><Link href="/contact" className="hover:text-[#430883]">Termos de uso</Link></li>
-          <li><Link href="/contact" className="hover:text-[#430883]">Política de privacidade</Link></li>
+          <li><Link href="/ajuda" className="hover:text-[#430883]">Ajuda</Link></li>
+          <li><Link href="/fale-conosco" className="hover:text-[#430883]">Fale conosco</Link></li>
+          <li><Link href="/termos" className="hover:text-[#430883]">Termos de uso</Link></li>
+          <li><Link href="/politica" className="hover:text-[#430883]">Política de privacidade</Link></li>
         </ul>
 
         {/* Redes sociais + Copyright */}

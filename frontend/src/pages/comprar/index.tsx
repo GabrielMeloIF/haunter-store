@@ -1,6 +1,5 @@
 import Footer from "@/Components/Footer/Footer";
 import Header from "@/Components/Header/Header";
-import NavBar from "@/Components/Navbar/NavBar";
 import { FaStar } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
@@ -98,7 +97,7 @@ export default function Comprar() {
   return (
     <>
       <Header />
-      <NavBar />
+     
       <div className="flex">
         {/* Imagem principal */}
         <div className="flex flex-col p-20">

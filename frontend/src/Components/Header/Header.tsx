@@ -2,6 +2,7 @@ import Image from "next/image";
 import Logo from "../../../public/logo.png";
 import { IoIosSearch } from "react-icons/io";
 import { BsBell, BsBorderAll, BsCart2, BsEnvelope } from "react-icons/bs";
+import { FaRegStar } from "react-icons/fa";
 import { CgAdd } from "react-icons/cg";
 import Link from "next/link";
 import { useState, useCallback } from "react";
@@ -72,6 +73,11 @@ export default function Header() {
         <Link href="/carrinho" className="flex items-center gap-1 text-white hover:text-[#430883]">
           <BsCart2 />
           <span>Carrinho</span>
+        </Link>
+
+        <Link href="/favoritos" className="flex items-center gap-1 text-white hover:text-[#430883]">
+          <FaRegStar />
+          <span>Favoritos</span>
         </Link>
       </nav>
 

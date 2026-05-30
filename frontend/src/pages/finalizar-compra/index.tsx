@@ -1,5 +1,5 @@
 import Header from "@/Components/Header/Header";
-import NavBar from "@/Components/Navbar/NavBar";
+
 import Footer from "@/Components/Footer/Footer";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -101,7 +101,7 @@ export default function Finalizar() {
     return (
       <>
         <Header />
-        <NavBar />
+       
         <div className="min-h-[70vh] flex flex-col items-center justify-center gap-6">
           <p className="text-white text-lg">Faça login para finalizar sua compra</p>
           <Link href="/entrar" className="text-purple-400 hover:text-purple-300">
@@ -117,7 +117,7 @@ export default function Finalizar() {
     return (
       <>
         <Header />
-        <NavBar />
+  
         <div className="min-h-[70vh] flex flex-col items-center justify-center gap-6">
           <p className="text-white text-lg">Seu carrinho está vazio</p>
           <Link href="/" className="text-purple-400 hover:text-purple-300">
@@ -133,7 +133,7 @@ export default function Finalizar() {
     return (
       <>
         <Header />
-        <NavBar />
+     
         <div className="min-h-[70vh] flex flex-col items-center justify-center gap-6">
           <div className="w-20 h-20 rounded-full bg-green-500 flex items-center justify-center text-white text-4xl">
             ✓
@@ -159,7 +159,7 @@ export default function Finalizar() {
   return (
     <>
       <Header />
-      <NavBar />
+  
 
       <div className="max-w-6xl mx-auto px-6 py-10 min-h-screen">
         <h1 className="text-3xl font-bold text-white mb-8">Finalizar Compra</h1>

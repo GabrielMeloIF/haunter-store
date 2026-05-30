@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Header from "@/Components/Header/Header";
-import NavBar from "@/Components/Navbar/NavBar";
 import Footer from "@/Components/Footer/Footer";
 import { useCarrinho } from "@/context/CarrinhoContext";
 import { useAuth } from "@/context/AuthContext";
@@ -17,7 +16,7 @@ export default function Carrinho() {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
-        <NavBar />
+     
         <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-10">
           <p className="text-white text-lg">Faça login para ver seu carrinho</p>
           <Link href="/entrar" className="text-purple-400 hover:text-purple-300">
@@ -65,7 +64,7 @@ export default function Carrinho() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <NavBar />
+
       <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-10">
         <h1 className="text-white text-3xl font-bold mb-8">Meu Carrinho</h1>
 

@@ -1,5 +1,5 @@
 import Header from "@/Components/Header/Header";
-import Navbar from "@/Components/Navbar/NavBar";
+
 import Footer from "@/Components/Footer/Footer";
 import { useRouter } from 'next/router'
 import { useAds } from '@/context/AdsContext'
@@ -11,8 +11,7 @@ export default function MeusAnuncios() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <Navbar />
-
+   
       <div className="flex-1  max-w-7xl mx-auto p-15 w-full">
 
         <div className="flex items-center justify-between mb-8">
