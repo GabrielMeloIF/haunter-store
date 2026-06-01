@@ -111,7 +111,7 @@ export default function ProfilePage() {
               />
             ) : (
               <div className="w-20 h-20 rounded-full bg-purple-700 flex items-center justify-center text-white text-2xl font-bold">
-                {name[0]?.toUpperCase() || "U"}
+                {name?.[0].toUpperCase() || "U"}
               </div>
             )}
             <label className="cursor-pointer text-sm text-purple-600 hover:underline">

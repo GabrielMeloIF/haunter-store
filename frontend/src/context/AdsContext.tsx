@@ -32,7 +32,7 @@ export function AdsProvider({ children }: { children: ReactNode }) {
   function publishAd(data: Omit<Ad, 'id' | 'publishedAt'>) {
     const newAd: Ad = {
       ...data,
-      id: crypto.randomUUID(),
+      id: Date.now().toString(),
       publishedAt: new Date().toISOString(),
     }
     setAds(prev => [newAd, ...prev])

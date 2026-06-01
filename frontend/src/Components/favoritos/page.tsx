@@ -1,6 +1,6 @@
 import Header from "@/Components/Header/Header";
 import Footer from "@/Components/Footer/Footer";
-import NavBar from "@/Components/Navbar/NavBar";
+
 import { Icon } from "@iconify/react";
 
 // ===== BANCO DE DADOS SIMULADO =====
@@ -39,7 +39,7 @@ export default function Notificacao() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <NavBar />
+    
 
       <main className="flex-1 px-4">
         <div className="flex justify-center">

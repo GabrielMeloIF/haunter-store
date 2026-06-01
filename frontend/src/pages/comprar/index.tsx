@@ -5,38 +5,44 @@ import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { produtosAPI } from "@/services/api";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { useCarrinho } from "@/context/CarrinhoContext";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Comprar() {
-  const [produtos, setProdutos] = useState([
-    {
-      id: 1,
-      nome: "Mouse Fortrek Spider",
-      descricao:
-        "Eleve sua experiência nos jogos e no dia a dia com o Mouse Fortrek Spider. Com um design moderno e agressivo, iluminação em LED vermelho e acabamento ergonômico, ele foi desenvolvido para oferecer conforto e alta performance durante longas horas de uso.",
-      preco: "R$ 79,00",
-      imagens: ["/mouse 1.png", "/headset 1.png", "/teclado 1.png"],
-      comentario:
-        "Ótimo mouse para jogos, confortável e com boa precisão. A iluminação em LED é um bônus visual que eu adoro!",
-      estrelas: 4,
-    },
-  ]);
+  const router = useRouter();
+  const { adicionarItem } = useCarrinho();
+  const { usuario } = useAuth();
+  const { id } = router.query;
 
+  const [produto, setProduto] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [rating, setRating] = useState(0);
   const [novoComentario, setNovoComentario] = useState("");
-  const [favoritos, setFavoritos] = useState<number[]>(() => {
-    if (typeof window === "undefined") return [];
-    const salvo = localStorage.getItem("favoritos");
-    return salvo ? JSON.parse(salvo) : [];
-  });
+  const [comentarios, setComentarios] = useState<any[]>([]);
+  const [favoritos, setFavoritos] = useState<number[]>([]);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const salvo = localStorage.getItem("favoritos");
-      if (salvo) setFavoritos(JSON.parse(salvo));
-    }
+    const salvo = localStorage.getItem("favoritos");
+    if (salvo) setFavoritos(JSON.parse(salvo));
   }, []);
+
+  useEffect(() => {
+    async function carregarProduto() {
+      if (!id) return;
+      try {
+        const data = await produtosAPI.getById(Number(id));
+        setProduto(data);
+      } catch (error) {
+        console.error("Erro ao carregar produto:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    carregarProduto();
+  }, [id]);
 
   const toggleFavorito = (id: number) => {
     setFavoritos((prev) => {
@@ -48,124 +54,117 @@ export default function Comprar() {
     });
   };
 
-  const produto = produtos[0];
-  const [currentImage, setCurrentImage] = useState(0);
+  const adicionarAoCarrinho = async () => {
+    if (!produto) return;
 
-  const nextImage = () => {
-    setCurrentImage((prev) => (prev + 1) % produto.imagens.length);
-  };
+    if (!usuario) {
+      toast.error("Faça login para adicionar ao carrinho!", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      return;
+    }
 
-  const prevImage = () => {
-    setCurrentImage((prev) =>
-      prev === 0 ? produto.imagens.length - 1 : prev - 1
-    );
-  };
-
-  const adicionarAoCarrinho = () => {
-    const salvo = localStorage.getItem("carrinho");
-    const ids: number[] = salvo ? JSON.parse(salvo) : [];
-    ids.push(produto.id);
-    localStorage.setItem("carrinho", JSON.stringify(ids));
-    toast.success("Produto adicionado ao carrinho!", {
-      position: "bottom-right",
-      autoClose: 3000,
-    });
+    try {
+      await adicionarItem(produto.id, 1);
+      toast.success("Produto adicionado ao carrinho!", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+    } catch (error: any) {
+      toast.error(error.message, {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+    }
   };
 
   const adicionarComentario = () => {
     if (!novoComentario.trim()) return;
-    const novo = {
-      id: Date.now(),
-      nome: produto.nome,
-      descricao: produto.descricao,
-      preco: produto.preco,
-      imagens: [produto.imagens[0]],
-      comentario: novoComentario,
-      estrelas: rating,
-    };
-    setProdutos([...produtos, novo]);
+    const novo = { comentario: novoComentario, estrelas: rating };
+    setComentarios([...comentarios, novo]);
     setNovoComentario("");
     setRating(0);
   };
 
   const calculoRating = () => {
-    if (produtos.length === 0) return 0;
-    const total = produtos.reduce((acc, p) => acc + p.estrelas, 0);
-    return Math.round(total / produtos.length);
+    if (comentarios.length === 0) return 0;
+    const total = comentarios.reduce((acc, c) => acc + c.estrelas, 0);
+    return Math.round(total / comentarios.length);
   };
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen flex justify-center items-center">
+          <p className="text-white text-2xl">Carregando produto...</p>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  if (!produto) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen flex justify-center items-center">
+          <p className="text-white text-2xl">Produto não encontrado.</p>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
       <Header />
-     
-      <div className="flex">
-        {/* Imagem principal */}
-        <div className="flex flex-col p-20">
+      <ToastContainer />
+
+      <div className="flex flex-wrap justify-center gap-10 p-10">
+        <div className="flex flex-col items-center">
           <Image
-            src={produto.imagens[currentImage]}
-            alt="Mouse Gamer"
-            width={400}
-            height={300}
+            src={produto.imagem_url || "/mouse 1.png"}
+            alt={produto.nome}
+            width={450}
+            height={450}
+            className="rounded-lg"
           />
-          <div className="mt-5 flex gap-8">
-            <div className="mt-5 flex items-center gap-4">
-              <button onClick={prevImage} className="text-white text-2xl">
-                ‹
-              </button>
-              <div className="flex gap-4">
-                {produto.imagens.map((img, index) => (
-                  <Image
-                    key={index}
-                    src={img}
-                    alt={produto.nome}
-                    width={110}
-                    height={50}
-                    className={`cursor-pointer border-2 ${
-                      index === currentImage
-                        ? "border-purple-500 rounded-2xl"
-                        : "border-transparent"
-                    }`}
-                    onClick={() => setCurrentImage(index)}
-                  />
-                ))}
-              </div>
-              <button onClick={nextImage} className="text-white text-2xl">
-                ›
-              </button>
-            </div>
-          </div>
         </div>
 
-        {/* Detalhes do produto */}
-        <div className="flex flex-col p-20 rounded-lg h-100 w-200 mt-20 bg-[#d9d9d9]/20">
-          <div className="flex items-center gap-63 mb-5">
-            <h1 className="text-2xl font-bold text-white -mt-8 mb-3">
-              {produto.nome}
-            </h1>
+        <div className="flex flex-col p-10 rounded-lg w-[700px] bg-[#d9d9d9]/20">
+          <div className="flex justify-between items-center mb-5">
+            <h1 className="text-3xl font-bold text-white">{produto.nome}</h1>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <FaStar
                   key={star}
-                  className={`cursor-pointer text-2xl -mt-8 ${
-                    star <= rating ? "text-yellow-400" : "text-black"
+                  className={`cursor-pointer text-2xl ${
+                    star <= rating ? "text-yellow-400" : "text-gray-500"
                   }`}
                   onClick={() => setRating(star)}
                 />
               ))}
             </div>
           </div>
-          <p className="text-lg mt-2 text-white">{produto.descricao}</p>
-          <p className="text-3xl font-bold mt-4 text-white">{produto.preco}</p>
-          <div className="flex gap-4 mt-6">
+
+          <p className="text-white text-lg">{produto.descricao}</p>
+
+          <p className="text-4xl font-bold text-white mt-6">
+            R$ {Number(produto.preco).toFixed(2).replace(".", ",")}
+          </p>
+
+          <div className="flex gap-4 mt-8">
             <button
               onClick={adicionarAoCarrinho}
-              className="bg-[#5a10a8] text-white py-2 px-4 rounded-lg hover:bg-[#3a0a6a] transition duration-200 mt-4"
+              className="bg-[#5a10a8] text-white py-3 px-6 rounded-lg hover:bg-[#3a0a6a]"
             >
               Adicionar ao Carrinho
             </button>
             <Link
               href="/finalizar-compra"
-              className="bg-[#5a10a8] text-white py-2 px-4 rounded-lg hover:bg-[#3a0a6a] transition duration-200 mt-4"
+              className="bg-[#5a10a8] text-white py-3 px-6 rounded-lg hover:bg-[#3a0a6a]"
             >
               Comprar Agora
             </Link>
@@ -173,86 +172,65 @@ export default function Comprar() {
         </div>
       </div>
 
-      {/* Favoritar e compartilhar */}
-      <div className="flex justify-center gap-60 -mt-40 mb-39">
+      <div className="flex justify-center gap-40 mb-10">
         <div className="flex flex-col items-center cursor-pointer">
           <FaStar
             onClick={() => toggleFavorito(produto.id)}
-            className={`text-3xl ${
-              favoritos.includes(produto.id) ? "text-yellow-400" : "text-black"
+            className={`text-4xl ${
+              favoritos.includes(produto.id) ? "text-yellow-400" : "text-gray-500"
             }`}
           />
-          <span className="text-white mt-1 text-sm">Favoritar</span>
+          <span className="text-white mt-2">Favoritar</span>
         </div>
+
         <button
           onClick={() => {
-            const url = window.location.href;
-            navigator.clipboard.writeText(url);
-            toast.info("Link copiado!", {
-              position: "bottom-right",
-              autoClose: 2000,
-            });
+            navigator.clipboard.writeText(window.location.href);
+            toast.info("Link copiado!", { position: "bottom-right", autoClose: 2000 });
           }}
-          className="flex flex-col items-center text-purple-600 px-4 py-2 rounded hover:text-purple-700"
+          className="flex flex-col items-center"
         >
-          <Icon icon="typcn:arrow-back" width={40} className="-mt-4" />
+          <Icon icon="mdi:share-variant" width={40} className="text-purple-500" />
           <span className="text-white">Compartilhar</span>
         </button>
       </div>
 
-      {/* Seção de comentários */}
-      <div className="bg-white rounded-lg p-4 mt-4 flex flex-col">
-        <p className="text-black ml-70 text-2xl mt-10">Comentários do produto</p>
-        <div className="flex gap-2 ml-30 mt-17">
+      <div className="bg-white rounded-lg p-8 mx-10 mb-10">
+        <h2 className="text-2xl font-bold mb-6">Comentários do Produto</h2>
+
+        <div className="flex gap-2">
           <input
             type="text"
             placeholder="Escreva seu comentário..."
             value={novoComentario}
             onChange={(e) => setNovoComentario(e.target.value)}
-            className="w-150 bg-gray-200 placeholder:text-gray-500 border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                adicionarComentario();
-              }
-            }}
+            className="flex-1 border border-gray-300 rounded-lg p-2"
           />
           <button
             onClick={adicionarComentario}
-            className="bg-[#5a10a8] text-white px-4 py-2 rounded-lg hover:bg-[#3a0a6a] transition duration-200"
+            className="bg-[#5a10a8] text-white px-4 rounded-lg"
           >
             Enviar
           </button>
         </div>
 
-        <div className="flex">
-          <div className="flex items-start">
-            <div>
-              {produtos.map((p) => (
-                <div
-                  key={p.id}
-                  className="flex items-center bg-gray-400 rounded w-230 h-16 ml-20 mt-5 gap-10"
-                >
-                  <Icon
-                    icon="heroicons:user"
-                    className="ml-7 text-2xl text-white"
-                  />
-                  <p>
-                    {p.comentario.slice(0, 80)}
-                    {p.comentario.length > 80 ? "..." : ""}
-                  </p>
-                  <p className="flex items-center gap-2">
-                    {p.estrelas}
-                    <FaStar className="text-yellow-400" />
-                  </p>
-                </div>
-              ))}
+        <div className="mt-6 space-y-3">
+          {comentarios.map((comentario, index) => (
+            <div key={index} className="bg-gray-200 rounded-lg p-4 flex justify-between">
+              <p>{comentario.comentario}</p>
+              <div className="flex items-center gap-1">
+                <span>{comentario.estrelas}</span>
+                <FaStar className="text-yellow-400" />
+              </div>
             </div>
+          ))}
+        </div>
 
-            <div className="ml-100 mt-5 flex flex-col">
-              <h2 className="text-xl">Avaliações</h2>
-              <FaStar className="text-yellow-400 text-6xl ml-4 mt-10" />
-              <p className="ml-4">{calculoRating()} estrelas</p>
-            </div>
+        <div className="mt-10">
+          <h3 className="text-xl font-bold">Média das Avaliações</h3>
+          <div className="flex items-center gap-2 mt-3">
+            <FaStar className="text-yellow-400 text-4xl" />
+            <span className="text-2xl">{calculoRating()} estrelas</span>
           </div>
         </div>
       </div>

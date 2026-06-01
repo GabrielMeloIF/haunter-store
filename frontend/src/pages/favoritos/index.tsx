@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Header from "@/Components/Header/Header";
-
 import Footer from "@/Components/Footer/Footer";
-import { todosProdutos, Produto } from "../../produtos";
+import { useProdutos, Produto } from "@/context/ProdutosContext";
 
 export default function Favoritos() {
+  const { produtos } = useProdutos();
   const [produtosFavoritos, setProdutosFavoritos] = useState<Produto[]>([]);
 
   useEffect(() => {
     const salvo = localStorage.getItem("favoritos");
     const ids: number[] = salvo ? JSON.parse(salvo) : [];
-    setProdutosFavoritos(todosProdutos.filter((p) => ids.includes(p.id)));
-  }, []);
+    setProdutosFavoritos(produtos.filter((p) => ids.includes(p.id)));
+  }, [produtos]);
 
   const removerFavorito = (id: number) => {
     const novos = produtosFavoritos.filter((p) => p.id !== id);
@@ -23,7 +23,7 @@ export default function Favoritos() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-  
+
       <main className="flex-1">
         <h1 className="flex justify-center text-white text-3xl font-bold mt-10">
           Favoritos
@@ -38,10 +38,10 @@ export default function Favoritos() {
             {produtosFavoritos.map((produto) => (
               <div
                 key={produto.id}
-                className="rounded-lg shadow-md p-4 border-2 border-white w-80"
+                className="rounded-lg shadow-md p-4 border-2 border-white w-80 flex flex-col"
               >
                 <Image
-                  src={produto.imagem}
+                  src={produto.imagem_url || "/mouse 1.png"}
                   alt={produto.nome}
                   width={300}
                   height={200}
@@ -51,16 +51,16 @@ export default function Favoritos() {
                 </h2>
                 <p className="text-white">{produto.descricao}</p>
                 <p className="text-white font-bold text-xl mt-2">
-                  {produto.preco}
+                  R$ {produto.preco?.toFixed(2).replace(".", ",")}
                 </p>
                 <div className="flex gap-8">
                   <button
                     onClick={() => removerFavorito(produto.id)}
-                    className="mt-4 bg-red-600 text-white  py-2 rounded hover:bg-red-800 w-40"
+                    className="mt-4 bg-red-600 text-white py-2 rounded hover:bg-red-800 w-40"
                   >
                     Remover dos favoritos
                   </button>
-                  <div className="flex gap-30 items-center mt-4">
+                 <div className="flex gap-8 mt-auto">
                     <button className="bg-[#A636E9] text-white px-4 py-2 rounded hover:bg-[#430883]">
                       Comprar
                     </button>

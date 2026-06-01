@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaStar } from "react-icons/fa";
 import { useState } from "react";
-import { useProdutos } from "@/context/ProdutosContext";
+import { useProdutos, } from "@/context/ProdutosContext";
 import { Produto } from "@/context/ProdutosContext";
 
 export default function Cards() {
@@ -24,46 +24,49 @@ export default function Cards() {
   };
 
   const CardItem = ({ produto }: { produto: Produto }) => (
-    <div className="rounded-lg shadow-md p-4 border-2 border-white w-80 transition-transform duration-300 hover:scale-105">
-      <div className="relative">
-        <FaStar
-          onClick={() => toggleFavorito(produto.id)}
-          className={`absolute top-2 right-2 text-2xl cursor-pointer ${
-            favoritos.includes(produto.id)
-              ? "text-yellow-400"
-              : "text-black"
-          }`}
-        />
+  <div className="rounded-lg shadow-md p-4 border-2 border-white w-80 h-[440px] flex flex-col transition-transform duration-300 hover:scale-105">
+    <div className="relative">
+      <FaStar
+        onClick={() => toggleFavorito(produto.id)}
+        className={`absolute top-2 right-2 text-2xl cursor-pointer z-10 ${
+          favoritos.includes(produto.id)
+            ? "text-yellow-400"
+            : "text-black"
+        }`}
+      />
+
+      <div className="relative w-full h-56">
         <Image
           src={produto.imagem_url || "/mouse 1.png"}
           alt={produto.nome}
-          width={300}
-          height={200}
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = "/mouse 1.png";
-          }}
+          fill
+          className="object-contain rounded"
         />
       </div>
-
-      <h2 className="text-white text-xl font-bold mb-2 mt-5">
-        {produto.nome}
-      </h2>
-      <p className="text-white">{produto.descricao}</p>
-
-      <div className="flex gap-30 items-center mt-2">
-        <p className="text-white font-bold text-xl">
-          R$ {produto.preco?.toFixed(2).replace(".", ",")}
-        </p>
-
-        <Link
-          href={`/comprar?id=${produto.id}`}
-          className="bg-[#A636E9] text-white px-4 py-2 rounded hover:bg-[#430883]"
-        >
-          Comprar
-        </Link>
-      </div>
     </div>
-  );
+
+    <h2 className="text-white text-xl font-bold mb-2 mt-5">
+      {produto.nome}
+    </h2>
+
+    <p className="text-white flex-grow">
+      {produto.descricao}
+    </p>
+
+    <div className="mt-auto flex justify-between items-center">
+      <p className="text-white font-bold text-xl">
+        R$ {produto.preco?.toFixed(2).replace(".", ",")}
+      </p>
+
+      <Link
+        href={`/comprar?id=${produto.id}`}
+        className="bg-[#A636E9] text-white px-4 py-2 rounded hover:bg-[#430883]"
+      >
+        Comprar
+      </Link>
+    </div>
+  </div>
+);
 
   if (loading) {
     return (

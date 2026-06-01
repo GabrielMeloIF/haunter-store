@@ -4,12 +4,48 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "http2.mlstatic.com",
+      },
+      {
+        protocol: "https",
         hostname: "m.media-amazon.com",
       },
       {
         protocol: "https",
-        hostname: "picsum.photos",
+        hostname: "upload.wikimedia.org",
       },
+      {
+        protocol: "https",
+        hostname: "images.tcdn.com.br",
+      },
+      {
+        protocol: "https",
+        hostname: "store-images.s-microsoft.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images8.kabum.com.br",
+      },
+      {
+        protocol: "https",
+        hostname: "images6.kabum.com.br",
+      },
+      {
+        protocol: "https",
+        hostname: "imgs.pontofrio.com.br",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.dooca.store",
+      },
+      {
+        protocol: "https",
+        hostname: "alfatecnologico.com.br",
+      },
+      {
+      protocol: "https",
+      hostname: "encrypted-tbn2.gstatic.com",
+    },
     ],
   },
 };

@@ -6,7 +6,7 @@ const STATS = [
 
 export default function Hero() {
   return (
-    <div className="bg-gradient-to-br from-purple-700  text-white py-10 px-4">
+    <div className="  text-white py-10 px-4">
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-6">
       
 
