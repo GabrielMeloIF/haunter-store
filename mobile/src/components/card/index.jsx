@@ -20,7 +20,7 @@ const { width } = Dimensions.get("window");
 const CARD_GAP = 12;
 const CARD_WIDTH = width * 0.45;
 
-const API_URL = "http://192.168.56.1:4000";
+const API_URL = "http://192.168.56.1:5000";
 
 export default function Cards() {
   const router = useRouter();
@@ -236,28 +236,36 @@ useFocusEffect(
     );
   };
 
+  const filtrarProdutos = (lista) => {
+  if (!busca.trim()) return lista;
+
+  return lista.filter((produto) =>
+    produto.nome.toLowerCase().includes(busca.toLowerCase())
+  );
+};
+
   const secoes = [
-    {
-      key: "perifericos",
-      titulo: "Periféricos",
-      data: perifericos,
-    },
-    {
-      key: "jogos",
-      titulo: "Jogos",
-      data: games,
-    },
-    {
-      key: "consoles",
-      titulo: "Consoles",
-      data: consoles,
-    },
-    {
-      key: "pcs",
-      titulo: "PCs",
-      data: pcs,
-    },
-  ];
+  {
+    key: "perifericos",
+    titulo: "Periféricos",
+    data: perifericos,
+  },
+  {
+    key: "jogos",
+    titulo: "Jogos",
+    data: games,
+  },
+  {
+    key: "consoles",
+    titulo: "Consoles",
+    data: consoles,
+  },
+  {
+    key: "pcs",
+    titulo: "PCs",
+    data: pcs,
+  },
+];
 
   return (
     <View style={styles.container}>

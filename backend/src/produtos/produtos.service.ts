@@ -5,9 +5,22 @@ import { PrismaService } from '../prisma.service';
 export class ProdutosService {
   constructor(private prisma: PrismaService) {}
 
-  findAll() {
-    return this.prisma.produto.findMany({ include: { categoria: true } });
-  }
+  async findAll(busca?: string) {
+  console.log("BUSCA:", busca);
+
+  return this.prisma.produto.findMany({
+    where: busca
+      ? {
+          nome: {
+            contains: busca,
+          },
+        }
+      : undefined,
+    include: {
+      categoria: true,
+    },
+  });
+}
 
   async findOne(id: number) {
     const produto = await this.prisma.produto.findUnique({
@@ -26,6 +39,7 @@ export class ProdutosService {
       data,
     });
   }
+
 
   async updateMany(
     produtos: {

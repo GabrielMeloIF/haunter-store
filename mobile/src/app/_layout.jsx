@@ -2,6 +2,7 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
 import { UserProvider } from "../components/context/userContext";
 import { AuthProvider, useAuth } from "../components/context/authContext";
+import { SearchProvider } from "../components/context/searchContext";
 
 // Componente que cuida da proteção de rotas
 function ProtecaoRota({ children }) {
@@ -38,19 +39,21 @@ export default function Layout() {
   return (
     <AuthProvider>
       <UserProvider>
-        <ProtecaoRota>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="login" options={{ headerShown: false }} />
-            <Stack.Screen name="register" options={{ headerShown: false }} />
-            <Stack.Screen name="finalizar" options={{ headerShown: false }} />
-            <Stack.Screen name="pagamento" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="confirmacao"
-              options={{ headerShown: false }}
-            />
-          </Stack>
-        </ProtecaoRota>
+        <SearchProvider>
+          <ProtecaoRota>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="login" options={{ headerShown: false }} />
+              <Stack.Screen name="register" options={{ headerShown: false }} />
+              <Stack.Screen name="finalizar" options={{ headerShown: false }} />
+              <Stack.Screen name="pagamento" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="confirmacao"
+                options={{ headerShown: false }}
+              />
+            </Stack>
+          </ProtecaoRota>
+        </SearchProvider>
       </UserProvider>
     </AuthProvider>
   );

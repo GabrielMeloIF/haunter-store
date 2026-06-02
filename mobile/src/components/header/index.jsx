@@ -9,59 +9,63 @@ import {
 } from "react-native";
 
 import { useAuth } from "../context/authContext";
-
 import { useState } from "react";
 import Feather from "@expo/vector-icons/Feather";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
-
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useRouter } from "expo-router";
 import { useUser } from "../context/userContext";
+import { useSearch } from "../context/searchContext";
+
 const Logo = require("../../../assets/logo.png");
 
 export default function Header() {
   const router = useRouter();
 
   const { usuario, estaLogado } = useAuth();
+  const [textoBusca, setTextoBusca] = useState("");
+  const { setBusca } = useSearch();
 
-  const [busca, setBusca] = useState("");
   const [showSearch, setShowSearch] = useState(false);
+
   const { width } = useWindowDimensions();
   const isMobile = width < 1024;
 
   const handleBuscar = () => {
-    const query = busca.trim().toLowerCase();
-    if (!query) return;
-    console.log("Buscar:", query);
-    setBusca("");
-  };
+  if (!textoBusca.trim()) return;
+
+  setBusca(textoBusca.trim());
+  router.push({
+    pathname: "/pesquisa",
+    params: {
+      q: textoBusca.trim(),
+    },
+  });
+};
 
   return (
     <View style={styles.header}>
-      {/*  busca */}
-
       <View style={styles.side}>
         <TouchableOpacity onPress={() => setShowSearch(!showSearch)}>
           <EvilIcons name="search" size={20} color="white" />
         </TouchableOpacity>
+
         {showSearch && (
           <TextInput
             style={styles.input}
             placeholder="Digite sua busca..."
             placeholderTextColor="#ddd"
-            value={busca}
-            onChangeText={setBusca}
+            value={textoBusca}
+            onChangeText={setTextoBusca}
             onSubmitEditing={handleBuscar}
           />
         )}
       </View>
 
-      {/*  logo */}
       <TouchableOpacity onPress={() => router.push("/(tabs)")}>
         <Image source={Logo} style={styles.logo} resizeMode="contain" />
       </TouchableOpacity>
 
-      {/* ícones */}
       <View style={[styles.side, { justifyContent: "flex-end" }]}>
         <TouchableOpacity
           style={styles.userBtn}
@@ -76,7 +80,9 @@ export default function Header() {
 
         <TouchableOpacity
           style={styles.anunciarBtn}
-          onPress={() => router.push(estaLogado ? "/anunciar" : "/(tabs)/user")}
+          onPress={() =>
+            router.push(estaLogado ? "/anunciar" : "/(tabs)/user")
+          }
         >
           <Feather name="plus-circle" size={20} color="white" />
         </TouchableOpacity>
@@ -84,6 +90,7 @@ export default function Header() {
     </View>
   );
 }
+  
 
 const styles = StyleSheet.create({
   header: {

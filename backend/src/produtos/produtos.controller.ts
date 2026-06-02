@@ -6,6 +6,7 @@ import {
   Delete,
   Param,
   Body,
+  Query,
 } from '@nestjs/common';
 import { ProdutosService } from './produtos.service';
 
@@ -14,8 +15,8 @@ export class ProdutosController {
   constructor(private readonly produtosService: ProdutosService) {}
 
   @Get()
-  findAll() {
-    return this.produtosService.findAll();
+  findAll(@Query('busca') busca?: string) {
+    return this.produtosService.findAll(busca);
   }
 
   @Post('lote')
