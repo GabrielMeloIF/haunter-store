@@ -6,7 +6,7 @@ export class MensagemController {
   constructor(private readonly mensagemService: MensagemService) {}
 
   @Post()
-  create(@Body() body: { id_conversa: number; id_remetente: number; conteudo: string }) {
+  create(@Body() body: { id_conversa?: number; id_destinatario?: number; id_remetente: number; conteudo: string }) {
     return this.mensagemService.create(body);
   }
 

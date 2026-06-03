@@ -6,9 +6,7 @@ export class ProdutosService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(busca?: string) {
-  console.log("BUSCA:", busca);
-
-  return this.prisma.produto.findMany({
+    return this.prisma.produto.findMany({
     where: busca
       ? {
           nome: {

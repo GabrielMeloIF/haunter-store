@@ -42,7 +42,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${API_URL}/produtos/buscar?nome=${encodeURIComponent(termo)}`);
+      const response = await fetch(`${API_URL}/produtos?busca=${encodeURIComponent(termo)}`);
       
       if (!response.ok) {
         throw new Error("Erro ao buscar produtos");
