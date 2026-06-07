@@ -197,10 +197,10 @@ export const mensagensAPI = {
   getByConversa: (id_conversa: number) =>
     request(`/mensagens/conversa/${id_conversa}`),
   getById: (id: number) => request(`/mensagens/${id}`),
-  create: (id_conversa: number, id_remetente: number, conteudo: string) =>
+  create: (body: { id_conversa?: number; id_destinatario?: number; id_remetente: number; conteudo: string }) =>
     request('/mensagens', {
       method: 'POST',
-      body: { id_conversa, id_remetente, conteudo },
+      body,
     }),
   markAsRead: (id: number) =>
     request(`/mensagens/${id}/lida`, { method: 'PATCH' }),

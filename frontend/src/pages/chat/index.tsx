@@ -1,123 +1,126 @@
 import Header from "@/Components/Header/Header";
 import { Icon } from "@iconify/react";
-import { useState } from "react";
-
-const chatInicial = [
-  {
-    id: 1,
-    usuario: "Kauan",
-    avatar: "https://pbs.twimg.com/media/DqPSpVzWsAAAWqP.jpg",
-    mensagem: "Ola sou o kauan, gostaria de negociar o produto...",
-    hora: "2026-03-19T14:32:00",
-    mensagens: [
-      { id: 1, texto: "Oi, tenho interesse!", eu: false },
-      { id: 2, texto: "Ola, kauan", eu: true },
-    ],
-  },
-  {
-    id: 2,
-    usuario: "Lula",
-    avatar: "https://www.brasildefato.com.br/wp-content/uploads/2024/09/image_processing20231027-1640-qzx79g.jpeg",
-    mensagem: "Companheiro ainda está disponível?",
-    hora: "2026-03-19T09:15:00",
-    mensagens: [
-      { id: 1, texto: "Companheiro ainda está disponível?", eu: false },
-      { id: 2, texto: "Sim!", eu: true },
-    ],
-  },
-   {
-    id: 3,
-    usuario: "Bolsonaro",
-    avatar: "https://s2-cbn.glbimg.com/xi0bwCYiNub6yfst_XaYka2_yw4=/0x0:2047x1365/888x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_d975fad146a14bbfad9e763717b09688/internal_photos/bs/2025/1/N/LKABYTQbagCGAHZAv6Kw/54580441966-9ccaaa985f-k.jpg",
-    mensagem: "Ta ok?",
-    hora: "2026-03-19T09:15:00",
-    mensagens: [
-      { id: 1, texto: "Ta ok?", eu: false },
-      { id: 2, texto: "Sim!", eu: true },
-    ],
-  },
-];
+import { useState, useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Chat() {
-  const [chats, setChats] = useState(chatInicial);
+  const { usuario } = useAuth();
+  const usuarioLogado = usuario?.id ?? null;
+
+  const [chats, setChats] = useState<any[]>([]);
   const [chatSelecionado, setChatSelecionado] = useState<any>(null);
   const [novaMensagem, setNovaMensagem] = useState("");
   const [menuAberto, setMenuAberto] = useState<number | null>(null);
 
-  const enviarMensagem = () => {
-    if (!novaMensagem.trim()) return;
+  useEffect(() => {
+    if (usuarioLogado) carregarConversas();
+  }, [usuarioLogado]);
 
-    const novaMsg = {
-      id: Date.now(),
-      texto: novaMensagem,
-      eu: true,
-    };
+  async function carregarConversas() {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/conversas/usuario/${usuarioLogado}`
+      );
 
-    const novosChats = chats.map((c) => {
-      if (c.id === chatSelecionado.id) {
+      const data = await response.json();
+
+      const conversasTratadas = data.map((conversa: any) => {
+        const p1 = conversa.participante1;
+        const p2 = conversa.participante2;
+        const outroUsuario = p1?.id_usuario === usuarioLogado ? p2 : p1;
+
         return {
-          ...c,
-          mensagens: [...c.mensagens, novaMsg],
-          mensagem: novaMensagem,
+          ...conversa,
+          nomeUsuario: outroUsuario?.nome ?? "Usuário",
+          avatar: outroUsuario?.foto ?? null,
+          ultimaMensagem:
+            conversa.mensagem?.[0]?.conteudo ?? "Sem mensagens",
         };
+      });
+
+      setChats(conversasTratadas);
+    } catch (error) {
+      console.error("Erro ao carregar conversas:", error);
+    }
+  }
+
+  async function abrirConversa(conversa: any) {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/mensagens/conversa/${conversa.id_conversa}`
+      );
+
+      const mensagens = await response.json();
+
+      // normalize selected chat to include participant info and mensagens
+      const p1 = conversa.participante1;
+      const p2 = conversa.participante2;
+      const outroUsuario = p1?.id_usuario === usuarioLogado ? p2 : p1;
+
+      setChatSelecionado({
+        ...conversa,
+        nomeUsuario: outroUsuario?.nome ?? "Usuário",
+        avatar: outroUsuario?.foto ?? null,
+        mensagens,
+      });
+    } catch (error) {
+      console.error("Erro ao abrir conversa:", error);
+    }
+  }
+
+  const enviarMensagem = async () => {
+    if (!novaMensagem.trim() || !chatSelecionado) return;
+
+    try {
+      // if chatSelecionado has id_conversa use it, otherwise send id_destinatario
+      const payload: any = {
+        id_remetente: usuarioLogado,
+        conteudo: novaMensagem,
+      };
+
+      if (chatSelecionado.id_conversa) payload.id_conversa = chatSelecionado.id_conversa;
+      else if (chatSelecionado.participante1 || chatSelecionado.participante2) {
+        // determine destinatario
+        const p1 = chatSelecionado.participante1;
+        const p2 = chatSelecionado.participante2;
+        const destinatario = p1?.id_usuario === usuarioLogado ? p2 : p1;
+        if (destinatario) payload.id_destinatario = destinatario.id_usuario;
       }
-      return c;
-    });
 
-    setChats(novosChats);
-    setChatSelecionado({
-      ...chatSelecionado,
-      mensagens: [...chatSelecionado.mensagens, novaMsg],
-    });
+      await fetch("http://localhost:5000/mensagens", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-    setNovaMensagem("");
+      setNovaMensagem("");
+
+      await abrirConversa(chatSelecionado);
+      await carregarConversas();
+    } catch (error) {
+      console.error("Erro ao enviar mensagem:", error);
+    }
   };
 
-  const excluirMensagem = (msgId: number) => {
-    const novosChats = chats.map((c) => {
-      if (c.id === chatSelecionado.id) {
-        return {
-          ...c,
-          mensagens: c.mensagens.filter((m) => m.id !== msgId),
-        };
-      }
-      return c;
-    });
+  const excluirMensagem = async (msgId: number) => {
+    try {
+      await fetch(`http://localhost:5000/mensagens/${msgId}`, {
+        method: "DELETE",
+      });
 
-    setChats(novosChats);
-    setChatSelecionado({
-      ...chatSelecionado,
-      mensagens: chatSelecionado.mensagens.filter((m: any) => m.id !== msgId),
-    });
+      await abrirConversa(chatSelecionado);
+      await carregarConversas();
 
-    setMenuAberto(null);
+      setMenuAberto(null);
+    } catch (error) {
+      console.error("Erro ao excluir mensagem:", error);
+    }
   };
 
-  const editarMensagem = (msgId: number, textoAtual: string) => {
-    const novoTexto = prompt("Editar mensagem:", textoAtual);
-    if (!novoTexto) return;
-
-    const novosChats = chats.map((c) => {
-      if (c.id === chatSelecionado.id) {
-        return {
-          ...c,
-          mensagens: c.mensagens.map((m) =>
-            m.id === msgId ? { ...m, texto: novoTexto } : m,
-          ),
-        };
-      }
-      return c;
-    });
-
-    setChats(novosChats);
-    setChatSelecionado({
-      ...chatSelecionado,
-      mensagens: chatSelecionado.mensagens.map((m: any) =>
-        m.id === msgId ? { ...m, texto: novoTexto } : m,
-      ),
-    });
-
-    setMenuAberto(null);
+  const editarMensagem = () => {
+    alert("Edição de mensagens ainda não foi implementada no backend.");
   };
 
   return (
@@ -127,17 +130,17 @@ export default function Chat() {
       <div className="flex h-svh">
         {/* contatos */}
         <div className="bg-gray-700 w-[25%] flex flex-col p-4">
-          {chats.map((n) => (
+          {chats.map((conversa) => (
             <div
-              key={n.id}
-              onClick={() => setChatSelecionado(n)}
+              key={conversa.id_conversa}
+              onClick={() => abrirConversa(conversa)}
               className="flex items-center gap-3 border-b border-gray-600 py-3 cursor-pointer hover:bg-gray-600 rounded-lg px-2"
             >
-              <div className="bg-gray-300 rounded-full w-12 h-11 flex items-center justify-center">
-                {n.avatar ? (
+              <div className="bg-gray-300 rounded-full w-12 h-11 flex items-center justify-center overflow-hidden">
+                {conversa.avatar ? (
                   <img
-                    src={n.avatar}
-                    alt={n.usuario}
+                    src={conversa.avatar}
+                    alt={conversa.nomeUsuario}
                     className="w-full h-full object-cover rounded-full"
                   />
                 ) : (
@@ -147,10 +150,11 @@ export default function Chat() {
 
               <div className="flex flex-col w-full">
                 <span className="text-gray-200 font-bold text-sm">
-                  {n.usuario}
+                  {conversa.nomeUsuario}
                 </span>
+
                 <span className="text-gray-400 text-xs truncate">
-                  {n.mensagem}
+                  {conversa.ultimaMensagem}
                 </span>
               </div>
             </div>
@@ -162,59 +166,73 @@ export default function Chat() {
           {chatSelecionado ? (
             <>
               <div className="flex border-b border-gray-600 p-4 items-center gap-3 bg-gray-800">
-                <div className="bg-gray-300 rounded-full w-11 h-11 flex items-center justify-center">
+                <div className="bg-gray-300 rounded-full w-11 h-11 flex items-center justify-center overflow-hidden">
                   {chatSelecionado.avatar ? (
                     <img
                       src={chatSelecionado.avatar}
-                      alt={chatSelecionado.usuario}
+                      alt={chatSelecionado.nomeUsuario}
                       className="w-full h-full object-cover rounded-full"
                     />
                   ) : (
-                    <Icon icon="heroicons:user" className="text-xl text-white" />
+                    <Icon
+                      icon="heroicons:user"
+                      className="text-xl text-white"
+                    />
                   )}
                 </div>
 
                 <h2 className="text-white text-xl">
-                  {chatSelecionado.usuario}
+                  {chatSelecionado.nomeUsuario}
                 </h2>
               </div>
 
               {/* mensagens */}
               <div className="flex-1 p-4 flex flex-col gap-3 overflow-y-auto">
-                {chatSelecionado.mensagens.map((msg: any) => (
+                {chatSelecionado.mensagens?.map((msg: any) => (
                   <div
-                    key={msg.id}
+                    key={msg.id_mensagem}
                     className={`p-3 rounded-lg max-w-xl text-white relative ${
-                      msg.eu
+                      msg.id_remetente === usuarioLogado
                         ? "bg-purple-600 self-end mr-2"
                         : "bg-gray-600 self-start ml-2"
                     }`}
                   >
-                    {msg.texto}
+                    {msg.conteudo}
 
-                    {/* editar excluir */}
-                    {msg.eu && (
+                    {msg.id_remetente === usuarioLogado && (
                       <div className="absolute top-3 right-0">
                         <button
                           onClick={() =>
-                            setMenuAberto(menuAberto === msg.id ? null : msg.id)
+                            setMenuAberto(
+                              menuAberto === msg.id_mensagem
+                                ? null
+                                : msg.id_mensagem
+                            )
                           }
                           className="text-white text-sm"
                         >
-                          <Icon icon="iconamoon:arrow-down-2-thin" width={20} height={20} className="-mt-8"/>
+                          <Icon
+                            icon="iconamoon:arrow-down-2-thin"
+                            width={20}
+                            height={20}
+                            className="-mt-8"
+                          />
                         </button>
 
-                        {menuAberto === msg.id && (
+                        {menuAberto === msg.id_mensagem && (
                           <div className="absolute right-0 mt-1 bg-gray-700 rounded shadow-md text-sm z-10">
                             <button
-                              onClick={() => editarMensagem(msg.id, msg.texto)}
+                              onClick={() => editarMensagem()}
                               className="flex flex-col px-3 py-1 hover:bg-gray-600 w-full text-left"
                             >
                               Editar
                             </button>
+
                             <button
-                              onClick={() => excluirMensagem(msg.id)}
-                              className="flex flex-col  px-3 py-1 hover:bg-gray-600 w-full text-left text-red-400"
+                              onClick={() =>
+                                excluirMensagem(msg.id_mensagem)
+                              }
+                              className="flex flex-col px-3 py-1 hover:bg-gray-600 w-full text-left text-red-400"
                             >
                               Excluir
                             </button>
@@ -249,7 +267,9 @@ export default function Chat() {
               </div>
             </>
           ) : (
-            <p className="text-gray-400 p-4">Selecione um chat</p>
+            <div className="flex-1 flex items-center justify-center">
+              <p className="text-gray-400">Selecione uma conversa</p>
+            </div>
           )}
         </div>
       </div>

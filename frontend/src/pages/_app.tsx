@@ -7,31 +7,34 @@ import { AdsProvider } from "@/context/AdsContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { ProdutosProvider } from "@/context/ProdutosContext";
 import { CarrinhoProvider } from "@/context/CarrinhoContext";
+import { SearchProvider } from "@/context/SearchContext";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <AuthProvider>
       <ProdutosProvider>
         <CarrinhoProvider>
-          <AdsProvider>
-            <Head>
-              <title>Haunter Store</title>
-            </Head>
+          <SearchProvider>
+            <AdsProvider>
+              <Head>
+                <title>Haunter Store</title>
+              </Head>
 
-            <Component {...pageProps} />
+              <Component {...pageProps} />
 
-            <ToastContainer
-              position="bottom-right"
-              autoClose={3000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-            />
-          </AdsProvider>
+              <ToastContainer
+                position="bottom-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+              />
+            </AdsProvider>
+            </SearchProvider>
         </CarrinhoProvider>
       </ProdutosProvider>
     </AuthProvider>

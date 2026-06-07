@@ -42,10 +42,16 @@ model categoria {
 }
 
 model conversa {
-  id_conversa Int        @id @default(autoincrement())
-  criada_em   DateTime   @default(now())
-  mensagem    mensagem[]
-  usuario     usuario[]  @relation("usuarioconversas")
+  id_conversa Int      @id @default(autoincrement())
+  criada_em   DateTime @default(now())
+
+  participante1Id Int
+  participante2Id Int
+
+  participante1 usuario @relation("conv_user1", fields: [participante1Id], references: [id_usuario])
+  participante2 usuario @relation("conv_user2", fields: [participante2Id], references: [id_usuario])
+
+  mensagem mensagem[]
 }
 
 model cupom {
@@ -85,17 +91,19 @@ model itempedido {
 }
 
 model mensagem {
-  id_mensagem  Int      @id @default(autoincrement())
+  id_mensagem  Int @id @default(autoincrement())
   id_conversa  Int
   id_remetente Int
-  conteudo     String   @db.Text
-  lida         Boolean  @default(false)
-  enviada_em   DateTime @default(now())
-  conversa     conversa @relation(fields: [id_conversa], references: [id_conversa], map: "Mensagem_id_conversa_fkey")
-  usuario      usuario  @relation(fields: [id_remetente], references: [id_usuario], map: "Mensagem_id_remetente_fkey")
 
-  @@index([id_conversa], map: "Mensagem_id_conversa_fkey")
-  @@index([id_remetente], map: "Mensagem_id_remetente_fkey")
+  conteudo   String   @db.Text
+  lida       Boolean  @default(false)
+  enviada_em DateTime @default(now())
+
+  conversa conversa @relation(fields: [id_conversa], references: [id_conversa])
+  usuario  usuario  @relation(fields: [id_remetente], references: [id_usuario])
+
+  @@index([id_conversa])
+  @@index([id_remetente])
 }
 
 model notificacao {
@@ -177,7 +185,9 @@ model usuario {
   mensagem        mensagem[]
   notificacao     notificacao[]
   pedido          pedido[]
-  conversa        conversa[]           @relation("usuarioconversas")
+
+  conversasComoParticipante1 conversa[] @relation("conv_user1")
+  conversasComoParticipante2 conversa[] @relation("conv_user2")
 }
 
 enum notificacao_tipo {

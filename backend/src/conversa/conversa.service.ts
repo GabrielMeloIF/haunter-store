@@ -5,16 +5,16 @@ import { PrismaService } from '../prisma.service';
 export class ConversaService {
   constructor(private prisma: PrismaService) {}
 
-  create(usuario: number[]) {
+  create(participantes: [number, number]) {
     return this.prisma.conversa.create({
       data: {
-        usuario
-: {
-          connect: usuario.map((id) => ({ id_usuario: id })),
-        },
+        participante1Id: participantes[0],
+        participante2Id: participantes[1],
       },
       include: {
-        usuario: { select: { id_usuario: true, nome: true, email: true } },
+        participante1: { select: { id_usuario: true, nome: true, email: true } },
+        participante2: { select: { id_usuario: true, nome: true, email: true } },
+        mensagem: true,
       },
     });
   }
@@ -22,7 +22,8 @@ export class ConversaService {
   findAll() {
     return this.prisma.conversa.findMany({
       include: {
-        usuario: { select: { id_usuario: true, nome: true, email: true } },
+        participante1: { select: { id_usuario: true, nome: true, email: true } },
+        participante2: { select: { id_usuario: true, nome: true, email: true } },
         mensagem: { orderBy: { enviada_em: 'desc' }, take: 1 },
       },
     });
@@ -32,7 +33,8 @@ export class ConversaService {
     const conversa = await this.prisma.conversa.findUnique({
       where: { id_conversa: id },
       include: {
-        usuario: { select: { id_usuario: true, nome: true, email: true } },
+        participante1: { select: { id_usuario: true, nome: true, email: true } },
+        participante2: { select: { id_usuario: true, nome: true, email: true } },
         mensagem: { orderBy: { enviada_em: 'asc' } },
       },
     });
@@ -42,9 +44,15 @@ export class ConversaService {
 
   findByUsuario(id_usuario: number) {
     return this.prisma.conversa.findMany({
-      where: { usuario: { some: { id_usuario } } },
+      where: {
+        OR: [
+          { participante1Id: id_usuario },
+          { participante2Id: id_usuario },
+        ],
+      },
       include: {
-        usuario: { select: { id_usuario: true, nome: true, email: true } },
+        participante1: { select: { id_usuario: true, nome: true, email: true } },
+        participante2: { select: { id_usuario: true, nome: true, email: true } },
         mensagem: { orderBy: { enviada_em: 'desc' }, take: 1 },
       },
       orderBy: { criada_em: 'desc' },

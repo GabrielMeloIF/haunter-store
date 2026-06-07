@@ -6,7 +6,7 @@ export class ConversaController {
   constructor(private readonly conversaService: ConversaService) {}
 
   @Post()
-  create(@Body() body: { participantes: number[] }) {
+  create(@Body() body: { participantes: [number, number] }) {
     return this.conversaService.create(body.participantes);
   }
 
