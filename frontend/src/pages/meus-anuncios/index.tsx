@@ -23,7 +23,7 @@ export default function MeusAnuncios() {
           </div>
           <button
             onClick={() => router.push('/anunciar')}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-3 rounded-full text-sm border-2 border-white transition-colors shadow-lg shadow-purple-500/30"
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-3 rounded-full text-sm scale-100 hover:scale-102 transition-transform"
           >
             + Novo anúncio
           </button>
@@ -43,7 +43,7 @@ export default function MeusAnuncios() {
             <p className="text-gray-400 text-sm mb-6">Crie seu primeiro anúncio e comece a vender!</p>
             <button
               onClick={() => router.push('/anunciar')}
-              className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3 rounded-full text-sm border-2 border-white transition-colors shadow-lg shadow-purple-500/30"
+              className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3 rounded-full text-sm scale-100 hover:scale-102 transition-transform"
             >
               Criar anúncio
             </button>
@@ -55,7 +55,7 @@ export default function MeusAnuncios() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {ads.map(ad => (
               <div key={ad.id}
-                className="bg-white rounded-2xl border-2 border-purple-500/30 overflow-hidden hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-200 group">
+                className="bg-[#1a1a2e] rounded-2xl border-2 border-purple-500/30 overflow-hidden hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-200 group">
 
                 {/* Foto */}
                 <div className="relative h-48 bg-gray-100 overflow-hidden">
@@ -80,10 +80,10 @@ export default function MeusAnuncios() {
 
                 {/* Info */}
                 <div className="p-4">
-                  <h3 className="font-black text-gray-800 text-sm leading-tight mb-1 line-clamp-2">
+                  <h3 className="font-black text-white text-sm leading-tight mb-1 line-clamp-2">
                     {ad.title || '(sem título)'}
                   </h3>
-                  <p className="text-lg font-black text-purple-600 mb-1">
+                  <p className="text-lg font-black text-purple-400 mb-1">
                     {ad.price ? 'R$ ' + Number(ad.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : 'A combinar'}
                     {ad.negotiable && <span className="ml-2 text-xs font-semibold text-gray-400">(neg.)</span>}
                   </p>

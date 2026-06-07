@@ -102,7 +102,7 @@ export default function Finalizar() {
       <>
         <Header />
        
-        <div className="min-h-[70vh] flex flex-col items-center justify-center gap-6">
+        <div className="min-h-screen flex flex-col items-center justify-center gap-6">
           <p className="text-white text-lg">Faça login para finalizar sua compra</p>
           <Link href="/entrar" className="text-purple-400 hover:text-purple-300">
             Ir para login
@@ -118,7 +118,7 @@ export default function Finalizar() {
       <>
         <Header />
   
-        <div className="min-h-[70vh] flex flex-col items-center justify-center gap-6">
+        <div className="min-h-screen flex flex-col items-center justify-center gap-6">
           <p className="text-white text-lg">Seu carrinho está vazio</p>
           <Link href="/" className="text-purple-400 hover:text-purple-300">
             Voltar para loja
@@ -134,7 +134,7 @@ export default function Finalizar() {
       <>
         <Header />
      
-        <div className="min-h-[70vh] flex flex-col items-center justify-center gap-6">
+        <div className="min-h-screen flex flex-col items-center justify-center gap-6">
           <div className="w-20 h-20 rounded-full bg-green-500 flex items-center justify-center text-white text-4xl">
             ✓
           </div>

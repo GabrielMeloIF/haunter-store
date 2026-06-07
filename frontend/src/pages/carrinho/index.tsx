@@ -82,7 +82,7 @@ export default function Carrinho() {
               {itens.map((item) => (
                 <div
                   key={item.id_carrinho}
-                  className="flex items-center gap-6 rounded-xl border border-white/20 bg-white/5 p-4"
+                  className="flex items-center gap-6 rounded-xl border border-purple-900 bg-white/5 p-4"
                 >
                   <Image
                     src={item.produto?.imagem_url || "/mouse 1.png"}
@@ -104,7 +104,7 @@ export default function Carrinho() {
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => handleAlterarQuantidade(item.id_carrinho, -1)}
-                      className="w-8 h-8 rounded-full border border-white/20 text-white hover:bg-white/10 transition"
+                      className="w-8 h-8 rounded-full border border-purple-900 text-white hover:bg-purple-900 transition"
                       disabled={loading}
                     >
                       −
@@ -112,7 +112,7 @@ export default function Carrinho() {
                     <span className="text-white w-4 text-center">{item.quantidade}</span>
                     <button
                       onClick={() => handleAlterarQuantidade(item.id_carrinho, +1)}
-                      className="w-8 h-8 rounded-full border border-white/20 text-white hover:bg-white/10 transition"
+                      className="w-8 h-8 rounded-full border border-purple-900 text-white hover:bg-purple-900 transition"
                       disabled={loading}
                     >
                       +
@@ -131,7 +131,7 @@ export default function Carrinho() {
             </div>
 
             {/* Resumo */}
-            <div className="w-72 bg-white/5 border border-white/10 rounded-2xl p-6 sticky top-6">
+            <div className="w-72 bg-white/5 border border-purple-900 rounded-2xl p-6 sticky top-6">
               <h3 className="text-white font-semibold text-lg mb-4">Resumo</h3>
               <div className="space-y-2 mb-4">
                 {itens.map((item) => (
@@ -145,7 +145,7 @@ export default function Carrinho() {
                   </div>
                 ))}
               </div>
-              <div className="border-t border-white/10 pt-4 flex justify-between font-bold text-lg">
+              <div className="border-t border-purple-900 pt-4 flex justify-between font-bold text-lg">
                 <span className="text-white">Total</span>
                 <span className="text-purple-400">R$ {total.toFixed(2).replace(".", ",")}</span>
               </div>

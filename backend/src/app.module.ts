@@ -11,6 +11,7 @@ import { NotificacaoModule } from './notificacao/notificacao.module';
 import { MarketplaceModule } from './marketplace/marketplace.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AvaliacaoModule } from './avaliacao/avaliacao.module'; 
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     MensagemModule,
     NotificacaoModule,
     MarketplaceModule,
+    AvaliacaoModule,
   ],
 })
 export class AppModule {}

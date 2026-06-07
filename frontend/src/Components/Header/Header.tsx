@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Logo from "../../../public/logo.png";
 import { IoIosSearch } from "react-icons/io";
-import { BsBell, BsBorderAll, BsCart2, BsEnvelope } from "react-icons/bs";
+import { BsBorderAll, BsCart2, BsEnvelope } from "react-icons/bs";
+import { MdOutlineShoppingBag } from "react-icons/md";
 import { FaRegStar } from "react-icons/fa";
 import { CgAdd } from "react-icons/cg";
 import Link from "next/link";
@@ -65,9 +66,9 @@ export default function Header() {
           <span>Mensagens</span>
         </Link>
 
-        <Link href="/notificacao" className="flex items-center gap-1 text-white hover:text-[#430883]">
-          <BsBell />
-          <span>Notificações</span>
+        <Link href="/minhas-compras" className="flex items-center gap-1 text-white hover:text-[#430883]">
+          <MdOutlineShoppingBag />
+          <span>Minhas compras</span>
         </Link>
 
         <Link href="/carrinho" className="flex items-center gap-1 text-white hover:text-[#430883]">
@@ -85,7 +86,7 @@ export default function Header() {
       <nav className="flex lg:hidden items-center gap-2 ml-auto">
         <Link href="/" className="text-white"><BsBorderAll /></Link>
         <Link href="/chat" className="text-white"><BsEnvelope /></Link>
-        <Link href="/notificacao" className="text-white"><BsBell /></Link>
+        <Link href="/minhas-compras" className="text-white"><MdOutlineShoppingBag /></Link>
         <Link href="/" className="text-white"><BsCart2 /></Link>
       </nav>
 

@@ -4,7 +4,7 @@ export default function Termos() {
   return (
     <>
     <Header />
-    <div className="min-h-screen p-10 text-white bg-[#303030]">
+    <div className="min-h-screen p-10 text-white">
       <h1 className="text-3xl font-bold mb-5">Termos de Uso</h1>
 
       <p className="mb-4">

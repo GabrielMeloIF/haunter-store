@@ -64,7 +64,7 @@ export default function Cards() {
   );
 
   const CardItem = ({ produto }: { produto: any }) => (
-    <div className="rounded-lg shadow-md p-4 border-2 border-white w-80 transition-transform duration-300 hover:scale-105 mb-30">
+    <div className="rounded-lg shadow-md p-4 border-2 border-purple-900 w-80 transition-transform duration-300 hover:scale-105 mb-30">
       <div className="relative">
         <FaStar
           onClick={() => toggleFavorito(produto.id)}

@@ -6,7 +6,7 @@ export default function Privacidade() {
     <div className="flex flex-col min-h-screen">
       <Header />
 
-      <main className="flex-1 p-10 text-white bg-[#303030]">
+      <main className="flex-1 p-10 text-white ">
         <h1 className="text-3xl font-bold mb-5">Política de Privacidade</h1>
 
         <p className="mb-4">

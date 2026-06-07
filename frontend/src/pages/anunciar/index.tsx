@@ -111,7 +111,7 @@ export default function Anunciar() {
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {form.photos.map(url => (
-              <div key={url} className="relative rounded-xl overflow-hidden h-28 bg-gray-100">
+              <div key={url} className="relative rounded-xl overflow-hidden h-28">
                 <img src={url} alt="preview" className="w-full h-full object-cover" />
                 <button
                   onClick={() => handleRemovePhoto(url)}
@@ -124,7 +124,7 @@ export default function Anunciar() {
             {form.photos.length < 20 && (
               <label className={`border-2 border-dashed border-purple-400 rounded-xl h-28
                                 flex flex-col items-center justify-center cursor-pointer
-                                bg-white hover:border-brand hover:bg-brand-light transition-colors
+                                bg-[#1a1a2e] hover:border-brand hover:bg-brand-light transition-colors
                                 ${loadingPhotos ? 'opacity-60 pointer-events-none' : ''}`}>
                 {loadingPhotos ? (
                   <svg className="w-6 h-6 text-purple-400 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -138,7 +138,7 @@ export default function Anunciar() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                             d="M3 16s1-4 5-4 5 4 5 4M3 16v2a2 2 0 002 2h14a2 2 0 002-2v-2M16 10l-4-4-4 4M12 6v10"/>
                     </svg>
-                    <span className="text-xs font-bold text-brand">Adicionar foto</span>
+                    <span className="text-xs font-bold text-brand text-white">Adicionar foto</span>
                   </>
                 )}
                 <input ref={fileRef} type="file" accept="image/*" multiple className="hidden"
@@ -156,7 +156,7 @@ export default function Anunciar() {
           <input type="text" maxLength={70} value={form.title}
             placeholder="Ex: iPhone 13 128GB – Preto – Perfeito estado"
             onChange={e => handleUpdate('title', e.target.value)}
-            className="w-full border-2 border-purple-500/40 bg-white text-gray-800 placeholder-gray-400 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
+            className="w-full border-2 border-purple-500/40 bg-[#1a1a2e] text-gray-800 placeholder-gray-400 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
           <div className="flex justify-end mt-1">
             <span className="text-xs text-gray-500">{form.title.length}/70</span>
           </div>
@@ -170,7 +170,7 @@ export default function Anunciar() {
           <textarea rows={5} maxLength={6000} value={form.description}
             placeholder="Descreva seu produto com detalhes: estado, defeitos, motivo da venda, acessórios incluídos..."
             onChange={e => handleUpdate('description', e.target.value)}
-            className="w-full border-2 border-purple-500/40 bg-white text-gray-800 placeholder-gray-400 rounded-xl px-4 py-3 text-sm font-semibold transition resize-none focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
+            className="w-full border-2 border-purple-500/40 bg-[#1a1a2e] text-gray-800 placeholder-gray-400 rounded-xl px-4 py-3 text-sm font-semibold transition resize-none focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
           <div className="flex justify-end mt-1">
             <span className="text-xs text-gray-500">{form.description.length}/6000</span>
           </div>
@@ -186,7 +186,7 @@ export default function Anunciar() {
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400 font-bold text-sm">R$</span>
               <input type="number" min={0} value={form.price} placeholder="0,00"
                 onChange={e => handleUpdate('price', e.target.value)}
-                className="w-full border-2 border-purple-500/40 bg-white text-gray-800 placeholder-gray-400 rounded-xl pl-10 pr-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
+                className="w-full border-2 border-purple-500/40 bg-[#1a1a2e] text-gray-800 placeholder-gray-400 rounded-xl pl-10 pr-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
             </div>
             <label className="flex items-center gap-2 mt-2 cursor-pointer">
               <input type="checkbox" checked={form.negotiable}
@@ -199,7 +199,7 @@ export default function Anunciar() {
           <div>
             <label className="block text-sm font-black text-purple-300 mb-1">Condição</label>
             <select value={form.condition} onChange={e => handleUpdate('condition', e.target.value)}
-              className="w-full border-2 border-purple-500/40 bg-white text-gray-800 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20">
+              className="w-full border-2 border-purple-500/40 bg-[#1a1a2e] text-gray-800 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20">
               <option value="">Selecione…</option>
               <option>Novo</option>
               <option>Seminovo</option>
@@ -216,10 +216,10 @@ export default function Anunciar() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input type="text" placeholder="CEP" maxLength={9} value={form.cep}
               onChange={e => handleMaskCep(e.target.value)}
-              className="border-2 border-purple-500/40 bg-white text-gray-800 placeholder-gray-400 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
+              className="border-2 border-purple-500/40 bg-[#1a1a2e] text-gray-800 placeholder-gray-400 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
             <input type="text" placeholder="Bairro / Cidade" value={form.city}
               onChange={e => handleUpdate('city', e.target.value)}
-              className="border-2 border-purple-500/40 bg-white text-gray-800 placeholder-gray-400 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
+              className="border-2 border-purple-500/40 bg-[#1a1a2e] text-gray-800 placeholder-gray-400 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
           </div>
         </div>
 
@@ -248,13 +248,13 @@ export default function Anunciar() {
         <div className="flex justify-between mt-8">
           <button
             onClick={() => router.push('/')}
-            className="text-purple-400 font-bold px-6 py-3 rounded-full text-sm border-2 border-purple-500/40 bg-white hover:bg-purple-500/10 transition-colors"
+            className="text-purple-400 font-bold px-6 py-3 rounded-full text-sm border-2 border-purple-500/40 bg-[#1a1a2e] scale-100 hover:scale-102 transition-transform"
           >
             ← Voltar
           </button>
           <button
             onClick={handlePublish}  
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3 rounded-full text-sm border-2 border-white transition-colors shadow-lg shadow-purple-500/30"
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3 rounded-full text-sm border-2 border-purple-900 transition-colors "
           >
             Publicar anúncio →
           </button>
