@@ -46,7 +46,7 @@ export default function Busca() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {resultados.map((produto) => (
-              <Link key={produto.id} href={`/produtos/${produto.id}`}>
+              <Link key={produto.id} href={`/comprar?id=${produto.id}`}>
                 <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow cursor-pointer border border-gray-700 hover:border-purple-500">
                   <div className="relative w-full h-40 bg-gray-700">
                     <Image

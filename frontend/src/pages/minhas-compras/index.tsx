@@ -12,22 +12,7 @@ const compras = [
       "https://m.media-amazon.com/images/I/61hzuoXwjqL._AC_SX679_.jpg",
     dataCompra: "2026-03-19",
   },
-  {
-    id: 59,
-    nome: "Teclado Mecânico RGB",
-    preco: 299.99,
-    imagem:
-      "https://m.media-amazon.com/images/I/71WHv8fMREL._AC_SL1500_.jpg",
-    dataCompra: "2026-03-10",
-  },
-  {
-    id: 60,
-    nome: "Headset Gamer",
-    preco: 199.99,
-    imagem:
-      "https://m.media-amazon.com/images/I/61M4K8A1VPL._AC_SL1500_.jpg",
-    dataCompra: "2026-02-28",
-  },
+  
 ];
 
 export default function Compras() {
