@@ -71,6 +71,34 @@ export class PedidosService {
     return pedido;
   }
 
+  async createFromProduto(id_usuario: number, id_produto: number, quantidade = 1) {
+    if (quantidade <= 0) {
+      throw new BadRequestException('Quantidade inválida para checkout.');
+    }
+
+    const produto = await this.prisma.produto.findUnique({ where: { id: id_produto } });
+    if (!produto) {
+      throw new NotFoundException(`Produto #${id_produto} não encontrado`);
+    }
+
+    const pedido = await this.prisma.pedido.create({
+      data: {
+        id_usuario,
+        valor_total: produto.preco * quantidade,
+        itempedido: {
+          create: {
+            id_produto,
+            quantidade,
+            preco_unitario: produto.preco,
+          },
+        },
+      },
+      include: { itempedido: { include: { produto: true } } },
+    });
+
+    return pedido;
+  }
+
   updateStatus(
     id: number,
     status: 'PENDENTE' | 'CONFIRMADO' | 'ENVIADO' | 'ENTREGUE' | 'CANCELADO',

@@ -23,6 +23,7 @@ export class UsersService {
     email: string;
     senha: string;
     confirmar_senha: string;
+    tipo_usuario?: 'CLIENTE' | 'ADMIN';
   }) {
     const bcrypt = await import('bcrypt');
 
@@ -34,6 +35,7 @@ export class UsersService {
         email: data.email,
         senha: senhaHash,
         confirmar_senha: senhaHash,
+        tipo_usuario: data.tipo_usuario ?? 'CLIENTE',
       },
     });
   }
@@ -45,6 +47,7 @@ export class UsersService {
       email: string;
       senha: string;
       confirmar_senha: string;
+      tipo_usuario: 'CLIENTE' | 'ADMIN';
     }>,
   ) {
     if (!id) throw new Error('ID inválido');

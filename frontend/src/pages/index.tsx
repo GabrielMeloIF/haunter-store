@@ -4,6 +4,7 @@ import Carrossel from "./../Components/Carrosel/Carrossel";
 import Footer from "@/Components/Footer/Footer";
 import Cards from "@/Components/Card/Card";
 import BtnTopo from "@/Components/BtnTopo/BtnTopo";
+import FloatingChatWidget from "@/Components/FloatingChatWidget/FloatingChatWidget";
 
 
 
@@ -19,6 +20,7 @@ export default function Home() {
         <BtnTopo />
       </main>
       <Footer />
+      <FloatingChatWidget />
    </>
   );
 }

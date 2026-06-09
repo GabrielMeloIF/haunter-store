@@ -26,6 +26,19 @@ export class PedidosController {
     return this.pedidosService.createFromCarrinho(+id_usuario);
   }
 
+  // Finaliza a compra de um produto direto, sem usar o carrinho
+  @Post('checkout')
+  createFromProduto(
+    @Body()
+    body: {
+      id_usuario: number;
+      id_produto: number;
+      quantidade?: number;
+    },
+  ) {
+    return this.pedidosService.createFromProduto(body.id_usuario, body.id_produto, body.quantidade ?? 1);
+  }
+
   // Atualiza status (admin)
   @Patch(':id/status')
   updateStatus(

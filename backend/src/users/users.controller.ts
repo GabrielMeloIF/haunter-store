@@ -16,14 +16,36 @@ export class UsersController {
   }
 
   @Post()
-  create(@Body() body: { nome: string; email: string; senha: string; confirmar_senha: string }) {
+  create(
+    @Body()
+    body: {
+      nome: string
+      email: string
+      senha: string
+      confirmar_senha: string
+      foto?: string
+      tipo_usuario?: 'CLIENTE' | 'ADMIN'
+    },
+  ) {
     return this.usersService.create(body);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() body: Partial<{ nome: string; email: string; senha: string; }>) {
-    return this.usersService.update(+id, body);
-  }
+update(
+  @Param('id') id: string,
+  @Body()
+  body: Partial<{
+    nome: string
+    email: string
+    senha: string
+    confirmar_senha: string
+    foto: string
+    tipo_usuario: 'CLIENTE' | 'ADMIN'
+  }>,
+) {
+  console.log('PUT /users chamado com id:', id, '| body:', body) // ← aqui
+  return this.usersService.update(+id, body)
+};
 
   @Delete(':id')
   remove(@Param('id') id: string) {

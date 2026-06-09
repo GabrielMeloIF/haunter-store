@@ -12,7 +12,7 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function Header() {
   const router = useRouter();
-  const { usuario } = useAuth();
+  const { usuario, logout } = useAuth();
   const [busca, setBusca] = useState("");
 
   const handleBuscar = useCallback(() => {
@@ -55,66 +55,118 @@ export default function Header() {
       </div>
 
       {/* Links */}
-      <nav className="hidden lg:flex ml-auto gap-4 xl:gap-6 2xl:gap-10 items-center flex-shrink-0">
-        <Link href="/meus-anuncios" className="flex items-center gap-1 text-white hover:text-[#430883]">
-          <BsBorderAll />
-          <span>Meus anúncios</span>
-        </Link>
+      {usuario?.tipo?.toUpperCase() === 'ADMIN' ? (
+        <nav className="hidden lg:flex ml-auto items-center flex-shrink-0">
+          <Link href="/admin" className="flex items-center gap-1 text-white hover:text-[#430883]">
+            <BsBorderAll />
+            <span>Painel</span>
+          </Link>
+          <button
+            onClick={() => {
+              logout()
+              router.push('/entrar')
+            }}
+            className="ml-4 rounded-full bg-white/10 px-3 py-1 text-sm font-semibold text-white hover:bg-white/20"
+          >
+            Sair
+          </button>
+        </nav>
+      ) : (
+        <nav className="hidden lg:flex ml-auto gap-4 xl:gap-6 2xl:gap-10 items-center flex-shrink-0">
+          <Link href="/meus-anuncios" className="flex items-center gap-1 text-white hover:text-[#430883]">
+            <BsBorderAll />
+            <span>Meus anúncios</span>
+          </Link>
 
-        <Link href="/chat" className="flex items-center gap-1 text-white hover:text-[#430883]">
-          <BsEnvelope />
-          <span>Mensagens</span>
-        </Link>
+          <Link href="/chat" className="flex items-center gap-1 text-white hover:text-[#430883]">
+            <BsEnvelope />
+            <span>Mensagens</span>
+          </Link>
 
-        <Link href="/minhas-compras" className="flex items-center gap-1 text-white hover:text-[#430883]">
-          <MdOutlineShoppingBag />
-          <span>Minhas compras</span>
-        </Link>
+          <Link href="/minhas-compras" className="flex items-center gap-1 text-white hover:text-[#430883]">
+            <MdOutlineShoppingBag />
+            <span>Minhas compras</span>
+          </Link>
 
-        <Link href="/carrinho" className="flex items-center gap-1 text-white hover:text-[#430883]">
-          <BsCart2 />
-          <span>Carrinho</span>
-        </Link>
+          <Link href="/carrinho" className="flex items-center gap-1 text-white hover:text-[#430883]">
+            <BsCart2 />
+            <span>Carrinho</span>
+          </Link>
 
-        <Link href="/favoritos" className="flex items-center gap-1 text-white hover:text-[#430883]">
-          <FaRegStar />
-          <span>Favoritos</span>
-        </Link>
-      </nav>
+          <Link href="/favoritos" className="flex items-center gap-1 text-white hover:text-[#430883]">
+            <FaRegStar />
+            <span>Favoritos</span>
+          </Link>
+        </nav>
+      )}
 
       {/* Ícones mobile */}
       <nav className="flex lg:hidden items-center gap-2 ml-auto">
-        <Link href="/" className="text-white"><BsBorderAll /></Link>
-        <Link href="/chat" className="text-white"><BsEnvelope /></Link>
-        <Link href="/minhas-compras" className="text-white"><MdOutlineShoppingBag /></Link>
-        <Link href="/" className="text-white"><BsCart2 /></Link>
+        {usuario?.tipo?.toUpperCase() === 'ADMIN' ? (
+          <>
+            <Link href="/admin" className="text-white" title="Painel administrativo">
+              <BsBorderAll />
+            </Link>
+            <button
+              onClick={() => {
+                logout()
+                router.push('/entrar')
+              }}
+              className="text-white ml-2"
+              title="Sair"
+            >
+              Sair
+            </button>
+          </>
+        ) : (
+          <>
+            <Link href="/" className="text-white"><BsBorderAll /></Link>
+            <Link href="/chat" className="text-white"><BsEnvelope /></Link>
+            <Link href="/minhas-compras" className="text-white"><MdOutlineShoppingBag /></Link>
+            <Link href="/" className="text-white"><BsCart2 /></Link>
+          </>
+        )}
       </nav>
 
-      {/* Usuário */}
-      <div className="hidden md:flex flex-shrink-0 bg-white/50 rounded-xl px-2 lg:px-4 xl:px-6 py-1 border border-transparent hover:border-[#430883] transition duration-300">
-        {usuario ? (
-          <Link href="/perfil">
-            <div
-              className="w-8 h-8 rounded-full bg-purple-700 flex items-center justify-center text-white font-bold cursor-pointer"
-              title="Minha conta"
-            >
-              {usuario.nome?.[0]?.toUpperCase() || "U"}
-            </div>
-          </Link>
-        ) : (
-          <Link href="/entrar" className="text-white hover:text-[#430883] transition duration-300">
-            Entrar
-          </Link>
-        )}
-      </div>
+      {usuario?.tipo?.toUpperCase() !== 'ADMIN' && (
+        <>
+          {/* Usuário */}
+          <div className="hidden md:flex flex-shrink-0 bg-white/50 rounded-xl px-2 lg:px-4 xl:px-6 py-1 border border-transparent hover:border-[#430883] transition duration-300">
+            {usuario ? (
+              <Link href="/perfil">
+                      <div title="Minha conta">
+                        {usuario.foto ? (
+                          <Image
+                            src={usuario.foto}
+                            alt={usuario.nome || 'Usuário'}
+                            width={32}
+                            height={32}
+                            unoptimized
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-purple-700 flex items-center justify-center text-white font-bold cursor-pointer">
+                            {usuario.nome?.[0]?.toUpperCase() || "U"}
+                          </div>
+                        )}
+                      </div>
+              </Link>
+            ) : (
+              <Link href="/entrar" className="text-white hover:text-[#430883] transition duration-300">
+                Entrar
+              </Link>
+            )}
+          </div>
 
-      {/* Anunciar */}
-      <div className="flex-shrink-0 bg-[#430883] rounded-xl flex items-center h-7 sm:h-8 md:h-9 lg:h-10 px-2 sm:px-3 lg:px-4 hover:bg-[#7317D7]">
-        <CgAdd className="text-white" />
-        <Link href="/anunciar" className="text-white hidden sm:block px-2">
-          Anunciar
-        </Link>
-      </div>
+          {/* Anunciar */}
+          <div className="flex-shrink-0 bg-[#430883] rounded-xl flex items-center h-7 sm:h-8 md:h-9 lg:h-10 px-2 sm:px-3 lg:px-4 hover:bg-[#7317D7]">
+            <CgAdd className="text-white" />
+            <Link href="/anunciar" className="text-white hidden sm:block px-2">
+              Anunciar
+            </Link>
+          </div>
+        </>
+      )}
     </header>
   );
 }

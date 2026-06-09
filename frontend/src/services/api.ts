@@ -42,14 +42,23 @@ async function request(endpoint: string, options: RequestOptions = {}) {
 
 // Auth
 export const authAPI = {
-  login: (email: string, senha: string) =>
-    request('/auth/login', { method: 'POST', body: { email, senha } }),
+  login: async (email: string, senha: string) => {
+    const data = await request('/auth/login', { method: 'POST', body: { email, senha } })
+    
+    return {
+      ...data,
+      usuario: {
+        ...data.usuario,
+        id: data.usuario.id ?? data.usuario.id_usuario,
+      }
+    }
+  },
 };
 
 // Users
 export const usersAPI = {
-  getAll: () => request('/users'),
-  getById: (id: number) => request(`/users/${id}`),
+  getAll: (token?: string) => request('/users', { token }),
+  getById: (id: number, token?: string) => request(`/users/${id}`, { token }),
   create: (nome: string, email: string, senha: string, confirmar_senha: string) =>
     request('/users', {
       method: 'POST',
@@ -63,8 +72,8 @@ export const usersAPI = {
 
 // Produtos
 export const produtosAPI = {
-  getAll: () => request('/produtos'),
-  getById: (id: number) => request(`/produtos/${id}`),
+  getAll: (token?: string) => request('/produtos', { token }),
+  getById: (id: number, token?: string) => request(`/produtos/${id}`, { token }),
   create: (data: any, token?: string) =>
     request('/produtos', { method: 'POST', body: data, token }),
   update: (id: number, data: any, token?: string) =>
@@ -115,11 +124,17 @@ export const carrinhoAPI = {
 
 // Pedidos
 export const pedidosAPI = {
-  getAll: () => request('/pedidos'),
-  getById: (id: number) => request(`/pedidos/${id}`),
+  getAll: (token?: string) => request('/pedidos', { token }),
+  getById: (id: number, token?: string) => request(`/pedidos/${id}`, { token }),
   getByUser: (id_usuario: number) => request(`/pedidos/usuario/${id_usuario}`),
-  finalize: (id_usuario: number) =>
-    request(`/pedidos/finalizar/${id_usuario}`, { method: 'POST' }),
+  finalize: (id_usuario: number, token?: string) =>
+    request(`/pedidos/finalizar/${id_usuario}`, { method: 'POST', token }),
+  buyProduct: (id_usuario: number, id_produto: number, quantidade = 1, token?: string) =>
+    request('/pedidos/checkout', {
+      method: 'POST',
+      body: { id_usuario, id_produto, quantidade },
+      token,
+    }),
   updateStatus: (id: number, status: string, token?: string) =>
     request(`/pedidos/${id}/status`, {
       method: 'PATCH',
@@ -146,7 +161,7 @@ export const avaliacoesAPI = {
 
 // Cupons
 export const cuponAPI = {
-  getAll: () => request('/cupons'),
+  getAll: (token?: string) => request('/cupons', { token }),
   getById: (id: number) => request(`/cupons/${id}`),
   getByUser: (id_usuario: number) =>
     request(`/cupons/usuario/${id_usuario}`),

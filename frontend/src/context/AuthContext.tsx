@@ -32,14 +32,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Carregar usuário do localStorage ao iniciar
   useEffect(() => {
-    const savedUsuario = localStorage.getItem('user')
-    const savedToken = localStorage.getItem('token')
-    if (savedUsuario && savedToken) {
-      setUsuario(JSON.parse(savedUsuario))
-      setToken(savedToken)
-    }
-    setLoading(false)
-  }, [])
+  const savedUsuario = localStorage.getItem('user')
+  const savedToken = localStorage.getItem('token')
+  if (savedUsuario && savedToken) {
+    const parsed = JSON.parse(savedUsuario)
+    // garante que id sempre existe
+    setUsuario({ ...parsed, id: parsed.id ?? parsed.id_usuario })
+    setToken(savedToken)
+  }
+  setLoading(false)
+}, [])
 
   const login = async (email: string, senha: string) => {
     try {
@@ -83,19 +85,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const updateUsuario = async (data: Partial<Usuario>) => {
-    if (!usuario || !token) throw new Error('Usuário não autenticado')
-    try {
-      setLoading(true)
-      const updated = await usersAPI.update(usuario.id, data, token)
-      setUsuario(updated)
-      localStorage.setItem('user', JSON.stringify(updated))
-    } catch (err: any) {
-      setError(err.message)
-      throw err
-    } finally {
-      setLoading(false)
-    }
+  if (!usuario || !token) throw new Error('Usuário não autenticado')
+  
+  console.log('usuario no update:', usuario) // ← add isso temporariamente
+  
+  const id = usuario.id ?? (usuario as any).id_usuario // ← fallback
+  if (!id) throw new Error('ID do usuário não encontrado')
+  
+  try {
+    setLoading(true)
+    const updated = await usersAPI.update(id, data, token)
+    setUsuario({ ...updated, id: updated.id ?? updated.id_usuario }) // ← normaliza
+    localStorage.setItem('user', JSON.stringify({ ...updated, id: updated.id ?? updated.id_usuario }))
+  } catch (err: any) {
+    setError(err.message)
+    throw err
+  } finally {
+    setLoading(false)
   }
+}
 
   return (
     <AuthContext.Provider value={{ usuario, token, loading, error, login, register, logout, updateUsuario }}>

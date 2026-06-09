@@ -272,7 +272,7 @@ export default function Comprar() {
             {/* Botões */}
             <div className="flex flex-col gap-3 mt-2">
               <Link
-                href="/finalizar-compra"
+                href={{ pathname: "/finalizar-compra", query: { produtoId: produto.id } }}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white text-center py-4 rounded-xl font-bold transition flex items-center justify-center gap-2 text-lg"
               >
                 <FaBolt /> Comprar Agora

@@ -3,6 +3,26 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  const bcrypt = await import('bcrypt');
+  const adminSenha = await bcrypt.hash('admin123', 10);
+
+  await prisma.usuario.upsert({
+    where: { email: 'admin@haunter.com' },
+    update: {
+      nome: 'Admin Haunter',
+      senha: adminSenha,
+      confirmar_senha: adminSenha,
+      tipo_usuario: 'ADMIN',
+    },
+    create: {
+      nome: 'Admin Haunter',
+      email: 'admin@haunter.com',
+      senha: adminSenha,
+      confirmar_senha: adminSenha,
+      tipo_usuario: 'ADMIN',
+    },
+  });
+
   await prisma.produto.deleteMany();
   await prisma.categoria.deleteMany();
 

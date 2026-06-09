@@ -32,19 +32,19 @@ export function CarrinhoProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null)
 
   const carregarCarrinho = async () => {
-    if (!usuario) return
-    try {
-      setLoading(true)
-      setError(null)
-      const data = await carrinhoAPI.getByUser(usuario.id)
-      setItens(data)
-    } catch (err: any) {
-      setError(err.message)
-      console.error('Erro ao carregar carrinho:', err)
-    } finally {
-      setLoading(false)
-    }
+  if (!usuario?.id) return  // ← troca de !usuario para !usuario?.id
+  try {
+    setLoading(true)
+    setError(null)
+    const data = await carrinhoAPI.getByUser(usuario.id)
+    setItens(data)
+  } catch (err: any) {
+    setError(err.message)
+    console.error('Erro ao carregar carrinho:', err)
+  } finally {
+    setLoading(false)
   }
+}
 
   const adicionarItem = async (id_produto: number, quantidade: number) => {
     if (!usuario) throw new Error('Faça login para adicionar itens')
@@ -106,11 +106,10 @@ export function CarrinhoProvider({ children }: { children: ReactNode }) {
 
   // Carregar carrinho quando usuário faz login
   useEffect(() => {
-    if (usuario) {
-      carregarCarrinho()
-    }
-  }, [usuario])
-
+  if (usuario?.id) {  // ← garante que o id existe
+    carregarCarrinho()
+  }
+}, [usuario?.id])
   return (
     <CarrinhoContext.Provider
       value={{ itens, loading, error, carregarCarrinho, adicionarItem, atualizarQuantidade, removerItem, limparCarrinho }}

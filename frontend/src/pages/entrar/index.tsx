@@ -39,13 +39,13 @@ export default function AuthPage() {
   const { login, register, loading } = useAuth()
 
   const [formData, setFormData] = useState({
-    email: "",
+    identifier: "",
     password: "",
     name: "",
   })
 
   const [errors, setErrors] = useState({
-    email: false,
+    identifier: false,
     password: false,
     name: false,
   })
@@ -55,7 +55,7 @@ export default function AuthPage() {
 
     // validação
     const newErrors = {
-      email: !formData.email.trim(),
+      identifier: !formData.identifier.trim(),
       password: !formData.password.trim(),
       name: mode === "register" && !formData.name.trim(),
     }
@@ -64,11 +64,11 @@ export default function AuthPage() {
 
     try {
       if (mode === "register") {
-        await register(formData.name, formData.email, formData.password, formData.password)
+        await register(formData.name, formData.identifier, formData.password, formData.password)
         toast.success("Cadastro realizado com sucesso!")
         router.push("/")
       } else {
-        await login(formData.email, formData.password)
+        await login(formData.identifier, formData.password)
         toast.success("Login realizado com sucesso!")
         router.push("/")
       }
@@ -79,8 +79,8 @@ export default function AuthPage() {
 
   const toggleMode = () => {
     setMode(mode === "login" ? "register" : "login")
-    setFormData({ email: "", password: "", name: "" })
-    setErrors({ email: false, password: false, name: false })
+    setFormData({ identifier: "", password: "", name: "" })
+    setErrors({ identifier: false, password: false, name: false })
   }
 
   return (
@@ -125,7 +125,7 @@ export default function AuthPage() {
               Haunter Store
             </h1>
             <p className="mt-2 text-gray-500 text-sm">
-              {mode === "login" ? "Entre na sua conta" : "Crie sua conta"}
+              {mode === "login" ? "Entre com email ou nome de usuário" : "Crie sua conta"}
             </p>
           </div>
 
@@ -143,13 +143,13 @@ export default function AuthPage() {
             )}
 
             <Input
-              type="email"
+              type="text"
               placeholder="E-mail"
-              value={formData.email}
-              error={errors.email}
+              value={formData.identifier}
+              error={errors.identifier}
               onChange={(e) => {
-                setFormData({ ...formData, email: e.target.value })
-                if (errors.email) setErrors({ ...errors, email: false })
+                setFormData({ ...formData, identifier: e.target.value })
+                if (errors.identifier) setErrors({ ...errors, identifier: false })
               }}
             />
 
@@ -178,7 +178,7 @@ export default function AuthPage() {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm">
+          <p className="mt-6 text-center text-sm text-white">
             {mode === "login" ? "Não tem conta?" : "Já tem conta?"}
             <button onClick={toggleMode} className="ml-2 text-purple-600">
               {mode === "login" ? "Criar" : "Entrar"}

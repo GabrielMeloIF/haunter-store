@@ -2,17 +2,18 @@ import Header from "@/Components/Header/Header";
 
 import Footer from "@/Components/Footer/Footer";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaLock, FaCreditCard, FaBarcode, FaMapMarkerAlt, FaChevronDown } from "react-icons/fa";
+import { FaLock, FaCreditCard, FaBarcode, FaMapMarkerAlt, FaChevronDown, FaQrcode } from "react-icons/fa";
 import { useCarrinho } from "@/context/CarrinhoContext";
 import { useAuth } from "@/context/AuthContext";
-import { pedidosAPI } from "@/services/api";
+import { pedidosAPI, produtosAPI } from "@/services/api";
 import { toast } from "react-toastify";
 
 const PARCELAS_MAX = 12;
 const JUROS_POR_PARCELA = 0.0199;
+const PIX_KEY = "pix@haunterstore.com.br";
 
 function calcularParcela(preco: number, parcelas: number): string {
   if (parcelas === 1) return `R$ ${preco.toFixed(2).replace(".", ",")}`;
@@ -26,16 +27,25 @@ function calcularTotal(preco: number, parcelas: number): string {
   return `R$ ${total.toFixed(2).replace(".", ",")}`;
 }
 
+function calcularJuros(preco: number, parcelas: number): string {
+  if (parcelas === 1) return "R$ 0,00";
+  const total = preco * Math.pow(1 + JUROS_POR_PARCELA, parcelas);
+  const juros = total - preco;
+  return `R$ ${juros.toFixed(2).replace(".", ",")}`;
+}
+
 export default function Finalizar() {
   const router = useRouter();
   const { usuario, token } = useAuth();
   const { itens, limparCarrinho } = useCarrinho();
 
-  const [pagamento, setPagamento] = useState<"credito" | "debito" | "boleto">("credito");
+  const [pagamento, setPagamento] = useState<"credito" | "debito" | "pix">("credito");
   const [parcelas, setParcelas] = useState(1);
   const [etapa, setEtapa] = useState<1 | 2 | 3>(1);
   const [pedidoConcluido, setPedidoConcluido] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [produtoCheckout, setProdutoCheckout] = useState<any>(null);
+  const [produtoCheckoutLoading, setProdutoCheckoutLoading] = useState(false);
 
   const [endereco, setEndereco] = useState({
     cep: "",
@@ -53,6 +63,30 @@ export default function Finalizar() {
     validade: "",
     cvv: "",
   });
+
+  const produtoIdFromQuery = Array.isArray(router.query.produtoId)
+    ? router.query.produtoId[0]
+    : router.query.produtoId;
+  const produtoId = produtoIdFromQuery ? Number(produtoIdFromQuery) : null;
+
+  useEffect(() => {
+    if (!router.isReady || !produtoId) return;
+
+    const carregarProdutoCheckout = async () => {
+      try {
+        setProdutoCheckoutLoading(true);
+        const produto = await produtosAPI.getById(produtoId);
+        setProdutoCheckout(produto);
+      } catch (error) {
+        console.error("Erro ao carregar produto para checkout direto:", error);
+        setProdutoCheckout(null);
+      } finally {
+        setProdutoCheckoutLoading(false);
+      }
+    };
+
+    carregarProdutoCheckout();
+  }, [router.isReady, produtoId]);
 
   const buscarCep = async (cep: string) => {
     const limpo = cep.replace(/\D/g, "");
@@ -78,24 +112,89 @@ export default function Finalizar() {
   const formatarValidade = (v: string) =>
     v.replace(/\D/g, "").slice(0, 4).replace(/(\d{2})(\d)/, "$1/$2");
 
+  const handleCopiarPix = async () => {
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error("Navegador não suporta copiar para a área de transferência");
+      }
+      await navigator.clipboard.writeText(PIX_KEY);
+      toast.success("Chave Pix copiada para a área de transferência");
+    } catch (error: any) {
+      console.error("Erro ao copiar chave Pix:", error);
+      toast.error("Não foi possível copiar a chave Pix. Tente novamente.");
+    }
+  };
+
   const handleConfirmarPedido = async () => {
     if (!usuario) {
       toast.error("Usuário não autenticado");
       return;
     }
 
+    if (produtoId && !produtoCheckout) {
+      toast.error("Produto para checkout não encontrado");
+      return;
+    }
+
     try {
       setLoading(true);
-      await pedidosAPI.finalize(usuario.id);
-      await limparCarrinho();
+
+      const pedidoPromise = produtoCheckout
+        ? pedidosAPI.buyProduct(usuario.id, produtoCheckout.id, 1, token ?? undefined)
+        : pedidosAPI.finalize(usuario.id, token ?? undefined);
+
+      await toast.promise(pedidoPromise, {
+        pending: "Confirmando pedido...",
+        success: "Pedido realizado com sucesso!",
+        error: {
+          render({ data }: any) {
+            return data?.message || "Erro ao finalizar pedido";
+          },
+        },
+      });
+
+      if (!produtoCheckout) {
+        await limparCarrinho();
+      }
+
       setPedidoConcluido(true);
-      toast.success("Pedido realizado com sucesso!");
     } catch (error: any) {
       toast.error(error.message || "Erro ao finalizar pedido");
     } finally {
       setLoading(false);
     }
   };
+
+  if (pedidoConcluido) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen flex flex-col items-center justify-center px-6 py-20">
+          <div className="max-w-xl w-full bg-white/5 border border-white/10 rounded-3xl p-10 text-center shadow-lg shadow-black/20">
+            <h1 className="text-4xl font-bold text-white mb-4">Pedido confirmado!</h1>
+            <p className="text-gray-300 mb-6">
+              O pagamento foi registrado e seu pedido foi criado com sucesso. Você pode acompanhar tudo em "Minhas Compras".
+            </p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <Link
+                href="/minhas-compras"
+                className="inline-flex items-center justify-center rounded-full bg-purple-600 px-6 py-3 text-white font-semibold hover:bg-purple-700 transition"
+              >
+                Ver meus pedidos
+              </Link>
+              <Link
+                href="/"
+                className="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-white hover:bg-white/5 transition"
+              >
+                Continuar comprando
+              </Link>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   if (!usuario) {
     return (
@@ -113,7 +212,19 @@ export default function Finalizar() {
     );
   }
 
-  if (itens.length === 0 && !pedidoConcluido) {
+  if (produtoId && produtoCheckoutLoading) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen flex flex-col items-center justify-center gap-6">
+          <p className="text-white text-lg">Carregando checkout do produto...</p>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  if (!produtoCheckout && itens.length === 0 && !pedidoConcluido) {
     return (
       <>
         <Header />
@@ -154,7 +265,19 @@ export default function Finalizar() {
     );
   }
 
-  const totalCarrinho = itens.reduce((acc, item) => acc + (item.produto?.preco || 0) * item.quantidade, 0);
+  const checkoutItems = produtoCheckout
+    ? [
+        {
+          id_carrinho: 0,
+          id_usuario: usuario?.id ?? 0,
+          id_produto: produtoCheckout.id,
+          quantidade: 1,
+          produto: produtoCheckout,
+        },
+      ]
+    : itens;
+
+  const totalCarrinho = checkoutItems.reduce((acc, item) => acc + (item.produto?.preco || 0) * item.quantidade, 0);
 
   return (
     <>
@@ -303,7 +426,7 @@ export default function Finalizar() {
                   {[
                     { key: "credito", label: "Crédito", icon: <FaCreditCard /> },
                     { key: "debito", label: "Débito", icon: <FaCreditCard /> },
-                    { key: "boleto", label: "Boleto", icon: <FaBarcode /> },
+                    { key: "pix", label: "Pix", icon: <FaQrcode /> },
                   ].map((op) => (
                     <button
                       key={op.key}
@@ -394,14 +517,31 @@ export default function Finalizar() {
                   </div>
                 )}
 
-                {pagamento === "boleto" && (
-                  <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-5 text-center">
-                    <FaBarcode className="text-yellow-400 text-4xl mx-auto mb-3" />
-                    <p className="text-yellow-300 font-semibold">Pagamento via Boleto Bancário</p>
+                {pagamento === "pix" && (
+                  <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-5 text-center">
+                    <FaQrcode className="text-green-400 text-4xl mx-auto mb-3" />
+                    <p className="text-green-300 font-semibold">Pagamento via Pix</p>
                     <p className="text-gray-400 text-sm mt-2">
-                      O boleto será gerado após confirmar o pedido. Vencimento em 3 dias úteis.
+                      Escaneie o QR code ou copie a chave Pix abaixo no seu banco de preferência.
                     </p>
-                    <p className="text-white font-bold text-lg mt-3">R$ {totalCarrinho.toFixed(2).replace(".", ",")} à vista</p>
+                    <div className="mt-4 inline-block bg-[#0f172a] p-4 rounded-2xl text-left text-sm text-white w-full">
+                      <p className="font-semibold">Chave Pix</p>
+                      <p className="break-all">{PIX_KEY}</p>
+                      <p className="mt-3 text-gray-300">Valor: R$ {totalCarrinho.toFixed(2).replace(".", ",")}</p>
+                    </div>
+                    <div className="mt-4">
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(`pix://${PIX_KEY}?amount=${totalCarrinho.toFixed(2)}&msg=Haunter%20Store`)}`}
+                        alt="QR Code Pix"
+                        className="mx-auto rounded-2xl border border-white/10"
+                      />
+                    </div>
+                    <button
+                      onClick={handleCopiarPix}
+                      className="mt-4 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-full font-semibold transition"
+                    >
+                      Copiar chave Pix
+                    </button>
                   </div>
                 )}
 
@@ -441,8 +581,8 @@ export default function Finalizar() {
 
                     <div className="bg-white/5 rounded-xl p-4">
                       <p className="text-gray-400 text-xs uppercase tracking-widest mb-2">Pagamento</p>
-                      {pagamento === "boleto" ? (
-                        <p className="text-white">Boleto Bancário — R$ {totalCarrinho.toFixed(2).replace(".", ",")} à vista</p>
+                      {pagamento === "pix" ? (
+                        <p className="text-white">Pix — Chave: {PIX_KEY} · Valor: R$ {totalCarrinho.toFixed(2).replace(".", ",")}</p>
                       ) : (
                         <p className="text-white">
                           {pagamento === "credito" ? "Cartão de Crédito" : "Cartão de Débito"} ···· {cartao.numero.slice(-4)} —{" "}
@@ -479,7 +619,7 @@ export default function Finalizar() {
           <div className="w-80 bg-white/5 border border-white/10 rounded-2xl p-6 sticky top-6">
             <h3 className="text-white font-semibold mb-4">Resumo do pedido</h3>
             <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
-              {itens.map((item) => (
+              {checkoutItems.map((item) => (
                 <div key={item.id_carrinho} className="flex gap-3 items-center">
                   <Image
                     src={item.produto?.imagem_url || "/mouse 1.png"}
@@ -511,9 +651,7 @@ export default function Finalizar() {
               {pagamento === "credito" && parcelas > 1 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Juros ({parcelas}x)</span>
-                  <span className="text-yellow-400">
-                    {(parseFloat(calcularTotal(totalCarrinho, parcelas)) - totalCarrinho).toFixed(2).replace(".", ",")}
-                  </span>
+                  <span className="text-yellow-400">{calcularJuros(totalCarrinho, parcelas)}</span>
                 </div>
               )}
               <div className="flex justify-between font-bold text-base pt-2 border-t border-white/10">
