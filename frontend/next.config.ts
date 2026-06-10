@@ -43,9 +43,37 @@ const nextConfig = {
         hostname: "alfatecnologico.com.br",
       },
       {
-      protocol: "https",
-      hostname: "encrypted-tbn2.gstatic.com",
-    },
+        protocol: "https",
+        hostname: "img.kalunga.com.br",
+      },
+      {
+        protocol: "https",
+        hostname: "encrypted-tbn2.gstatic.com",
+      },
+      {
+        protocol: "https",
+        hostname: "down-br.img.susercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "assets.nintendo.com",
+      },
+      {
+        protocol: "https",
+        hostname: "image.api.playstation.com",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.awsli.com.br",
+      },
+      {
+        protocol: "https",
+        hostname: "imagedelivery.net",
+      },
+      {
+        protocol: "https",
+        hostname: "img.terabyteshop.com.br",
+      }
     ],
   },
 };
