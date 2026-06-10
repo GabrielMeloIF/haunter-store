@@ -1,19 +1,29 @@
 import Header from "@/Components/Header/Header";
-
 import Footer from "@/Components/Footer/Footer";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaLock, FaCreditCard, FaBarcode, FaMapMarkerAlt, FaChevronDown, FaQrcode } from "react-icons/fa";
+import {
+  FaLock,
+  FaCreditCard,
+  FaMapMarkerAlt,
+  FaChevronDown,
+  FaQrcode,
+  FaTag,
+  FaCheckCircle,
+  FaTimesCircle,
+} from "react-icons/fa";
 import { useCarrinho } from "@/context/CarrinhoContext";
 import { useAuth } from "@/context/AuthContext";
-import { pedidosAPI, produtosAPI } from "@/services/api";
+import { pedidosAPI, produtosAPI, cuponAPI } from "@/services/api";
 import { toast } from "react-toastify";
 
 const PARCELAS_MAX = 12;
 const JUROS_POR_PARCELA = 0.0199;
 const PIX_KEY = "pix@haunterstore.com.br";
+
+// ─── helpers de cálculo ───────────────────────────────────────────────────────
 
 function calcularParcela(preco: number, parcelas: number): string {
   if (parcelas === 1) return `R$ ${preco.toFixed(2).replace(".", ",")}`;
@@ -34,6 +44,112 @@ function calcularJuros(preco: number, parcelas: number): string {
   return `R$ ${juros.toFixed(2).replace(".", ",")}`;
 }
 
+// ─── tipos ────────────────────────────────────────────────────────────────────
+
+interface CupomAplicado {
+  codigo: string;
+  desconto: number; // percentual, ex: 10 = 10%
+  descricao: string;
+}
+
+// ─── componente de cupom (sidebar) ───────────────────────────────────────────
+
+interface CupomBoxProps {
+  idUsuario: number;
+  totalCarrinho: number;
+  cupomAplicado: CupomAplicado | null;
+  onAplicar: (cupom: CupomAplicado) => void;
+  onRemover: () => void;
+}
+
+function CupomBox({
+  idUsuario,
+  totalCarrinho,
+  cupomAplicado,
+  onAplicar,
+  onRemover,
+}: CupomBoxProps) {
+  const [codigo, setCodigo] = useState("");
+  const [loadingCupom, setLoadingCupom] = useState(false);
+
+  const handleAplicar = async () => {
+    const codigoLimpo = codigo.trim().toUpperCase();
+    if (!codigoLimpo) return;
+
+    try {
+      setLoadingCupom(true);
+
+      const data = await cuponAPI.validar(codigoLimpo, idUsuario);
+
+      onAplicar({
+        codigo: codigoLimpo,
+        desconto: data.desconto,
+        descricao: data.cupom?.descricao ?? `${data.desconto}% de desconto`,
+      });
+
+      setCodigo("");
+      toast.success(`Cupom aplicado: ${data.desconto}% de desconto`);
+    } catch (err: any) {
+      toast.error(err.message ?? "Cupom inválido ou expirado");
+    } finally {
+      setLoadingCupom(false);
+    }
+  };
+
+  if (cupomAplicado) {
+    const valorDesconto = (totalCarrinho * cupomAplicado.desconto) / 100;
+
+    return (
+      <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-3 flex items-start gap-3">
+        <FaCheckCircle className="text-purple-400 mt-0.5 shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="text-white text-sm font-semibold truncate">
+            {cupomAplicado.codigo}
+          </p>
+          <p className="text-gray-400 text-xs leading-snug">
+            {cupomAplicado.descricao}
+          </p>
+          <p className="text-purple-300 text-xs font-medium mt-0.5">
+            −R$ {valorDesconto.toFixed(2).replace(".", ",")}
+          </p>
+        </div>
+        <button
+          onClick={onRemover}
+          title="Remover cupom"
+          className="text-gray-500 hover:text-red-400 transition shrink-0 mt-0.5"
+        >
+          <FaTimesCircle />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex gap-2">
+      <div className="relative flex-1">
+        <FaTag className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs" />
+        <input
+          type="text"
+          placeholder="Código do cupom"
+          value={codigo}
+          onChange={(e) => setCodigo(e.target.value.toUpperCase())}
+          onKeyDown={(e) => e.key === "Enter" && handleAplicar()}
+          className="w-full bg-white/10 border border-white/20 text-white text-sm rounded-lg pl-8 pr-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-gray-500"
+        />
+      </div>
+      <button
+        onClick={handleAplicar}
+        disabled={loadingCupom || !codigo.trim()}
+        className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition whitespace-nowrap"
+      >
+        {loadingCupom ? "..." : "Aplicar"}
+      </button>
+    </div>
+  );
+}
+
+// ─── página principal ─────────────────────────────────────────────────────────
+
 export default function Finalizar() {
   const router = useRouter();
   const { usuario, token } = useAuth();
@@ -46,6 +162,9 @@ export default function Finalizar() {
   const [loading, setLoading] = useState(false);
   const [produtoCheckout, setProdutoCheckout] = useState<any>(null);
   const [produtoCheckoutLoading, setProdutoCheckoutLoading] = useState(false);
+
+  // ── estado do cupom ──────────────────────────────────────────────────────
+  const [cupomAplicado, setCupomAplicado] = useState<CupomAplicado | null>(null);
 
   const [endereco, setEndereco] = useState({
     cep: "",
@@ -125,6 +244,7 @@ export default function Finalizar() {
     }
   };
 
+  // ── confirmar pedido (marca cupom como utilizado se houver) ───────────────
   const handleConfirmarPedido = async () => {
     if (!usuario) {
       toast.error("Usuário não autenticado");
@@ -153,6 +273,16 @@ export default function Finalizar() {
         },
       });
 
+      // Marca cupom como utilizado após pedido confirmado
+      if (cupomAplicado) {
+        try {
+          await cuponAPI.utilizar(cupomAplicado.codigo, usuario.id);
+        } catch {
+          // erro silencioso: não bloqueia o fluxo, pedido já foi criado
+          console.warn("Não foi possível marcar cupom como utilizado");
+        }
+      }
+
       if (!produtoCheckout) {
         await limparCarrinho();
       }
@@ -164,6 +294,8 @@ export default function Finalizar() {
       setLoading(false);
     }
   };
+
+  // ── telas de estado ───────────────────────────────────────────────────────
 
   if (pedidoConcluido) {
     return (
@@ -200,7 +332,6 @@ export default function Finalizar() {
     return (
       <>
         <Header />
-       
         <div className="min-h-screen flex flex-col items-center justify-center gap-6">
           <p className="text-white text-lg">Faça login para finalizar sua compra</p>
           <Link href="/entrar" className="text-purple-400 hover:text-purple-300">
@@ -228,7 +359,6 @@ export default function Finalizar() {
     return (
       <>
         <Header />
-  
         <div className="min-h-screen flex flex-col items-center justify-center gap-6">
           <p className="text-white text-lg">Seu carrinho está vazio</p>
           <Link href="/" className="text-purple-400 hover:text-purple-300">
@@ -240,30 +370,7 @@ export default function Finalizar() {
     );
   }
 
-  if (pedidoConcluido) {
-    return (
-      <>
-        <Header />
-     
-        <div className="min-h-screen flex flex-col items-center justify-center gap-6">
-          <div className="w-20 h-20 rounded-full bg-green-500 flex items-center justify-center text-white text-4xl">
-            ✓
-          </div>
-          <h1 className="text-3xl font-bold text-white">Pedido confirmado!</h1>
-          <p className="text-gray-300 text-center max-w-md">
-            Seu pedido foi realizado com sucesso. Você receberá um e-mail de confirmação em breve.
-          </p>
-          <Link
-            href="/"
-            className="mt-4 bg-[#5a10a8] text-white px-8 py-3 rounded-lg hover:bg-[#3a0a6a] transition"
-          >
-            Voltar para a loja
-          </Link>
-        </div>
-        <Footer />
-      </>
-    );
-  }
+  // ── dados do checkout ─────────────────────────────────────────────────────
 
   const checkoutItems = produtoCheckout
     ? [
@@ -277,12 +384,30 @@ export default function Finalizar() {
       ]
     : itens;
 
-  const totalCarrinho = checkoutItems.reduce((acc, item) => acc + (item.produto?.preco || 0) * item.quantidade, 0);
+  const totalCarrinho = checkoutItems.reduce(
+    (acc, item) => acc + (item.produto?.preco || 0) * item.quantidade,
+    0
+  );
+
+  // Valor do desconto do cupom em reais
+  const valorDesconto = cupomAplicado
+    ? (totalCarrinho * cupomAplicado.desconto) / 100
+    : 0;
+
+  // Base para calcular juros/parcelas já com desconto aplicado
+  const totalComDesconto = totalCarrinho - valorDesconto;
+
+  // Total final (com desconto e eventual juros de parcelamento)
+  const totalFinal =
+    pagamento === "credito" && parcelas > 1
+      ? totalComDesconto * Math.pow(1 + JUROS_POR_PARCELA, parcelas)
+      : totalComDesconto;
+
+  // ── render principal ──────────────────────────────────────────────────────
 
   return (
     <>
       <Header />
-  
 
       <div className="max-w-6xl mx-auto px-6 py-10 min-h-screen">
         <h1 className="text-3xl font-bold text-white mb-8">Finalizar Compra</h1>
@@ -305,20 +430,29 @@ export default function Finalizar() {
                 >
                   {etapa > e.n ? "✓" : e.n}
                 </div>
-                <span className={`text-xs mt-1 ${etapa >= e.n ? "text-purple-400" : "text-gray-500"}`}>
+                <span
+                  className={`text-xs mt-1 ${
+                    etapa >= e.n ? "text-purple-400" : "text-gray-500"
+                  }`}
+                >
                   {e.label}
                 </span>
               </div>
               {i < 2 && (
-                <div className={`w-24 h-0.5 mb-4 mx-1 transition-all ${etapa > e.n ? "bg-[#5a10a8]" : "bg-white/10"}`} />
+                <div
+                  className={`w-24 h-0.5 mb-4 mx-1 transition-all ${
+                    etapa > e.n ? "bg-[#5a10a8]" : "bg-white/10"
+                  }`}
+                />
               )}
             </div>
           ))}
         </div>
 
         <div className="flex gap-8 items-start">
-          {/* Coluna principal */}
+          {/* ── Coluna principal ────────────────────────────────────────── */}
           <div className="flex-1">
+
             {/* ETAPA 1 — ENDEREÇO */}
             {etapa === 1 && (
               <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
@@ -335,7 +469,10 @@ export default function Finalizar() {
                       placeholder="00000-000"
                       value={endereco.cep}
                       onChange={(e) => {
-                        const v = e.target.value.replace(/\D/g, "").slice(0, 8).replace(/(\d{5})(\d)/, "$1-$2");
+                        const v = e.target.value
+                          .replace(/\D/g, "")
+                          .slice(0, 8)
+                          .replace(/(\d{5})(\d)/, "$1-$2");
                         setEndereco((prev) => ({ ...prev, cep: v }));
                         buscarCep(v);
                       }}
@@ -348,7 +485,9 @@ export default function Finalizar() {
                       type="text"
                       placeholder="SP"
                       value={endereco.estado}
-                      onChange={(e) => setEndereco((prev) => ({ ...prev, estado: e.target.value }))}
+                      onChange={(e) =>
+                        setEndereco((prev) => ({ ...prev, estado: e.target.value }))
+                      }
                       className="w-full bg-white/10 border border-white/20 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-gray-500"
                     />
                   </div>
@@ -358,7 +497,9 @@ export default function Finalizar() {
                       type="text"
                       placeholder="Nome da rua"
                       value={endereco.rua}
-                      onChange={(e) => setEndereco((prev) => ({ ...prev, rua: e.target.value }))}
+                      onChange={(e) =>
+                        setEndereco((prev) => ({ ...prev, rua: e.target.value }))
+                      }
                       className="w-full bg-white/10 border border-white/20 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-gray-500"
                     />
                   </div>
@@ -368,7 +509,9 @@ export default function Finalizar() {
                       type="text"
                       placeholder="123"
                       value={endereco.numero}
-                      onChange={(e) => setEndereco((prev) => ({ ...prev, numero: e.target.value }))}
+                      onChange={(e) =>
+                        setEndereco((prev) => ({ ...prev, numero: e.target.value }))
+                      }
                       className="w-full bg-white/10 border border-white/20 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-gray-500"
                     />
                   </div>
@@ -378,7 +521,9 @@ export default function Finalizar() {
                       type="text"
                       placeholder="Apto, bloco..."
                       value={endereco.complemento}
-                      onChange={(e) => setEndereco((prev) => ({ ...prev, complemento: e.target.value }))}
+                      onChange={(e) =>
+                        setEndereco((prev) => ({ ...prev, complemento: e.target.value }))
+                      }
                       className="w-full bg-white/10 border border-white/20 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-gray-500"
                     />
                   </div>
@@ -388,7 +533,9 @@ export default function Finalizar() {
                       type="text"
                       placeholder="Bairro"
                       value={endereco.bairro}
-                      onChange={(e) => setEndereco((prev) => ({ ...prev, bairro: e.target.value }))}
+                      onChange={(e) =>
+                        setEndereco((prev) => ({ ...prev, bairro: e.target.value }))
+                      }
                       className="w-full bg-white/10 border border-white/20 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-gray-500"
                     />
                   </div>
@@ -398,7 +545,9 @@ export default function Finalizar() {
                       type="text"
                       placeholder="Cidade"
                       value={endereco.cidade}
-                      onChange={(e) => setEndereco((prev) => ({ ...prev, cidade: e.target.value }))}
+                      onChange={(e) =>
+                        setEndereco((prev) => ({ ...prev, cidade: e.target.value }))
+                      }
                       className="w-full bg-white/10 border border-white/20 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-gray-500"
                     />
                   </div>
@@ -454,7 +603,9 @@ export default function Finalizar() {
                         type="text"
                         placeholder="0000 0000 0000 0000"
                         value={cartao.numero}
-                        onChange={(e) => setCartao((p) => ({ ...p, numero: formatarCartao(e.target.value) }))}
+                        onChange={(e) =>
+                          setCartao((p) => ({ ...p, numero: formatarCartao(e.target.value) }))
+                        }
                         className="w-full bg-white/10 border border-white/20 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-gray-500"
                       />
                     </div>
@@ -464,7 +615,9 @@ export default function Finalizar() {
                         type="text"
                         placeholder="NOME SOBRENOME"
                         value={cartao.nome}
-                        onChange={(e) => setCartao((p) => ({ ...p, nome: e.target.value.toUpperCase() }))}
+                        onChange={(e) =>
+                          setCartao((p) => ({ ...p, nome: e.target.value.toUpperCase() }))
+                        }
                         className="w-full bg-white/10 border border-white/20 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-gray-500"
                       />
                     </div>
@@ -474,7 +627,9 @@ export default function Finalizar() {
                         type="text"
                         placeholder="MM/AA"
                         value={cartao.validade}
-                        onChange={(e) => setCartao((p) => ({ ...p, validade: formatarValidade(e.target.value) }))}
+                        onChange={(e) =>
+                          setCartao((p) => ({ ...p, validade: formatarValidade(e.target.value) }))
+                        }
                         className="w-full bg-white/10 border border-white/20 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-gray-500"
                       />
                     </div>
@@ -484,7 +639,12 @@ export default function Finalizar() {
                         type="text"
                         placeholder="000"
                         value={cartao.cvv}
-                        onChange={(e) => setCartao((p) => ({ ...p, cvv: e.target.value.replace(/\D/g, "").slice(0, 3) }))}
+                        onChange={(e) =>
+                          setCartao((p) => ({
+                            ...p,
+                            cvv: e.target.value.replace(/\D/g, "").slice(0, 3),
+                          }))
+                        }
                         className="w-full bg-white/10 border border-white/20 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-gray-500"
                       />
                     </div>
@@ -500,7 +660,7 @@ export default function Finalizar() {
                           >
                             {Array.from({ length: PARCELAS_MAX }, (_, i) => i + 1).map((n) => (
                               <option key={n} value={n} className="bg-[#1a0a2e] text-white">
-                                {n}x de {calcularParcela(totalCarrinho, n)}
+                                {n}x de {calcularParcela(totalComDesconto, n)}
                                 {n === 1 ? " (sem juros)" : " (1,99% a.m.)"}
                               </option>
                             ))}
@@ -509,7 +669,10 @@ export default function Finalizar() {
                         </div>
                         {parcelas > 1 && (
                           <p className="text-xs text-gray-400 mt-2">
-                            Total: <span className="text-white font-semibold">{calcularTotal(totalCarrinho, parcelas)}</span>
+                            Total:{" "}
+                            <span className="text-white font-semibold">
+                              {calcularTotal(totalComDesconto, parcelas)}
+                            </span>
                           </p>
                         )}
                       </div>
@@ -527,11 +690,15 @@ export default function Finalizar() {
                     <div className="mt-4 inline-block bg-[#0f172a] p-4 rounded-2xl text-left text-sm text-white w-full">
                       <p className="font-semibold">Chave Pix</p>
                       <p className="break-all">{PIX_KEY}</p>
-                      <p className="mt-3 text-gray-300">Valor: R$ {totalCarrinho.toFixed(2).replace(".", ",")}</p>
+                      <p className="mt-3 text-gray-300">
+                        Valor: R$ {totalComDesconto.toFixed(2).replace(".", ",")}
+                      </p>
                     </div>
                     <div className="mt-4">
                       <img
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(`pix://${PIX_KEY}?amount=${totalCarrinho.toFixed(2)}&msg=Haunter%20Store`)}`}
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+                          `pix://${PIX_KEY}?amount=${totalComDesconto.toFixed(2)}&msg=Haunter%20Store`
+                        )}`}
                         alt="QR Code Pix"
                         className="mx-auto rounded-2xl border border-white/10"
                       />
@@ -572,7 +739,8 @@ export default function Finalizar() {
                     <div className="bg-white/5 rounded-xl p-4">
                       <p className="text-gray-400 text-xs uppercase tracking-widest mb-2">Entrega</p>
                       <p className="text-white">
-                        {endereco.rua}, {endereco.numero} {endereco.complemento && `- ${endereco.complemento}`}
+                        {endereco.rua}, {endereco.numero}{" "}
+                        {endereco.complemento && `- ${endereco.complemento}`}
                       </p>
                       <p className="text-gray-300">
                         {endereco.bairro} — {endereco.cidade}/{endereco.estado} · {endereco.cep}
@@ -582,17 +750,44 @@ export default function Finalizar() {
                     <div className="bg-white/5 rounded-xl p-4">
                       <p className="text-gray-400 text-xs uppercase tracking-widest mb-2">Pagamento</p>
                       {pagamento === "pix" ? (
-                        <p className="text-white">Pix — Chave: {PIX_KEY} · Valor: R$ {totalCarrinho.toFixed(2).replace(".", ",")}</p>
+                        <p className="text-white">
+                          Pix — Chave: {PIX_KEY} · Valor: R${" "}
+                          {totalComDesconto.toFixed(2).replace(".", ",")}
+                        </p>
                       ) : (
                         <p className="text-white">
-                          {pagamento === "credito" ? "Cartão de Crédito" : "Cartão de Débito"} ···· {cartao.numero.slice(-4)} —{" "}
-                          {parcelas}x de {calcularParcela(totalCarrinho, parcelas)}
+                          {pagamento === "credito" ? "Cartão de Crédito" : "Cartão de Débito"} ····{" "}
+                          {cartao.numero.slice(-4)} — {parcelas}x de{" "}
+                          {calcularParcela(totalComDesconto, parcelas)}
                           {parcelas > 1 && (
-                            <span className="text-gray-400 text-sm"> (total: {calcularTotal(totalCarrinho, parcelas)})</span>
+                            <span className="text-gray-400 text-sm">
+                              {" "}(total: {calcularTotal(totalComDesconto, parcelas)})
+                            </span>
                           )}
                         </p>
                       )}
                     </div>
+
+                    {/* Cupom aplicado na revisão */}
+                    {cupomAplicado && (
+                      <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-4 flex items-center gap-3">
+                        <FaTag className="text-purple-400 shrink-0" />
+                        <div>
+                          <p className="text-gray-400 text-xs uppercase tracking-widest mb-0.5">
+                            Cupom aplicado
+                          </p>
+                          <p className="text-white font-semibold">
+                            {cupomAplicado.codigo}{" "}
+                            <span className="text-purple-300 font-normal text-sm">
+                              ({cupomAplicado.desconto}% de desconto)
+                            </span>
+                          </p>
+                          <p className="text-purple-300 text-sm">
+                            −R$ {valorDesconto.toFixed(2).replace(".", ",")}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -608,16 +803,19 @@ export default function Finalizar() {
                     disabled={loading}
                     className="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    <FaLock className="text-sm" /> {loading ? "Processando..." : "Confirmar pedido"}
+                    <FaLock className="text-sm" />{" "}
+                    {loading ? "Processando..." : "Confirmar pedido"}
                   </button>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Sidebar — resumo do pedido */}
+          {/* ── Sidebar — resumo do pedido ──────────────────────────────── */}
           <div className="w-80 bg-white/5 border border-white/10 rounded-2xl p-6 sticky top-6">
             <h3 className="text-white font-semibold mb-4">Resumo do pedido</h3>
+
+            {/* Lista de itens */}
             <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
               {checkoutItems.map((item) => (
                 <div key={item.id_carrinho} className="flex gap-3 items-center">
@@ -635,36 +833,70 @@ export default function Finalizar() {
                     <p className="text-white font-medium">{item.produto?.nome}</p>
                     <p className="text-gray-400 text-xs">x{item.quantidade}</p>
                   </div>
-                  <p className="text-white text-sm">R$ {(item.produto?.preco * item.quantidade).toFixed(2).replace(".", ",")}</p>
+                  <p className="text-white text-sm">
+                    R$ {(item.produto?.preco * item.quantidade).toFixed(2).replace(".", ",")}
+                  </p>
                 </div>
               ))}
             </div>
+
+            {/* Campo de cupom */}
+            <div className="border-t border-white/10 pt-4 mb-4">
+              <p className="text-gray-400 text-xs uppercase tracking-widest mb-2">Cupom de desconto</p>
+              <CupomBox
+                idUsuario={usuario.id}
+                totalCarrinho={totalCarrinho}
+                cupomAplicado={cupomAplicado}
+                onAplicar={setCupomAplicado}
+                onRemover={() => setCupomAplicado(null)}
+              />
+            </div>
+
+            {/* Totais */}
             <div className="border-t border-white/10 pt-4 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Subtotal</span>
-                <span className="text-white">R$ {totalCarrinho.toFixed(2).replace(".", ",")}</span>
+                <span className="text-white">
+                  R$ {totalCarrinho.toFixed(2).replace(".", ",")}
+                </span>
               </div>
+
+              {/* Linha de desconto — só aparece quando cupom está aplicado */}
+              {cupomAplicado && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">
+                    Desconto ({cupomAplicado.desconto}%)
+                  </span>
+                  <span className="text-purple-400">
+                    −R$ {valorDesconto.toFixed(2).replace(".", ",")}
+                  </span>
+                </div>
+              )}
+
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Frete</span>
                 <span className="text-green-400">Grátis</span>
               </div>
+
               {pagamento === "credito" && parcelas > 1 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Juros ({parcelas}x)</span>
-                  <span className="text-yellow-400">{calcularJuros(totalCarrinho, parcelas)}</span>
+                  <span className="text-yellow-400">
+                    {calcularJuros(totalComDesconto, parcelas)}
+                  </span>
                 </div>
               )}
+
               <div className="flex justify-between font-bold text-base pt-2 border-t border-white/10">
                 <span className="text-white">Total</span>
                 <span className="text-purple-400">
-                  {pagamento === "credito" && parcelas > 1
-                    ? calcularTotal(totalCarrinho, parcelas)
-                    : `R$ ${totalCarrinho.toFixed(2).replace(".", ",")}`}
+                  R$ {totalFinal.toFixed(2).replace(".", ",")}
                 </span>
               </div>
+
               {pagamento === "credito" && (
                 <p className="text-gray-400 text-xs text-right">
-                  {parcelas}x de {calcularParcela(totalCarrinho, parcelas)}
+                  {parcelas}x de {calcularParcela(totalComDesconto, parcelas)}
                 </p>
               )}
             </div>
@@ -676,4 +908,3 @@ export default function Finalizar() {
     </>
   );
 }
-

@@ -65,6 +65,72 @@ export class UsersService {
   }
 
   async remove(id: number) {
+    if (!id) throw new Error('ID inválido');
+
+    const user = await this.prisma.usuario.findUnique({
+      where: { id_usuario: id },
+    });
+
+    if (!user) {
+      throw new Error(`Usuário #${id} não encontrado`);
+    }
+
+    // Deletar todas as mensagens do usuário
+    await this.prisma.mensagem.deleteMany({
+      where: { id_remetente: id },
+    });
+
+    // Deletar todas as conversas onde o usuário é participante
+    await this.prisma.conversa.deleteMany({
+      where: {
+        OR: [
+          { participante1Id: id },
+          { participante2Id: id },
+        ],
+      },
+    });
+
+    // Deletar todos os itens de pedido e depois os pedidos
+    const pedidos = await this.prisma.pedido.findMany({
+      where: { id_usuario: id },
+    });
+
+    for (const pedido of pedidos) {
+      await this.prisma.itempedido.deleteMany({
+        where: { id_pedido: pedido.id_pedido },
+      });
+    }
+
+    await this.prisma.pedido.deleteMany({
+      where: { id_usuario: id },
+    });
+
+    // Deletar todos os produtos do usuário
+    await this.prisma.produto.deleteMany({
+      where: { id_usuario: id },
+    });
+
+    // Deletar todas as avaliações do usuário
+    await this.prisma.avaliacao.deleteMany({
+      where: { id_usuario: id },
+    });
+
+    // Deletar todos os itens do carrinho do usuário
+    await this.prisma.carrinho.deleteMany({
+      where: { id_usuario: id },
+    });
+
+    // Deletar cupons do usuário
+    await this.prisma.cupomusuario.deleteMany({
+      where: { id_usuario: id },
+    });
+
+    // Deletar notificações do usuário
+    await this.prisma.notificacao.deleteMany({
+      where: { id_usuario: id },
+    });
+
+    // Finalmente, deletar o usuário
     return this.prisma.usuario.delete({
       where: { id_usuario: id },
     });

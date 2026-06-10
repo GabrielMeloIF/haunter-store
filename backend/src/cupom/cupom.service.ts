@@ -1,32 +1,73 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Cupom } from './cupom.entitity';
+import { CupomUsuario } from './cupom-usuario.entity';
 
 @Injectable()
 export class CupomService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    @InjectRepository(Cupom)
+    private readonly cupomRepo: Repository<Cupom>,
 
-  create(data: { codigo: string; descricao: string; desconto: number; validade: string }) {
-    return this.prisma.cupom.create({
-      data: { ...data, validade: new Date(data.validade) },
+    @InjectRepository(CupomUsuario)
+    private readonly cupomUsuarioRepo: Repository<CupomUsuario>,
+  ) {}
+
+  // ── CRUD básico ────────────────────────────────────────────────────────────
+
+  create(data: {
+    codigo: string;
+    descricao: string;
+    desconto: number;
+    validade: string;
+  }) {
+    const cupom = this.cupomRepo.create({
+      ...data,
+      validade: new Date(data.validade),
     });
+    return this.cupomRepo.save(cupom);
   }
 
   findAll() {
-    return this.prisma.cupom.findMany({ orderBy: { criado_em: 'desc' } });
+    return this.cupomRepo.find({ order: { criado_em: 'DESC' } });
   }
 
   async findOne(id: number) {
-    const cupom = await this.prisma.cupom.findUnique({ where: { id_cupom: id } });
+    const cupom = await this.cupomRepo.findOne({ where: { id_cupom: id } });
     if (!cupom) throw new NotFoundException(`Cupom #${id} não encontrado`);
     return cupom;
   }
 
-  async validar(codigo: string, id_usuario: number) {
-    const cupom = await this.prisma.cupom.findUnique({ where: { codigo } });
-    if (!cupom) throw new NotFoundException(`Cupom "${codigo}" não encontrado`);
-    if (new Date() > cupom.validade) throw new BadRequestException('Cupom expirado');
+  async remove(id: number) {
+    await this.findOne(id); // lança 404 se não existir
+    return this.cupomRepo.delete({ id_cupom: id });
+  }
 
-    const uso = await this.prisma.cupomusuario.findFirst({
+  // ── Por usuário ────────────────────────────────────────────────────────────
+
+  findByUsuario(id_usuario: number) {
+    return this.cupomUsuarioRepo.find({
+      where: { id_usuario },
+      relations: ['cupom'],
+      order: { utilizado_em: 'DESC' },
+    });
+  }
+
+  // ── Validar ────────────────────────────────────────────────────────────────
+
+  async validar(codigo: string, id_usuario: number) {
+    const cupom = await this.cupomRepo.findOne({ where: { codigo } });
+    if (!cupom) throw new NotFoundException(`Cupom "${codigo}" não encontrado`);
+
+    if (new Date() > cupom.validade)
+      throw new BadRequestException('Cupom expirado');
+
+    const uso = await this.cupomUsuarioRepo.findOne({
       where: { id_cupom: cupom.id_cupom, id_usuario, utilizado: true },
     });
     if (uso) throw new BadRequestException('Cupom já utilizado por este usuário');
@@ -34,41 +75,34 @@ export class CupomService {
     return { valido: true, desconto: cupom.desconto, cupom };
   }
 
-  async utilizar(codigo: string, id_usuario: number) {
-    await this.validar(codigo, id_usuario);
-    const cupom = await this.prisma.cupom.findUnique({ where: { codigo } });
+  // ── Utilizar ───────────────────────────────────────────────────────────────
 
-    const existente = await this.prisma.cupomusuario.findFirst({
+  async utilizar(codigo: string, id_usuario: number) {
+    // Valida antes de marcar (lança exceção se inválido)
+    await this.validar(codigo, id_usuario);
+
+    const cupom = await this.cupomRepo.findOne({ where: { codigo } });
+
+    const existente = await this.cupomUsuarioRepo.findOne({
       where: { id_cupom: cupom!.id_cupom, id_usuario },
     });
 
     if (existente) {
-      return this.prisma.cupomusuario.update({
+      await this.cupomUsuarioRepo.update(existente.id_cupom_usuario, {
+        utilizado: true,
+        utilizado_em: new Date(),
+      });
+      return this.cupomUsuarioRepo.findOne({
         where: { id_cupom_usuario: existente.id_cupom_usuario },
-        data: { utilizado: true, utilizado_em: new Date() },
       });
     }
 
-    return this.prisma.cupomusuario.create({
-      data: {
-        id_usuario,
-        id_cupom: cupom!.id_cupom,
-        utilizado: true,
-        utilizado_em: new Date(),
-      },
+    const novo = this.cupomUsuarioRepo.create({
+      id_usuario,
+      id_cupom: cupom!.id_cupom,
+      utilizado: true,
+      utilizado_em: new Date(),
     });
-  }
-
-  findByUsuario(id_usuario: number) {
-    return this.prisma.cupomusuario.findMany({
-      where: { id_usuario },
-      include: { cupom: true },
-      orderBy: { utilizado_em: 'desc' },
-    });
-  }
-
-  async remove(id: number) {
-    await this.findOne(id);
-    return this.prisma.cupom.delete({ where: { id_cupom: id } });
+    return this.cupomUsuarioRepo.save(novo);
   }
 }

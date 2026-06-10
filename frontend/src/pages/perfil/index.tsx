@@ -109,34 +109,36 @@ export default function ProfilePage() {
   };
 
   // Executa o delete de fato (chamado só após confirmação)
-  const confirmarDelete = () => {
+  const confirmarDelete = async () => {
     if (!user) return
 
     const uid = user.uid
 
     if (uid && usuario) {
-      console.log("🔍 Tentando deletar:", { id: usuario.id, token })
-      usersAPI
-        .delete(usuario.id, token || undefined)
-        .then(() => {
-          
-          logout()
-          toast.success("Conta deletada com sucesso", { position: "bottom-right", autoClose: 3000 })
-          router.push("/")
+      try {
+        console.log("🔍 Tentando deletar:", { id: usuario.id, token })
+        await usersAPI.delete(usuario.id, token || undefined)
+        
+        // Sucesso: deletar do localStorage
+        const storedUsers = JSON.parse(localStorage.getItem("users") || "[]")
+        const remaining = storedUsers.filter((u: User) => u.uid !== uid)
+        localStorage.setItem("users", JSON.stringify(remaining))
+        localStorage.removeItem("user")
+        
+        logout()
+        toast.success("Conta deletada com sucesso", { position: "bottom-right", autoClose: 3000 })
+        router.push("/")
+      } catch (error: any) {
+        console.error("❌ Erro ao deletar conta:", error)
+        toast.error("Erro ao deletar conta: " + (error.message || "Tente novamente"), { 
+          position: "bottom-right", 
+          autoClose: 3000 
         })
-        .catch(() => {
-          
-          const storedUsers = JSON.parse(localStorage.getItem("users") || "[]")
-          const remaining = storedUsers.filter((u: User) => u.uid !== uid)
-          localStorage.setItem("users", JSON.stringify(remaining))
-          localStorage.removeItem("user")
-          logout()
-          toast.success("Conta deletada com sucesso", { position: "bottom-right", autoClose: 3000 })
-          router.push("/")
-        })
+      }
       return
     }
 
+    // Fallback (usuário não autenticado)
     const storedUsers = JSON.parse(localStorage.getItem("users") || "[]")
     const remaining = storedUsers.filter((u: User) => u.uid !== uid)
     localStorage.setItem("users", JSON.stringify(remaining))

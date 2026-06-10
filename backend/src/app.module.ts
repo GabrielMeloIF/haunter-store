@@ -12,6 +12,7 @@ import { MarketplaceModule } from './marketplace/marketplace.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AvaliacaoModule } from './avaliacao/avaliacao.module'; 
+import { CupomModule } from './cupom/cupom.module';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { AvaliacaoModule } from './avaliacao/avaliacao.module';
         password: config.get<string>('DB_PASSWORD'),
         database: config.get<string>('DB_NAME'),
         autoLoadEntities: true,
-        synchronize: true,
+        synchronize: false,
       }),
     }),
     AuthModule,
@@ -35,6 +36,7 @@ import { AvaliacaoModule } from './avaliacao/avaliacao.module';
     ProdutosModule,
     CategoriasModule,
     CarrinhoModule,
+    CupomModule,
     PedidosModule,
     ConversaModule,
     MensagemModule,

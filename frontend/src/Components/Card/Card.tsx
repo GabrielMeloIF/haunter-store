@@ -93,7 +93,7 @@ export default function Cards() {
               <div className=" absolute top-0 right-0 w-0 h-0 border-l-[30px] border-l-transparent border-t-[30px] border-t-[#0f0f1a] " />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-30 p-6">
+          <div className="grid grid-cols-4 gap-30 p-6">
             {perifericos.map((produto) => (
               <CardItem key={produto.id} produto={produto} />
             ))}
@@ -112,7 +112,7 @@ export default function Cards() {
               <div className=" absolute top-0 right-0 w-0 h-0 border-l-[30px] border-l-transparent border-t-[30px] border-t-[#0f0f1a] " />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-30 p-6">
+          <div className="grid grid-cols-4 gap-30 p-6">
             {jogos.map((produto) => (
               <CardItem key={produto.id} produto={produto} />
             ))}
@@ -131,7 +131,7 @@ export default function Cards() {
               <div className=" absolute top-0 right-0 w-0 h-0 border-l-[30px] border-l-transparent border-t-[30px] border-t-[#0f0f1a] " />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-30 p-6">
+          <div className="grid grid-cols-4 gap-30 p-6">
             {consoles.map((produto) => (
               <CardItem key={produto.id} produto={produto} />
             ))}
@@ -150,7 +150,7 @@ export default function Cards() {
               <div className=" absolute top-0 right-0 w-0 h-0 border-l-[30px] border-l-transparent border-t-[30px] border-t-[#0f0f1a] " />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-30 p-6">
+          <div className="grid grid-cols-4 gap-30 p-6">
             {pcs.map((produto) => (
               <CardItem key={produto.id} produto={produto} />
             ))}
