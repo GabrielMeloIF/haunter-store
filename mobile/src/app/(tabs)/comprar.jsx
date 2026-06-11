@@ -24,7 +24,7 @@ export default function Comprar() {
     nome: params.nome,
     preco: params.preco,
     descricao: params.descricao,
-    imagem: params.imagem, // vindo do cards
+    imagem: params.imagem,
   };
 
   const [favoritos, setFavoritos] = useState([]);
@@ -53,25 +53,16 @@ export default function Comprar() {
 
   const adicionarAoCarrinho = async () => {
     const salvo = await AsyncStorage.getItem("carrinho");
-    const itens = salvo ? JSON.parse(salvo) : [];
+    const ids = salvo ? JSON.parse(salvo) : [];
 
-    const novoItem = {
-      id: produto.id,
-      nome: produto.nome,
-      preco: produto.preco,
-      imagem: produto.imagem,
-      quantidade: 1,
-    };
+    ids.push(Number(produto.id));
 
-    itens.push(novoItem);
-
-    await AsyncStorage.setItem("carrinho", JSON.stringify(itens));
+    await AsyncStorage.setItem("carrinho", JSON.stringify(ids));
 
     setToast(true);
     setTimeout(() => setToast(false), 2500);
   };
 
-  // 🔥 COMENTÁRIO NO BANCO
   const adicionarComentario = async () => {
     if (!comentarioNovo.trim()) return;
 
@@ -176,9 +167,7 @@ export default function Comprar() {
 
         {comentarios.map((c, i) => (
           <View key={i} style={styles.comment}>
-            <Text style={{ color: "yellow" }}>
-              {"★".repeat(c.nota)}
-            </Text>
+            <Text style={{ color: "yellow" }}>{"★".repeat(c.nota)}</Text>
             <Text style={{ color: "#fff" }}>{c.texto}</Text>
           </View>
         ))}

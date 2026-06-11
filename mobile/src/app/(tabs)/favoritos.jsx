@@ -28,7 +28,7 @@ export default function Favoritos() {
 
   async function fetchProdutos() {
     try {
-      const response = await fetch("http://10.81.201.7:5000/produtos");
+      const response = await fetch("http://192.168.0.7:5000/produtos");
 
       const data = await response.json();
 
