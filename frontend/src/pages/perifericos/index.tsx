@@ -30,6 +30,8 @@ export default function Cards() {
           categoriasAPI.getAll(),
         ]);
 
+        console.log("PRODUTOS API:", produtosData);
+
         setProdutos(produtosData);
         setCategorias(categoriasData);
       } catch (error) {
@@ -55,12 +57,11 @@ export default function Cards() {
   };
 
   const categoriaPerifericos = categorias.find(
-    (categoria) => categoria.nome_categoria === "Periféricos"
+    (categoria) => categoria.nome_categoria === "Periféricos",
   );
 
   const produtosPerifericos = produtos.filter(
-    (produto) =>
-      produto.categoriaId === categoriaPerifericos?.id_categoria
+    (produto) => produto.categoriaId === categoriaPerifericos?.id_categoria,
   );
 
   const CardItem = ({ produto }: { produto: any }) => (
@@ -69,14 +70,12 @@ export default function Cards() {
         <FaStar
           onClick={() => toggleFavorito(produto.id)}
           className={`absolute top-2 right-2 text-2xl cursor-pointer ${
-            favoritos.includes(produto.id)
-              ? "text-yellow-400"
-              : "text-black"
+            favoritos.includes(produto.id) ? "text-yellow-400" : "text-black"
           }`}
         />
 
         <Image
-          src={produto.imagem_url || "/mouse 1.png"}
+          src={produto.imagens?.[0] || produto.imagem_url || "/mouse 1.png"}
           alt={produto.nome}
           width={300}
           height={200}
@@ -84,17 +83,13 @@ export default function Cards() {
         />
       </div>
 
-      <h2 className="text-white text-xl font-bold mb-2 mt-5">
-        {produto.nome}
-      </h2>
+      <h2 className="text-white text-xl font-bold mb-2 mt-5">{produto.nome}</h2>
 
       <p className="text-white">{produto.descricao}</p>
 
       <div className="flex justify-between items-center mt-4">
         <p className="text-white font-bold text-xl">
-          R$ {Number(produto.preco)
-            .toFixed(2)
-            .replace(".", ",")}
+          R$ {Number(produto.preco).toFixed(2).replace(".", ",")}
         </p>
 
         <Link
@@ -113,9 +108,7 @@ export default function Cards() {
         <Header />
 
         <div className="min-h-screen flex justify-center items-center">
-          <p className="text-white text-xl">
-            Carregando produtos...
-          </p>
+          <p className="text-white text-xl">Carregando produtos...</p>
         </div>
 
         <Footer />
@@ -128,23 +121,16 @@ export default function Cards() {
       <Header />
 
       <div className="flex flex-col items-center gap-10 py-8">
-        <h2 className="text-white font-bold text-3xl px-6 mb-6">
-          Periféricos
-        </h2>
+        <h2 className="text-white font-bold text-3xl px-6 mb-6">Periféricos</h2>
 
         <div className="grid grid-cols-3 gap-8 px-6">
           {produtosPerifericos.map((produto) => (
-            <CardItem
-              key={produto.id}
-              produto={produto}
-            />
+            <CardItem key={produto.id} produto={produto} />
           ))}
         </div>
 
         {produtosPerifericos.length === 0 && (
-          <p className="text-white text-xl">
-            Nenhum periférico encontrado.
-          </p>
+          <p className="text-white text-xl">Nenhum periférico encontrado.</p>
         )}
       </div>
 

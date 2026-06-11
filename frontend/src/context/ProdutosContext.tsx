@@ -11,8 +11,15 @@ export interface Produto {
   imagem_url: string
   estoque: number
   categoria?: any
+  imagens?: string[]
+  negociavel?: boolean
+  condicao?: string
+  cep?: string
+  cidade?: string
+  contatos?: string[]
+  marketplace?: boolean
+  id_usuario?: number
 }
-
 interface ProdutosContextType {
   produtos: Produto[]
   loading: boolean

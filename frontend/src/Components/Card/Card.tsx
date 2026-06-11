@@ -2,16 +2,38 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaStar } from "react-icons/fa";
 import { useState } from "react";
-import { useProdutos } from "@/context/ProdutosContext";
-import { Produto } from "@/context/ProdutosContext";
+import { useProdutos, Produto } from "@/context/ProdutosContext";
+import { useAuth } from "@/context/AuthContext";
+import { produtosAPI } from "@/services/api";
 
 export default function Cards() {
-  const { produtos, loading } = useProdutos();
+  const { usuario } = useAuth();
+
+  const { produtos, loading, carregarProdutos } = useProdutos();
+
   const [favoritos, setFavoritos] = useState<number[]>(() => {
     if (typeof window === "undefined") return [];
+
     const salvo = localStorage.getItem("favoritos");
     return salvo ? JSON.parse(salvo) : [];
   });
+
+  const [produtoExcluir, setProdutoExcluir] = useState<number | null>(null);
+
+  const confirmarDelete = async () => {
+    if (!produtoExcluir) return;
+
+    try {
+      await produtosAPI.delete(produtoExcluir);
+
+      await carregarProdutos();
+
+      setProdutoExcluir(null);
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao excluir produto.");
+    }
+  };
 
   const toggleFavorito = (id: number) => {
     setFavoritos((prev) => {
@@ -35,7 +57,11 @@ export default function Cards() {
 
         <div className="relative w-full h-56">
           <Image
-            src={produto.imagem_url || "/mouse 1.png"}
+            src={
+              produto.imagem_url ||
+              (produto.imagens as string[])?.[0] ||
+              "/mouse 1.png"
+            }
             alt={produto.nome}
             fill
             className="object-contain rounded"
@@ -52,13 +78,62 @@ export default function Cards() {
           R$ {produto.preco?.toFixed(2).replace(".", ",")}
         </p>
 
-        <Link
-          href={`/comprar?id=${produto.id}`}
-          className="bg-[#A636E9] text-white px-4 py-2 rounded hover:bg-[#430883]"
-        >
-          Comprar
-        </Link>
+        {usuario?.tipo === "ADMIN" ||
+        (usuario as any)?.tipo_usuario === "ADMIN" ? (
+          <div className="flex gap-2">
+            <Link
+               href={`/admin/produtos/editar/${produto.id}`}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:opacity-90"
+            >
+              Editar
+            </Link>
+
+            <button
+              onClick={() => setProdutoExcluir(produto.id)}
+              className="bg-red-600 text-white px-4 py-2 rounded hover:opacity-90"
+            >
+              Excluir
+            </button>
+          </div>
+        ) : (
+          <Link
+            href={`/comprar?id=${produto.id}`}
+            className="bg-[#A636E9] text-white px-4 py-2 rounded hover:bg-[#430883]"
+          >
+            Comprar
+          </Link>
+        )}
       </div>
+      {produtoExcluir && (
+  <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div className="bg-[#161622] border border-purple-700 rounded-xl p-6 w-[400px]">
+      <h2 className="text-white text-xl font-bold mb-3">
+        Excluir produto
+      </h2>
+
+      <p className="text-gray-300 mb-6">
+        Tem certeza que deseja excluir este produto?
+        Esta ação não poderá ser desfeita.
+      </p>
+
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={() => setProdutoExcluir(null)}
+          className="px-4 py-2 rounded bg-gray-600 text-white"
+        >
+          Cancelar
+        </button>
+
+        <button
+          onClick={confirmarDelete}
+          className="px-4 py-2 rounded bg-red-600 text-white"
+        >
+          Excluir
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 
@@ -103,7 +178,7 @@ export default function Cards() {
 
       {jogos.length > 0 && (
         <>
-         <div className="w-full px-6">
+          <div className="w-full px-6">
             <div className="relative inline-block">
               <h2 className=" bg-purple-700 text-white font-bold text-2xl px-8 py-3 pr-14 ">
                 Jogos
@@ -122,7 +197,7 @@ export default function Cards() {
 
       {consoles.length > 0 && (
         <>
-           <div className="w-full px-6">
+          <div className="w-full px-6">
             <div className="relative inline-block">
               <h2 className=" bg-purple-700 text-white font-bold text-2xl px-8 py-3 pr-14 ">
                 Consoles
@@ -141,7 +216,7 @@ export default function Cards() {
 
       {pcs.length > 0 && (
         <>
-           <div className="w-full px-6">
+          <div className="w-full px-6">
             <div className="relative inline-block">
               <h2 className=" bg-purple-700 text-white font-bold text-2xl px-8 py-3 pr-14 ">
                 PCs

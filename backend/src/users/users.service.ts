@@ -30,14 +30,14 @@ export class UsersService {
     const senhaHash = await bcrypt.hash(data.senha, 10);
 
     return this.prisma.usuario.create({
-      data: {
-        nome: data.nome,
-        email: data.email,
-        senha: senhaHash,
-        confirmar_senha: senhaHash,
-        tipo_usuario: data.tipo_usuario ?? 'CLIENTE',
-      },
-    });
+  data: {
+    nome: data.nome,
+    email: data.email.trim().toLowerCase(), 
+    senha: senhaHash,
+    confirmar_senha: senhaHash,
+    tipo_usuario: data.tipo_usuario ?? 'CLIENTE',
+  },
+});
   }
 
   async update(
@@ -57,6 +57,10 @@ export class UsersService {
       const bcrypt = await import('bcrypt');
       data.senha = await bcrypt.hash(data.senha, 10);
     }
+
+    if (data.email) {
+  data.email = data.email.trim().toLowerCase();
+}
 
     return this.prisma.usuario.update({
       where: { id_usuario: Number(id) }, 

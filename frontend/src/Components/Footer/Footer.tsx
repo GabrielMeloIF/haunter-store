@@ -1,41 +1,104 @@
 import Link from "next/link";
 import Image from "next/image";
 import Logo from "../../../public/logo.png";
-import { SiFacebook } from "react-icons/si";
-import { FaInstagram } from "react-icons/fa";
+import { SiFacebook, SiInstagram } from "react-icons/si";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#A636E9] w-full px-6 py-4">
+    <footer className="bg-[#A636E9] text-white mt-auto">
+      <div className="max-w-7xl mx-auto px-6 py-8">
 
-      <div className="flex flex-col md:grid md:grid-cols-3 items-center gap-4 md:gap-0">
+        {/* Parte superior */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
 
-        {/* Logo */}
-        <Link href="/" className="flex justify-center md:justify-start">
-          <Image src={Logo} alt="Logo" className="p-2 w-16 md:w-20 h-auto" />
-        </Link>
-
-        {/* Links */}
-        <ul className="flex flex-wrap gap-3 md:gap-6 text-white justify-center text-xs md:text-sm">
-          <li><Link href="/ajuda" className="hover:text-[#430883]">Ajuda</Link></li>
-          <li><Link href="/fale-conosco" className="hover:text-[#430883]">Fale conosco</Link></li>
-          <li><Link href="/termos" className="hover:text-[#430883]">Termos de uso</Link></li>
-          <li><Link href="/politica" className="hover:text-[#430883]">Política de privacidade</Link></li>
-        </ul>
-
-        {/* Redes sociais + Copyright */}
-        <div className="flex items-center gap-4 justify-center md:justify-end">
-          <Link href="https://www.facebook.com/?locale=pt_BR" className="text-blue-500 hover:text-[#430883]">
-            <SiFacebook className="text-2xl" />
+          {/* Logo */}
+          <Link
+            href="/"
+            className="transition-transform hover:scale-105"
+          >
+            <Image
+              src={Logo}
+              alt="Haunter Store"
+              className="w-20 h-auto"
+              priority
+            />
           </Link>
-          <Link href="https://www.instagram.com/" className="text-pink-800 hover:text-[#430883]">
-            <FaInstagram className="text-2xl" />
-          </Link>
-          <p className="text-white text-xs md:text-sm">© 2026 Haunter Store.</p>
+
+          {/* Navegação */}
+          <nav>
+            <ul className="flex flex-wrap justify-center gap-6 text-sm font-medium">
+              <li>
+                <Link
+                  href="/ajuda"
+                  className="hover:text-[#430883] transition-colors"
+                >
+                  Ajuda
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  href="/fale-conosco"
+                  className="hover:text-[#430883] transition-colors"
+                >
+                  Fale Conosco
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  href="/termos"
+                  className="hover:text-[#430883] transition-colors"
+                >
+                  Termos de Uso
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  href="/politica"
+                  className="hover:text-[#430883] transition-colors"
+                >
+                  Privacidade
+                </Link>
+              </li>
+            </ul>
+          </nav>
+
+          {/* Redes sociais */}
+          <div className="flex items-center gap-3">
+            <Link
+              href="https://facebook.com"
+              target="_blank"
+              className="p-2 rounded-full hover:bg-white/15 transition-colors"
+            >
+              <SiFacebook size={20} />
+            </Link>
+
+            <Link
+              href="https://instagram.com"
+              target="_blank"
+              className="p-2 rounded-full hover:bg-white/15 transition-colors"
+            >
+              <SiInstagram size={20} />
+            </Link>
+          </div>
+
+        </div>
+
+        {/* Linha */}
+        <div className="h-px bg-white/20 my-6" />
+
+        {/* Parte inferior */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-2 text-xs text-white/80">
+          <p>© 2026 Haunter Store. Todos os direitos reservados.</p>
+
+          <p>
+            Marketplace para compra e venda de produtos.
+          </p>
         </div>
 
       </div>
-
     </footer>
   );
 }

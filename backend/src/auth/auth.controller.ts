@@ -16,9 +16,17 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(@Body() body: { email: string; senha: string }) {
     if (!body.email || !body.senha) {
-      throw new BadRequestException('Email ou nome de usuário e senha são obrigatórios');
+      throw new BadRequestException('Email e senha são obrigatórios');
     }
-
     return this.authService.login(body.email, body.senha);
+  }
+
+  @Post('esqueci-senha')
+  @HttpCode(HttpStatus.OK)
+  async esqueciSenha(@Body() body: { email: string }) {
+    if (!body.email) {
+      throw new BadRequestException('Email é obrigatório');
+    }
+    return this.authService.esqueciSenha(body.email);
   }
 }

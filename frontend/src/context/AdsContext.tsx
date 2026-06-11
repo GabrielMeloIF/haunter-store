@@ -1,58 +1,64 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, ReactNode } from 'react'
+import { produtosAPI } from '@/services/api'
+import { useProdutos } from '@/context/ProdutosContext'
+import { useAuth } from '@/context/AuthContext'
 
 export type ContactMethod = 'chat' | 'whatsapp' | 'phone'
 
-export interface Ad {
-  id: string
-  title: string
+export interface AdFormData {
+  title:       string
   description: string
-  price: string
-  negotiable: boolean
-  condition: string
-  city: string
-  cep: string
-  contacts: ContactMethod[]
-  photos: string[]
-  publishedAt: string
+  price:       string
+  negotiable:  boolean
+  condition:   string
+  cep:         string
+  city:        string
+  contacts:    ContactMethod[]
+  photos:      string[]
+  categoriaId: number | null
 }
 
 interface AdsContextType {
-  ads: Ad[]
-  publishAd: (data: Omit<Ad, 'id' | 'publishedAt'>) => void
-  deleteAd: (id: string) => void
+  publishAd: (data: AdFormData) => Promise<void>
 }
 
 const AdsContext = createContext<AdsContextType | null>(null)
 
 export function AdsProvider({ children }: { children: ReactNode }) {
-  const [ads, setAds] = useState<Ad[]>([])
+  const { carregarProdutos } = useProdutos()
+  const { usuario, token } = useAuth()
 
-  function publishAd(data: Omit<Ad, 'id' | 'publishedAt'>) {
-    const newAd: Ad = {
-      ...data,
-      id: Date.now().toString(),
-      publishedAt: new Date().toISOString(),
-    }
-    setAds(prev => [newAd, ...prev])
+  async function publishAd(data: AdFormData) {
+    if (!usuario || !token) throw new Error('Usuário não autenticado')
+    if (!data.categoriaId)  throw new Error('Selecione uma categoria')
+
+    await produtosAPI.create(
+  {
+    nome:        data.title,
+    descricao:   data.description,
+    preco:       parseFloat(data.price),
+    estoque:     1,
+    categoriaId: data.categoriaId,
+    imagem_url:  null,           
+    imagens:     data.photos,    
+    negociavel:  data.negotiable,
+    condicao:    data.condition,
+    cep:         data.cep,
+    cidade:      data.city,
+    contatos:    data.contacts,
+    marketplace: true,
+    id_usuario:  usuario.id,
+  },
+  token,
+)
+
+    await carregarProdutos()
   }
-
-  function deleteAd(id: string) {
-    setAds(prev => prev.filter(a => a.id !== id))
-  }
-
-  useEffect(() => {
-    const saved = localStorage.getItem('haunter_ads')
-    if (saved) setAds(JSON.parse(saved))
-  }, [])
-
-  useEffect(() => {
-    localStorage.setItem('haunter_ads', JSON.stringify(ads))
-  }, [ads])
 
   return (
-    <AdsContext.Provider value={{ ads, publishAd, deleteAd }}>
+    <AdsContext.Provider value={{ publishAd }}>
       {children}
     </AdsContext.Provider>
   )

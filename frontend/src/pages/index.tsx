@@ -1,5 +1,4 @@
 import Header from "../Components/Header/Header";
-import Hero from "@/Components/Hero/Hero";
 import Carrossel from "./../Components/Carrosel/Carrossel";
 import Footer from "@/Components/Footer/Footer";
 import Cards from "@/Components/Card/Card";

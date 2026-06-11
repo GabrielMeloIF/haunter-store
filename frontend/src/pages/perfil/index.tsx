@@ -59,49 +59,70 @@ export default function ProfilePage() {
 
   // Salva alterações
   const handleSave = () => {
-    if (!name.trim() || !email.trim()) {
-      toast.error("Nome e email são obrigatórios!", {
-        position: "bottom-right",
-        autoClose: 3000,
-      });
-      return;
-    }
-
-    if (updateUsuario) {
-      updateUsuario({ nome: name, email, foto: photoURL })
-        .then(() => {
-          toast.success("Dados atualizados com sucesso!", {
-            position: "bottom-right",
-            autoClose: 3000,
-          });
-        })
-        .catch((err) => {
-          toast.error("Erro ao atualizar: " + (err.message || err), {
-            position: "bottom-right",
-            autoClose: 3000,
-          });
-        });
-      return;
-    }
-
-    const updatedUser: User = { ...user!, name, email, photoURL, password, uid: user!.uid };
-
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-
-    const storedUsers = JSON.parse(localStorage.getItem("users") || "[]");
-    const updatedUsers = storedUsers.map((u: User) =>
-      u.uid === updatedUser.uid ? updatedUser : u
-    );
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-
-    setUser(updatedUser);
-
-    toast.success("Dados atualizados com sucesso!", {
+  if (!name.trim() || !email.trim()) {
+    toast.error("Nome e email são obrigatórios!", {
       position: "bottom-right",
       autoClose: 3000,
     });
+    return;
+  }
+
+  const dadosAtualizacao: any = {
+    nome: name,
+    email,
+    foto: photoURL,
   };
 
+  if (password.trim()) {
+    dadosAtualizacao.senha = password;
+    dadosAtualizacao.confirmar_senha = password;
+  }
+
+  if (updateUsuario) {
+    updateUsuario(dadosAtualizacao)
+      .then(() => {
+        setPassword("");
+
+        toast.success("Dados atualizados com sucesso!", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+      })
+      .catch((err) => {
+        toast.error("Erro ao atualizar: " + (err.message || err), {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+      });
+
+    return;
+  }
+
+  const updatedUser: User = {
+    ...user!,
+    name,
+    email,
+    photoURL,
+    password,
+    uid: user!.uid,
+  };
+
+  localStorage.setItem("user", JSON.stringify(updatedUser));
+
+  const storedUsers = JSON.parse(localStorage.getItem("users") || "[]");
+  const updatedUsers = storedUsers.map((u: User) =>
+    u.uid === updatedUser.uid ? updatedUser : u
+  );
+
+  localStorage.setItem("users", JSON.stringify(updatedUsers));
+
+  setUser(updatedUser);
+
+  toast.success("Dados atualizados com sucesso!", {
+    position: "bottom-right",
+    autoClose: 3000,
+  });
+};
   // Logout
   const handleLogout = () => {
     logout()

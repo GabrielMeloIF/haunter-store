@@ -1,25 +1,10 @@
 import Header from "@/Components/Header/Header";
 import Hero from "@/Components/Hero/Hero";
 import Footer from "@/Components/Footer/Footer";
-import { useRouter } from 'next/router'         
+import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
-import { useAds } from '@/context/AdsContext'     
-
-interface AdFormData {
-  category:    string
-  subcategory: string
-  title:       string
-  description: string
-  price:       string
-  negotiable:  boolean
-  condition:   string
-  cep:         string
-  city:        string
-  contacts:    ContactMethod[]
-  photos:      string[]
-}
-
-export type ContactMethod = 'chat' | 'whatsapp' | 'phone'
+import { useAds, AdFormData, ContactMethod } from '@/context/AdsContext'
+import { useAuth } from '@/context/AuthContext'
 
 const CONTACT_OPTIONS: { id: ContactMethod; label: string }[] = [
   { id: 'chat',     label: 'Chat' },
@@ -27,19 +12,30 @@ const CONTACT_OPTIONS: { id: ContactMethod; label: string }[] = [
   { id: 'phone',    label: 'Telefone' },
 ]
 
+const CATEGORIAS = [
+  { id: 5, nome: 'Periféricos' },
+  { id: 6, nome: 'Jogos' },
+  { id: 7, nome: 'Consoles' },
+  { id: 8, nome: 'PCs' },
+]
+
 const INITIAL_FORM: AdFormData = {
-  category: '', subcategory: '', title: '', description: '',
-  price: '', negotiable: false, condition: '', cep: '', city: '',
-  contacts: [], photos: [],
+  title: '', description: '', price: '', negotiable: false,
+  condition: '', cep: '', city: '', contacts: [], photos: [],
+  categoriaId: null,
 }
 
 export default function Anunciar() {
   const router              = useRouter()
   const fileRef             = useRef<HTMLInputElement>(null)
   const [loadingPhotos, setLoadingPhotos] = useState(false)
-  const [form, setForm]     = useState<AdFormData>(INITIAL_FORM)
+  const [loadingCep, setLoadingCep] = useState(false)
+  const [publishing, setPublishing]       = useState(false)
+  const [erro, setErro]                   = useState<string | null>(null)
+  const [form, setForm]                   = useState<AdFormData>(INITIAL_FORM)
 
-  const { publishAd } = useAds()  
+  const { publishAd } = useAds()
+  const { usuario }   = useAuth()
 
   function handleUpdate<K extends keyof AdFormData>(key: K, value: AdFormData[K]) {
     setForm(prev => ({ ...prev, [key]: value }))
@@ -71,11 +67,29 @@ export default function Anunciar() {
     setForm(prev => ({ ...prev, photos: prev.photos.filter(p => p !== url) }))
   }
 
-  function handleMaskCep(raw: string) {
-    const digits = raw.replace(/\D/g, '').slice(0, 8)
-    const masked = digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits
-    setForm(prev => ({ ...prev, cep: masked }))
+  async function handleMaskCep(raw: string) {
+  const digits = raw.replace(/\D/g, '').slice(0, 8)
+  const masked = digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits
+  setForm(prev => ({ ...prev, cep: masked }))
+
+  if (digits.length === 8) {
+    try {
+      setLoadingCep(true)
+      const res  = await fetch(`https://viacep.com.br/ws/${digits}/json/`)
+      const data = await res.json()
+      if (!data.erro) {
+        setForm(prev => ({
+          ...prev,
+          city: `${data.bairro ? data.bairro + ' / ' : ''}${data.localidade} - ${data.uf}`,
+        }))
+      }
+    } catch {
+      // silencioso, usuário digita manualmente
+    } finally {
+      setLoadingCep(false)
+    }
   }
+}
 
   function handleToggleContact(method: ContactMethod) {
     setForm(prev => ({
@@ -86,10 +100,36 @@ export default function Anunciar() {
     }))
   }
 
-  function handlePublish() {
-    publishAd(form)            
-    setForm(INITIAL_FORM)         
-    router.push('/meus-anuncios') 
+  async function handlePublish() {
+    setErro(null)
+
+    if (!usuario) {
+      setErro('Você precisa estar logado para publicar um anúncio.')
+      return
+    }
+    if (!form.title.trim()) {
+      setErro('Preencha o título do anúncio.')
+      return
+    }
+    if (!form.price || parseFloat(form.price) <= 0) {
+      setErro('Informe um preço válido.')
+      return
+    }
+    if (!form.categoriaId) {
+      setErro('Selecione uma categoria.')
+      return
+    }
+
+    try {
+      setPublishing(true)
+      await publishAd(form)
+      setForm(INITIAL_FORM)
+      router.push('/')
+    } catch (err: any) {
+      setErro(err.message || 'Erro ao publicar anúncio.')
+    } finally {
+      setPublishing(false)
+    }
   }
 
   return (
@@ -103,6 +143,13 @@ export default function Anunciar() {
           <h2 className="text-xl font-black text-white">Fotos e detalhes do anúncio</h2>
           <p className="text-white text-sm">Anúncios com fotos vendem até 10× mais rápido.</p>
         </div>
+
+        {/* Erro */}
+        {erro && (
+          <div className="mb-4 bg-red-500/20 border border-red-500 text-red-300 rounded-xl px-4 py-3 text-sm font-semibold">
+            {erro}
+          </div>
+        )}
 
         {/* Fotos */}
         <div className="mb-6">
@@ -148,6 +195,23 @@ export default function Anunciar() {
           </div>
         </div>
 
+        {/* Categoria */}
+        <div className="mb-4">
+          <label className="block text-sm font-black text-purple-300 mb-1">
+            Categoria <span className="text-red-400">*</span>
+          </label>
+          <select
+            value={form.categoriaId ?? ''}
+            onChange={e => handleUpdate('categoriaId', e.target.value ? Number(e.target.value) : null)}
+            className="w-full border-2 border-purple-500/40 bg-[#1a1a2e] text-white rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+          >
+            <option value="">Selecione uma categoria…</option>
+            {CATEGORIAS.map(cat => (
+              <option key={cat.id} value={cat.id}>{cat.nome}</option>
+            ))}
+          </select>
+        </div>
+
         {/* Título */}
         <div className="mb-4">
           <label className="block text-sm font-black text-purple-300 mb-1">
@@ -156,7 +220,7 @@ export default function Anunciar() {
           <input type="text" maxLength={70} value={form.title}
             placeholder="Ex: iPhone 13 128GB – Preto – Perfeito estado"
             onChange={e => handleUpdate('title', e.target.value)}
-            className="w-full border-2 border-purple-500/40 bg-[#1a1a2e] text-gray-800 placeholder-gray-400 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
+            className="w-full border-2 border-purple-500/40 bg-[#1a1a2e] text-white placeholder-gray-400 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
           <div className="flex justify-end mt-1">
             <span className="text-xs text-gray-500">{form.title.length}/70</span>
           </div>
@@ -170,7 +234,7 @@ export default function Anunciar() {
           <textarea rows={5} maxLength={6000} value={form.description}
             placeholder="Descreva seu produto com detalhes: estado, defeitos, motivo da venda, acessórios incluídos..."
             onChange={e => handleUpdate('description', e.target.value)}
-            className="w-full border-2 border-purple-500/40 bg-[#1a1a2e] text-gray-800 placeholder-gray-400 rounded-xl px-4 py-3 text-sm font-semibold transition resize-none focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
+            className="w-full border-2 border-purple-500/40 bg-[#1a1a2e] text-white placeholder-gray-400 rounded-xl px-4 py-3 text-sm font-semibold transition resize-none focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
           <div className="flex justify-end mt-1">
             <span className="text-xs text-gray-500">{form.description.length}/6000</span>
           </div>
@@ -186,7 +250,7 @@ export default function Anunciar() {
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400 font-bold text-sm">R$</span>
               <input type="number" min={0} value={form.price} placeholder="0,00"
                 onChange={e => handleUpdate('price', e.target.value)}
-                className="w-full border-2 border-purple-500/40 bg-[#1a1a2e] text-gray-800 placeholder-gray-400 rounded-xl pl-10 pr-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
+                className="w-full border-2 border-purple-500/40 bg-[#1a1a2e] text-white placeholder-gray-400 rounded-xl pl-10 pr-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
             </div>
             <label className="flex items-center gap-2 mt-2 cursor-pointer">
               <input type="checkbox" checked={form.negotiable}
@@ -199,7 +263,7 @@ export default function Anunciar() {
           <div>
             <label className="block text-sm font-black text-purple-300 mb-1">Condição</label>
             <select value={form.condition} onChange={e => handleUpdate('condition', e.target.value)}
-              className="w-full border-2 border-purple-500/40 bg-[#1a1a2e] text-gray-800 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20">
+              className="w-full border-2 border-purple-500/40 bg-[#1a1a2e] text-white rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20">
               <option value="">Selecione…</option>
               <option>Novo</option>
               <option>Seminovo</option>
@@ -216,10 +280,10 @@ export default function Anunciar() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input type="text" placeholder="CEP" maxLength={9} value={form.cep}
               onChange={e => handleMaskCep(e.target.value)}
-              className="border-2 border-purple-500/40 bg-[#1a1a2e] text-gray-800 placeholder-gray-400 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
+              className="border-2 border-purple-500/40 bg-[#1a1a2e] text-white placeholder-gray-400 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
             <input type="text" placeholder="Bairro / Cidade" value={form.city}
               onChange={e => handleUpdate('city', e.target.value)}
-              className="border-2 border-purple-500/40 bg-[#1a1a2e] text-gray-800 placeholder-gray-400 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
+              className="border-2 border-purple-500/40 bg-[#1a1a2e] text-white placeholder-gray-400 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"/>
           </div>
         </div>
 
@@ -253,10 +317,11 @@ export default function Anunciar() {
             ← Voltar
           </button>
           <button
-            onClick={handlePublish}  
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3 rounded-full text-sm border-2 border-purple-900 transition-colors "
+            onClick={handlePublish}
+            disabled={publishing}
+            className="bg-purple-600 hover:bg-purple-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold px-8 py-3 rounded-full text-sm border-2 border-purple-900 transition-colors"
           >
-            Publicar anúncio →
+            {publishing ? 'Publicando...' : 'Publicar anúncio →'}
           </button>
         </div>
 
