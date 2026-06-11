@@ -1,308 +1,95 @@
-import { useEffect, useState, useCallback } from "react";
-
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
   Image,
   TouchableOpacity,
-  ScrollView,
   StyleSheet,
+  ScrollView,
 } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import Header from "../../components/header";
-
-import {
-  useRouter,
-  useFocusEffect,
-} from "expo-router";
-
-const API_URL = "http://192.168.56.1:4000";
-
 export default function Carrinho() {
   const [itens, setItens] = useState([]);
 
-  const router = useRouter();
-
-  useFocusEffect(
-    useCallback(() => {
-      carregarCarrinho();
-    }, [])
-  );
+  useEffect(() => {
+    carregarCarrinho();
+  }, []);
 
   const carregarCarrinho = async () => {
     try {
-      // pega ids do carrinho
-      const salvo =
-        await AsyncStorage.getItem("carrinho");
+      const salvo = await AsyncStorage.getItem("carrinho");
+      let dados = salvo ? JSON.parse(salvo) : [];
 
-      const ids = salvo
-        ? JSON.parse(salvo)
-        : [];
+      // 🔥 garante compatibilidade com formato antigo (ids)
+      if (dados.length > 0 && typeof dados[0] === "number") {
+        dados = [];
+      }
 
-      // busca produtos no banco
-      const response = await fetch(
-        `${API_URL}/produtos`
-      );
-
-      const todosProdutos =
-        await response.json();
-
-      // filtra produtos do carrinho
-      const produtos = todosProdutos
-        .filter((p) =>
-          ids.includes(Number(p.id))
-        )
-        .map((p) => ({
-          ...p,
-
-          quantidade: ids.filter(
-            (id) => id === p.id
-          ).length,
-        }));
-
-      // remove duplicados
-      const unicos = produtos.filter(
-        (p, i, arr) =>
-          arr.findIndex(
-            (x) => x.id === p.id
-          ) === i
-      );
-
-      setItens(unicos);
-
-    } catch (error) {
-      console.log(
-        "Erro ao carregar carrinho:",
-        error
-      );
+      setItens(dados);
+    } catch (err) {
+      console.log("erro carrinho:", err);
     }
   };
 
-  const salvarCarrinho = async (
-    lista
-  ) => {
-    const ids = lista.flatMap((p) =>
-      Array(p.quantidade).fill(p.id)
-    );
-
-    await AsyncStorage.setItem(
-      "carrinho",
-      JSON.stringify(ids)
-    );
-  };
-
   const removerItem = async (id) => {
-    const novos = itens.filter(
-      (p) => p.id !== id
-    );
-
-    setItens(novos);
-
-    await salvarCarrinho(novos);
+    const novo = itens.filter((i) => i.id !== id);
+    setItens(novo);
+    await AsyncStorage.setItem("carrinho", JSON.stringify(novo));
   };
 
-  const alterarQuantidade = async (
-    id,
-    delta
-  ) => {
-    const novos = itens
-      .map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              quantidade:
-                p.quantidade + delta,
-            }
-          : p
-      )
-      .filter((p) => p.quantidade > 0);
-
-    setItens(novos);
-
-    await salvarCarrinho(novos);
-  };
-
-  const calcularTotal = () => {
-    return itens.reduce((acc, p) => {
-      return (
-        acc +
-        Number(p.preco) * p.quantidade
-      );
-    }, 0);
-  };
-
-  const total = calcularTotal();
+  const total = itens.reduce(
+    (acc, item) => acc + Number(item.preco || 0),
+    0
+  );
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={
-        styles.scrollContainer
-      }
-    >
-      <View style={styles.content}>
-        <Header />
+    <View style={styles.container}>
+      <Text style={styles.title}>Carrinho</Text>
 
-        <View style={styles.main}>
-          <Text style={styles.titulo}>
-            Meu Carrinho
+      <ScrollView>
+        {itens.length === 0 ? (
+          <Text style={{ color: "#fff" }}>
+            Carrinho vazio
           </Text>
+        ) : (
+          itens.map((item) => (
+            <View key={item.id} style={styles.card}>
+              
+              {item.imagem ? (
+                <Image
+                  source={{ uri: item.imagem }}
+                  style={styles.image}
+                />
+              ) : (
+                <View style={styles.placeholder} />
+              )}
 
-          {itens.length === 0 ? (
-            <Text style={styles.vazio}>
-              Seu carrinho está vazio.
-            </Text>
-          ) : (
-            <>
-              {itens.map((produto) => (
-                <View
-                  key={produto.id}
-                  style={styles.card}
-                >
-                  <Image
-                    source={{
-                      uri:
-                        produto.imagem_url,
-                    }}
-                    style={styles.imagem}
-                  />
-
-                  <View style={{ flex: 1 }}>
-                    <Text
-                      style={styles.nome}
-                    >
-                      {produto.nome}
-                    </Text>
-
-                    <Text
-                      style={
-                        styles.descricao
-                      }
-                    >
-                      {produto.descricao}
-                    </Text>
-
-                    <Text
-                      style={styles.preco}
-                    >
-                      R$ {produto.preco}
-                    </Text>
-                  </View>
-
-                  <View
-                    style={
-                      styles.qtdContainer
-                    }
-                  >
-                    <TouchableOpacity
-                      onPress={() =>
-                        alterarQuantidade(
-                          produto.id,
-                          -1
-                        )
-                      }
-                      style={
-                        styles.btnQtd
-                      }
-                    >
-                      <Text
-                        style={
-                          styles.btnTexto
-                        }
-                      >
-                        -
-                      </Text>
-                    </TouchableOpacity>
-
-                    <Text
-                      style={styles.qtd}
-                    >
-                      {
-                        produto.quantidade
-                      }
-                    </Text>
-
-                    <TouchableOpacity
-                      onPress={() =>
-                        alterarQuantidade(
-                          produto.id,
-                          1
-                        )
-                      }
-                      style={
-                        styles.btnQtd
-                      }
-                    >
-                      <Text
-                        style={
-                          styles.btnTexto
-                        }
-                      >
-                        +
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  <TouchableOpacity
-                    onPress={() =>
-                      removerItem(
-                        produto.id
-                      )
-                    }
-                  >
-                    <Text
-                      style={
-                        styles.remover
-                      }
-                    >
-                      Remover
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
-
-              <View style={styles.resumo}>
-                <Text
-                  style={
-                    styles.resumoTitulo
-                  }
-                >
-                  Total
+              <View style={styles.info}>
+                <Text style={styles.nome}>
+                  {item.nome || "Produto"}
                 </Text>
 
-                <Text style={styles.total}>
-                  R${" "}
-                  {total
-                    .toFixed(2)
-                    .replace(".", ",")}
+                <Text style={styles.preco}>
+                  R$ {item.preco || "0"}
                 </Text>
-
-                <TouchableOpacity
-                  style={
-                    styles.btnFinalizar
-                  }
-                  onPress={() =>
-                    router.push(
-                      "/pagamento"
-                    )
-                  }
-                >
-                  <Text
-                    style={
-                      styles.btnTexto
-                    }
-                  >
-                    Finalizar compra
-                  </Text>
-                </TouchableOpacity>
               </View>
-            </>
-          )}
-        </View>
-      </View>
-    </ScrollView>
+
+              <TouchableOpacity
+                onPress={() => removerItem(item.id)}
+              >
+                <Text style={styles.remover}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          ))
+        )}
+      </ScrollView>
+
+      <Text style={styles.total}>
+        Total: R$ {total.toFixed(2)}
+      </Text>
+    </View>
   );
 }
 
@@ -310,50 +97,42 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#303030",
-  },
-
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: "space-between",
-  },
-
-  content: {
-    flex: 1,
-  },
-
-  main: {
     padding: 16,
   },
 
-  titulo: {
+  title: {
+    fontSize: 22,
     color: "#fff",
-    fontSize: 28,
     fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-
-  vazio: {
-    color: "#fff",
-    textAlign: "center",
-    marginTop: 40,
+    marginBottom: 10,
   },
 
   card: {
     flexDirection: "row",
-    gap: 10,
-    borderWidth: 1,
-    borderColor: "#fff",
-    borderRadius: 10,
+    backgroundColor: "#3a3a3a",
     padding: 10,
+    borderRadius: 12,
     marginBottom: 10,
     alignItems: "center",
   },
 
-  imagem: {
-    width: 80,
-    height: 80,
-    borderRadius: 6,
+  image: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    marginRight: 10,
+  },
+
+  placeholder: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    marginRight: 10,
+    backgroundColor: "#555",
+  },
+
+  info: {
+    flex: 1,
   },
 
   nome: {
@@ -361,67 +140,22 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
-  descricao: {
-    color: "#ccc",
-    fontSize: 12,
-  },
-
   preco: {
     color: "#A636E9",
-    fontWeight: "bold",
-  },
-
-  qtdContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-
-  btnQtd: {
-    borderWidth: 1,
-    borderColor: "#fff",
-    borderRadius: 20,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-
-  qtd: {
-    color: "#fff",
+    marginTop: 4,
   },
 
   remover: {
-    color: "red",
-    marginLeft: 10,
-  },
-
-  resumo: {
-    marginTop: 20,
-    borderTopWidth: 1,
-    borderColor: "#555",
-    paddingTop: 10,
-  },
-
-  resumoTitulo: {
-    color: "#fff",
+    color: "#ff4d4d",
     fontSize: 18,
+    fontWeight: "bold",
+    paddingHorizontal: 10,
   },
 
   total: {
-    color: "#A636E9",
-    fontSize: 22,
-    fontWeight: "bold",
-    marginVertical: 10,
-  },
-
-  btnFinalizar: {
-    backgroundColor: "#A636E9",
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-
-  btnTexto: {
     color: "#fff",
+    fontSize: 18,
     fontWeight: "bold",
+    marginTop: 10,
   },
 });
