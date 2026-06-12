@@ -244,7 +244,7 @@ export default function AdminPage() {
     <>
       <Header />
 
-      <main className="min-h-screen bg-slate-50 text-slate-900">
+      <main className="min-h-screen text-white">
         <section className="max-w-7xl mx-auto px-4 py-8">
 
           {/* Header */}
@@ -256,7 +256,7 @@ export default function AdminPage() {
                 Indicadores, pedidos, usuários e cupons em um só lugar.
               </p>
             </div>
-            <div className="rounded-3xl border border-purple-200 bg-white px-5 py-4 shadow-sm">
+            <div className="rounded-3xl border border-purple-200  px-5 py-4 shadow-sm">
               <p className="text-sm text-slate-500">Usuário</p>
               <p className="text-lg font-semibold">{usuario?.nome}</p>
               <p className="text-sm text-slate-500">Função: {usuario?.tipo}</p>
@@ -271,7 +271,7 @@ export default function AdminPage() {
               { label: "Usuários", value: dashboard.totalUsuarios, sub: "Registrados" },
               { label: "Cupons",   value: dashboard.totalCupons,   sub: "Disponíveis" },
             ].map(({ label, value, sub }) => (
-              <div key={label} className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+              <div key={label} className="rounded-3xl p-6 shadow-sm border border-slate-200">
                 <p className="text-sm text-slate-500 uppercase">{label}</p>
                 <p className="mt-4 text-4xl font-bold">
                   {isLoading ? <span className="text-slate-300">...</span> : value}
@@ -301,7 +301,7 @@ export default function AdminPage() {
               </div>
             )}
 
-            <div className="mt-4 overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <div className="mt-4 overflow-x-auto rounded-3xl border border-slate-200  shadow-sm">
               <table className="min-w-full divide-y divide-slate-200 text-left">
                 <thead className="bg-slate-50">
                   <tr>
@@ -350,7 +350,7 @@ export default function AdminPage() {
 
           {/* Produtos */}
           <section className="mt-10">
-            <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+            <div className="rounded-3xl p-6 shadow-sm border border-slate-200">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h3 className="text-lg font-semibold">Gerenciar Produtos</h3>
@@ -367,7 +367,7 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => router.push("/meus-anuncios")}
-                    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                    className="rounded-full bg-purple-700  px-4 py-2 text-sm font-semibold text-white hover:hover:bg-purple-900"
                   >
                     Ver anúncios
                   </button>
@@ -378,12 +378,12 @@ export default function AdminPage() {
 
           {/* Usuários */}
           <section className="mt-4">
-            <div className="rounded-3xl bg-white shadow-sm border border-slate-200 overflow-hidden">
+            <div className="rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
               {/* Cabeçalho clicável */}
               <button
                 type="button"
                 onClick={() => setOpenSection(openSection === "usuarios" ? null : "usuarios")}
-                className="w-full flex items-center justify-between px-6 py-5 text-left hover:bg-slate-50 transition"
+                className="w-full flex items-center justify-between px-6 py-5 text-left "
               >
                 <div>
                   <h3 className="text-lg font-semibold">Gerenciar Usuários</h3>
@@ -467,11 +467,11 @@ export default function AdminPage() {
 
           {/* Cupons */}
           <section className="mt-4">
-            <div className="rounded-3xl bg-white shadow-sm border border-slate-200 overflow-hidden">
+            <div className="rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
               <button
                 type="button"
                 onClick={() => setOpenSection(openSection === "cupons" ? null : "cupons")}
-                className="w-full flex items-center justify-between px-6 py-5 text-left hover:bg-slate-50 transition"
+                className="w-full flex items-center justify-between px-6 py-5 text-left "
               >
                 <div>
                   <h3 className="text-lg font-semibold">Gerenciar Cupons</h3>
@@ -494,14 +494,14 @@ export default function AdminPage() {
                         placeholder="Código (ex: PROMO10)"
                         value={cupomForm.codigo}
                         onChange={(e) => setCupomForm((f) => ({ ...f, codigo: e.target.value.toUpperCase() }))}
-                        className="rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
+                        className="rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:outline-none "
                       />
                       <input
                         type="text"
                         placeholder="Descrição (opcional)"
                         value={cupomForm.descricao}
                         onChange={(e) => setCupomForm((f) => ({ ...f, descricao: e.target.value }))}
-                        className="rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
+                        className="rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:outline-none "
                       />
                       <input
                         type="number"
@@ -510,13 +510,13 @@ export default function AdminPage() {
                         max={100}
                         value={cupomForm.desconto}
                         onChange={(e) => setCupomForm((f) => ({ ...f, desconto: e.target.value }))}
-                        className="rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
+                        className="rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:outline-none "
                       />
                       <input
                         type="date"
                         value={cupomForm.validade}
                         onChange={(e) => setCupomForm((f) => ({ ...f, validade: e.target.value }))}
-                        className="rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
+                        className="rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:outline-none "
                       />
                     </div>
                     <button
@@ -530,8 +530,8 @@ export default function AdminPage() {
                   </div>
 
                   {/* Lista de cupons */}
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+                  <div className="overflow-x-auto rounded-2xl overflow-hidden border border-slate-200">
+                    <table className="min-w-full divide-y divide-slate-200 text-left text-sm rounded-2xl">
                       <thead className="bg-slate-50">
                         <tr>
                           {["Código", "Descrição", "Desconto", "Validade", "Ações"].map((h) => (
@@ -539,7 +539,7 @@ export default function AdminPage() {
                           ))}
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-200">
+                      <tbody className="divide-y divide-slate-200   ">
                         {cupons.length === 0 ? (
                           <tr>
                             <td colSpan={5} className="px-4 py-4 text-center text-slate-400">

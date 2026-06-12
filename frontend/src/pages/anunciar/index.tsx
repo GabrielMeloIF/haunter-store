@@ -13,10 +13,10 @@ const CONTACT_OPTIONS: { id: ContactMethod; label: string }[] = [
 ]
 
 const CATEGORIAS = [
-  { id: 5, nome: 'Periféricos' },
-  { id: 6, nome: 'Jogos' },
-  { id: 7, nome: 'Consoles' },
-  { id: 8, nome: 'PCs' },
+  { id: 1, nome: 'Periféricos' },
+  { id: 2, nome: 'Jogos' },
+  { id: 3, nome: 'Consoles' },
+  { id: 4, nome: 'PCs' },
 ]
 
 const INITIAL_FORM: AdFormData = {
