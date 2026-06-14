@@ -139,7 +139,7 @@ export default function RevisarAnuncios(props) {
    async function handlePublish() {
   try {
     const response = await fetch(
-      "http://backend:4000/marketplace",
+     `${process.env.EXPO_PUBLIC_API_URL}/produtos`,
       {
         method: "POST",
         headers: {
@@ -448,79 +448,220 @@ export default function RevisarAnuncios(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#303030"
-
+    backgroundColor: "#0f0f1a",
   },
-  icon: {
-    marginTop: 32,
-    color: "#A636E9"
+  scrollContent: {
+    flexGrow: 1,
   },
-  titulo: {
+  content: {
+    flex: 1,
+  },
+  main: {
+    padding: 16,
+  },
+  hero: {
+    borderLeftWidth: 4,
+    borderLeftColor: "#A636E9",
+    paddingLeft: 12,
+    marginBottom: 20,
+  },
+  heroTitle: {
     color: "#fff",
-    fontSize: 30,
-    marginTop: 32,
-    paddingHorizontal: 16,
-    fontWeight: "bold"
+    fontSize: 18,
+    fontWeight: "900",
   },
-  formulario: {
-    marginTop: 32,
-    backgroundColor: "#292929",
+  heroSub: {
+    color: "#ccc",
+    fontSize: 13,
+    marginTop: 2,
+  },
+  card: {
+    backgroundColor: "#1a1a2e",
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: "#A636E9",
+    overflow: "hidden",
+    marginBottom: 20,
+  },
+  photoBox: {
+    backgroundColor: "#12122a",
+  },
+  photoMain: {
+    width: "100%",
+    height: 220,
+  },
+  photoBadge: {
+    position: "absolute",
+    bottom: 8,
+    right: 10,
+    backgroundColor: "rgba(0,0,0,0.55)",
     borderRadius: 10,
-    width: "85%",
-    height: 410,
-    display: "flex",
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    flexDirection: "column",
-    marginBottom: 32,
-    alignSelf: "center",
-    border: "0.5px solid #A636E9",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
   },
-  endereço: {
+  photoBadgeText: {
     color: "#fff",
-    margin: 10,
-    marginLeft: 23,
+    fontSize: 12,
+    fontWeight: "700",
   },
-  inputs: {
-    backgroundColor: "#D9D9D9",
-    borderRadius: 7,
-    width: 300,
-    height: 40,
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    fontSize: 14,
+  photoEmpty: {
+    height: 180,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#12122a",
+  },
+  photoEmptyIcon: {
+    fontSize: 40,
+    marginBottom: 6,
+  },
+  photoEmptyText: {
+    color: "#aaa",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  photoStrip: {
+    maxHeight: 68,
+    backgroundColor: "#0f0f1a",
+  },
+  photoStripContent: {
+    padding: 6,
+  },
+  photoThumb: {
+    width: 56,
+    height: 56,
+    borderRadius: 6,
+    marginRight: 4,
+  },
+  cardBody: {
+    padding: 16,
+  },
+  adTitle: {
+    fontSize: 17,
+    fontWeight: "900",
+    color: "#fff",
+    marginBottom: 6,
+  },
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  adPrice: {
+    fontSize: 22,
+    fontWeight: "900",
+    color: "#A636E9",
+    marginRight: 8,
+  },
+  negotiableBadge: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#ccc",
+    backgroundColor: "#1e1e3a",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  adDesc: {
+    fontSize: 13,
+    color: "#aaa",
+    fontWeight: "600",
     marginBottom: 10,
-    padding: 3,
-    color: "#4f4f4f",
+    lineHeight: 19,
   },
-  btnP: {
+  termsRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 24,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: "rgba(166,54,233,0.5)",
+    backgroundColor: "#1a1a2e",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 1,
+    flexShrink: 0,
+    marginRight: 10,
+  },
+  checkboxChecked: {
     backgroundColor: "#A636E9",
-    padding: 8,
-    borderRadius: 10,
-    color: "#fff",
-    width: 100,
-    height: 45,
-    marginBotom: 20,
-    paddingHorizontal: 17,
-    paddingVertical: 11,
-    margin: 12,
-    marginRight: 28,
-    fontWeight: "bold",
-    fontSize: 16,
+    borderColor: "#A636E9",
   },
-  btnV: {
-    backgroundColor: "#555",
-    width: 82,
-    height: 45,
-    borderRadius: 10,
+  checkmark: {
     color: "#fff",
-    paddingHorizontal: 17,
-    paddingVertical: 11,
-    display: "flex",
-    margin: 13,
-    marginLeft: 32,
-    fontWeight: "bold",
-    fontSize: 16,
-  }
-
+    fontSize: 12,
+    fontWeight: "900",
+    lineHeight: 14,
+  },
+  termsText: {
+    flex: 1,
+    fontSize: 12,
+    color: "#aaa",
+    fontWeight: "600",
+    lineHeight: 18,
+  },
+  termsLink: {
+    color: "#c084fc",
+    textDecorationLine: "underline",
+  },
+  navRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  btnBack: {
+    borderWidth: 2,
+    borderColor: "rgba(166,54,233,0.4)",
+    borderRadius: 50,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    backgroundColor: "#1a1a2e",
+  },
+  btnBackText: {
+    color: "#A636E9",
+    fontWeight: "700",
+    fontSize: 13,
+  },
+  btnPublish: {
+    backgroundColor: "#A636E9",
+    borderRadius: 50,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderWidth: 2,
+    borderColor: "#fff",
+    shadowColor: "#A636E9",
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  btnPublishDisabled: {
+    opacity: 0.4,
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  btnPublishText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 13,
+  },
+  lbOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.92)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  lbContainer: {
+    width: "100%",
+    alignItems: "center",
+    paddingHorizontal: 16,
+  },
+  lbImage: {
+    width: "100%",
+    height: 320,
+    borderRadius: 12,
+  },
 });

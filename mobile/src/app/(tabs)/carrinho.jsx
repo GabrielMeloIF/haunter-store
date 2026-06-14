@@ -11,7 +11,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../../components/header";
 import { useRouter, useFocusEffect } from "expo-router";
 
-const API_URL = "http://192.168.0.7:5000";
+const API_URL = "http://192.168.0.8:5000";
 
 export default function Carrinho() {
   const [itens, setItens] = useState([]);
@@ -170,7 +170,7 @@ export default function Carrinho() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#303030",
+    backgroundColor: "#0f0f1a",
   },
 
   scrollContainer: {

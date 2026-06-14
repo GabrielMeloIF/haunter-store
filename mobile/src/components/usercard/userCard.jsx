@@ -12,7 +12,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useAuth } from "../context/authContext";
 import Feather from "@expo/vector-icons/Feather";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://192.168.56.1:4000";
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://192.168.0.8:5000";
 
 export default function UserCard() {
   const router = useRouter();
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
-    backgroundColor: "#2F2F2F",
+    backgroundColor: "#0f0f1a",
   },
   notificacao: {
     position: "absolute",

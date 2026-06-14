@@ -28,7 +28,7 @@ export default function Favoritos() {
 
   async function fetchProdutos() {
     try {
-      const response = await fetch("http://192.168.0.7:5000/produtos");
+      const response = await fetch("http://192.168.0.8:5000/produtos");
 
       const data = await response.json();
 
@@ -113,7 +113,7 @@ export default function Favoritos() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#303030",
+    backgroundColor: "#0f0f1a",
   },
 
   scrollContainer: {

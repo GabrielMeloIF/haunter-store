@@ -13,23 +13,24 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../../components/header";
 import { useRouter, useLocalSearchParams } from "expo-router";
 
-const API_URL = "http://10.81.201.7:5000";
+const API_URL = "http://192.168.0.8:5000";
 
 export default function Comprar() {
   const router = useRouter();
   const params = useLocalSearchParams();
 
-  const produto = {
-    id: Number(params.id),
-    nome: params.nome,
-    preco: params.preco,
-    descricao: params.descricao,
-    imagem: params.imagem,
-  };
+ const produto = {
+  id: Number(params.id),
+  nome: params.nome,
+  preco: params.preco,
+  descricao: params.descricao,
+  imagem: params.imagem,
+};
 
   const [favoritos, setFavoritos] = useState([]);
   const [nota, setNota] = useState(0);
   const [comentarioNovo, setComentarioNovo] = useState("");
+
   const [comentarios, setComentarios] = useState([]);
   const [toast, setToast] = useState(false);
 
@@ -41,6 +42,24 @@ export default function Comprar() {
     const salvo = await AsyncStorage.getItem("favoritos");
     setFavoritos(salvo ? JSON.parse(salvo) : []);
   };
+ useEffect(() => {
+  if (!produto.id || isNaN(produto.id)) return;
+  carregarComentarios();
+}, [produto.id]);
+
+
+const carregarComentarios = async () => {
+  try {
+    const response = await fetch(`${API_URL}/avaliacoes/produto/${produto.id}`);
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+    setComentarios(data);
+  } catch (err) {
+    console.log("Erro ao carregar comentários:", err);
+  }
+};
 
   const toggleFavorito = async (id) => {
     const novos = favoritos.includes(id)
@@ -63,31 +82,42 @@ export default function Comprar() {
     setTimeout(() => setToast(false), 2500);
   };
 
-  const adicionarComentario = async () => {
-    if (!comentarioNovo.trim()) return;
+const adicionarComentario = async () => {
+  if (!comentarioNovo.trim()) return;
+
+  try {
+    // Pega o usuário salvo no login
+    const usuarioSalvo = await AsyncStorage.getItem("usuario");
+    const usuario = usuarioSalvo ? JSON.parse(usuarioSalvo) : null;
 
     const novo = {
-      produtoId: produto.id,
+      id_produto: produto.id,
+      id_usuario: usuario?.id_usuario ?? usuario?.id ?? 1,
       nota,
-      texto: comentarioNovo,
+      comentario: comentarioNovo, // ✅ campo correto que o backend espera
     };
 
-    try {
-      await fetch(`${API_URL}/comentarios`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(novo),
-      });
+    const response = await fetch(`${API_URL}/avaliacoes`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(novo),
+    });
 
-      setComentarios([...comentarios, novo]);
-      setComentarioNovo("");
-      setNota(0);
-    } catch (err) {
-      console.log("Erro ao enviar comentário:", err);
+    if (!response.ok) {
+      const erro = await response.json();
+      console.log("Erro ao enviar:", erro);
+      return;
     }
-  };
+
+    setComentarios([...comentarios, { ...novo, texto: comentarioNovo }]);
+    setComentarioNovo("");
+    setNota(0);
+  } catch (err) {
+    console.log("Erro ao enviar comentário:", err);
+  }
+};
 
   return (
     <ScrollView style={styles.container}>
@@ -118,16 +148,24 @@ export default function Comprar() {
         <Text style={styles.preco}>R$ {produto.preco}</Text>
 
         <View style={styles.botoes}>
-          <TouchableOpacity
-            style={styles.btn}
-            onPress={adicionarAoCarrinho}
-          >
+          <TouchableOpacity style={styles.btn} onPress={adicionarAoCarrinho}>
             <Text style={styles.btnText}>Adicionar ao carrinho</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.btn}
-            onPress={() => router.push("/finalizar")}
+            onPress={() =>
+              router.push({
+                pathname: "/pagamento",
+                params: {
+                  id: produto.id,
+                  nome: produto.nome,
+                  preco: produto.preco,
+                  descricao: produto.descricao,
+                  imagem: produto.imagem,
+                },
+              })
+            }
           >
             <Text style={styles.btnText}>Comprar</Text>
           </TouchableOpacity>
@@ -168,7 +206,7 @@ export default function Comprar() {
         {comentarios.map((c, i) => (
           <View key={i} style={styles.comment}>
             <Text style={{ color: "yellow" }}>{"★".repeat(c.nota)}</Text>
-            <Text style={{ color: "#fff" }}>{c.texto}</Text>
+            <Text style={{ color: "#fff" }}>{c.comentario}</Text>
           </View>
         ))}
       </View>
@@ -179,7 +217,7 @@ export default function Comprar() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#303030",
+    backgroundColor: "#0f0f1a",
   },
 
   galeriaContainer: {
@@ -195,7 +233,7 @@ const styles = StyleSheet.create({
 
   card: {
     margin: 16,
-    backgroundColor: "#3a3a3a",
+    backgroundColor: "#1c1c2e",
     padding: 16,
     borderRadius: 12,
     gap: 10,

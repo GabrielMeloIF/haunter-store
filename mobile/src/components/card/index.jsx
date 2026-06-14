@@ -19,7 +19,7 @@ const { width } = Dimensions.get("window");
 const CARD_GAP = 12;
 const CARD_WIDTH = width * 0.45;
 
-const API_URL = "http://192.168.0.7:5000";
+const API_URL = "http://192.168.0.8:5000";
 
 export default function Cards() {
   const router = useRouter();
@@ -233,7 +233,6 @@ const styles = StyleSheet.create({
     width: CARD_WIDTH,
     borderRadius: 12,
     overflow: "hidden",
-    backgroundColor: "#3a3a3a",
   },
 
   imageContainer: {
@@ -258,7 +257,7 @@ const styles = StyleSheet.create({
 
   info: {
     padding: 12,
-    backgroundColor: "#4a4a4a",
+    backgroundColor: "#1c1c2e",
     gap: 12,
   },
 

@@ -6,18 +6,18 @@ import Octicons from "@expo/vector-icons/Octicons";
 export default function ConfirmacaoProduto() {
   const router = useRouter();
   const {
-    produto: produtoRaw,
+    id,
+    nome,
+    preco,
+    descricao,
+    imagem,
     quantidade,
-    valor,
     pagamento,
   } = useLocalSearchParams();
-  const produto = produtoRaw ? JSON.parse(produtoRaw) : null;
 
-  const imageMap = {
-    headset: require("../../assets/headset 1.png"),
-    mouse: require("../../assets/mouse 1.png"),
-    teclado: require("../../assets/teclado 1.png"),
-  };
+  const valor = preco && quantidade
+    ? `R$ ${(Number(preco) * Number(quantidade)).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
+    : `R$ ${Number(preco).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
 
   return (
     <View style={styles.container}>
@@ -28,44 +28,40 @@ export default function ConfirmacaoProduto() {
 
         <View style={styles.card}>
           <Image
-            source={imageMap[produto?.imagemKey] || imageMap.headset}
+            source={{ uri: imagem }}
             style={styles.image}
           />
 
           <View style={styles.infoRow}>
             <View style={styles.infoTextos}>
               <Text style={styles.label}>Produto:</Text>
-              <Text style={styles.value}>
-                {produto?.nome || "Produto não informado"}
-              </Text>
+              <Text style={styles.value}>{nome || "Produto não informado"}</Text>
 
               <Text style={styles.label}>Quantidade:</Text>
               <Text style={styles.value}>{quantidade || "1 unidade"}</Text>
 
               <Text style={styles.label}>Valor Total:</Text>
-              <Text style={styles.value}>{valor || "R$ 0,00"}</Text>
+              <Text style={styles.value}>{valor}</Text>
 
               <Text style={styles.label}>Forma de Pagamento:</Text>
               <Text style={styles.value}>{pagamento || "Não selecionado"}</Text>
             </View>
-
-            
           </View>
         </View>
 
         <View style={styles.buttons}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.push("/pagamento")}
+            onPress={() => router.back()}
           >
             <Text style={styles.backText}>Voltar</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.nextButton}
-            onPress={() => router.push("/carrinho")}
+            onPress={() => router.push("/(tabs)")}
           >
-            <Text style={styles.nextText} onPress={() => router.push("/(tabs)")} >Finalizar</Text>
+            <Text style={styles.nextText}>Finalizar</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -76,7 +72,7 @@ export default function ConfirmacaoProduto() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#303030",
+    backgroundColor: "#0f0f1a",
   },
   content: {
     flex: 1,

@@ -23,9 +23,9 @@ const AD_STORAGE_KEY = "ad_form_data";
 const INITIAL_FORM = {
   category: "",
   subcategory: "",
-  title: "",
-  description: "",
-  price: "",
+  nome: "",
+  descricao: "",
+  preco: "",
   negotiable: false,
   condition: "",
   cep: "",
@@ -94,19 +94,18 @@ export default function RevisarAnuncios(props) {
   // ── Formatação ──────────────────────────────────────────
 
   const formattedPrice =
-    form.price && !isNaN(Number(form.price))
+    form.preco && !isNaN(Number(form.preco))
       ? "R$ " +
-        Number(form.price).toLocaleString("pt-BR", {
+        Number(form.preco).toLocaleString("pt-BR", {
           minimumFractionDigits: 2,
         })
       : "A combinar";
 
-  const rawDesc = form.description ?? "";
+  const rawDesc = form.descricao ?? "";
 
   const shortDesc =
     rawDesc.length > 0
-      ? rawDesc.slice(0, 120) +
-        (rawDesc.length > 120 ? "..." : "")
+      ? rawDesc.slice(0, 120) + (rawDesc.length > 120 ? "..." : "")
       : "(sem descrição)";
 
   // ── Lightbox ────────────────────────────────────────────
@@ -114,23 +113,17 @@ export default function RevisarAnuncios(props) {
   function openLightbox(index) {
     if (!form.photos?.length) return;
 
-    setLbIndex(
-      Math.min(index, form.photos.length - 1)
-    );
+    setLbIndex(Math.min(index, form.photos.length - 1));
 
     setLbVisible(true);
   }
 
   function lbPrev() {
-    setLbIndex(
-      (i) => (i - 1 + form.photos.length) % form.photos.length
-    );
+    setLbIndex((i) => (i - 1 + form.photos.length) % form.photos.length);
   }
 
   function lbNext() {
-    setLbIndex(
-      (i) => (i + 1) % form.photos.length
-    );
+    setLbIndex((i) => (i + 1) % form.photos.length);
   }
 
   // ── Ações ───────────────────────────────────────────────
@@ -155,19 +148,21 @@ export default function RevisarAnuncios(props) {
     if (!terms) return;
 
     try {
-      const response = await fetch(
-        "http://192.168.56.1:4000/marketplace",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+      const response = await fetch("http://192.168.0.8:5000/produtos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
 
-          body: JSON.stringify({
-            ...form,
-          }),
-        }
-      );
+        body: JSON.stringify({
+          nome: form.nome,
+          descricao: form.descricao,
+          preco: Number(form.preco),
+          estoque: 1,
+          categoriaId: Number(form.category) || 1,
+          imagem_url: form.photos?.[0] ?? "",
+        }),
+      });
 
       const data = await response.json();
 
@@ -178,9 +173,7 @@ export default function RevisarAnuncios(props) {
         return;
       }
 
-      await AsyncStorage.removeItem(
-        AD_STORAGE_KEY
-      );
+      await AsyncStorage.removeItem(AD_STORAGE_KEY);
 
       router.push("/");
     } catch (err) {
@@ -205,13 +198,10 @@ export default function RevisarAnuncios(props) {
           <View style={styles.main}>
             {/* Cabeçalho */}
             <View style={styles.hero}>
-              <Text style={styles.heroTitle}>
-                Revise seu anúncio
-              </Text>
+              <Text style={styles.heroTitle}>Revise seu anúncio</Text>
 
               <Text style={styles.heroSub}>
-                Veja como ficará para os compradores
-                antes de publicar.
+                Veja como ficará para os compradores antes de publicar.
               </Text>
             </View>
 
@@ -233,9 +223,7 @@ export default function RevisarAnuncios(props) {
 
                       {photos.length > 1 && (
                         <View style={styles.photoBadge}>
-                          <Text
-                            style={styles.photoBadgeText}
-                          >
+                          <Text style={styles.photoBadgeText}>
                             📷 {photos.length}
                           </Text>
                         </View>
@@ -245,43 +233,31 @@ export default function RevisarAnuncios(props) {
                     {photos.length > 1 && (
                       <ScrollView
                         horizontal
-                        showsHorizontalScrollIndicator={
-                          false
-                        }
+                        showsHorizontalScrollIndicator={false}
                         style={styles.photoStrip}
-                        contentContainerStyle={
-                          styles.photoStripContent
-                        }
+                        contentContainerStyle={styles.photoStripContent}
                       >
-                        {photos
-                          .slice(1)
-                          .map((uri, i) => (
-                            <TouchableOpacity
-                              key={`strip-${i}`}
-                              onPress={() =>
-                                openLightbox(i + 1)
-                              }
-                              activeOpacity={0.85}
-                            >
-                              <Image
-                                source={{ uri }}
-                                style={styles.photoThumb}
-                                resizeMode="cover"
-                              />
-                            </TouchableOpacity>
-                          ))}
+                        {photos.slice(1).map((uri, i) => (
+                          <TouchableOpacity
+                            key={`strip-${i}`}
+                            onPress={() => openLightbox(i + 1)}
+                            activeOpacity={0.85}
+                          >
+                            <Image
+                              source={{ uri }}
+                              style={styles.photoThumb}
+                              resizeMode="cover"
+                            />
+                          </TouchableOpacity>
+                        ))}
                       </ScrollView>
                     )}
                   </>
                 ) : (
                   <View style={styles.photoEmpty}>
-                    <Text style={styles.photoEmptyIcon}>
-                      🖼️
-                    </Text>
+                    <Text style={styles.photoEmptyIcon}>🖼️</Text>
 
-                    <Text style={styles.photoEmptyText}>
-                      Sem imagem
-                    </Text>
+                    <Text style={styles.photoEmptyText}>Sem imagem</Text>
                   </View>
                 )}
               </View>
@@ -293,22 +269,14 @@ export default function RevisarAnuncios(props) {
                 </Text>
 
                 <View style={styles.priceRow}>
-                  <Text style={styles.adPrice}>
-                    {formattedPrice}
-                  </Text>
+                  <Text style={styles.adPrice}>{formattedPrice}</Text>
 
                   {form.negotiable && (
-                    <Text
-                      style={styles.negotiableBadge}
-                    >
-                      negociável
-                    </Text>
+                    <Text style={styles.negotiableBadge}>negociável</Text>
                   )}
                 </View>
 
-                <Text style={styles.adDesc}>
-                  {shortDesc}
-                </Text>
+                <Text style={styles.adDesc}>{shortDesc}</Text>
               </View>
             </View>
 
@@ -317,28 +285,15 @@ export default function RevisarAnuncios(props) {
               style={styles.termsRow}
               onPress={handleToggleTerms}
             >
-              <View
-                style={[
-                  styles.checkbox,
-                  terms && styles.checkboxChecked,
-                ]}
-              >
-                {terms && (
-                  <Text style={styles.checkmark}>
-                    ✓
-                  </Text>
-                )}
+              <View style={[styles.checkbox, terms && styles.checkboxChecked]}>
+                {terms && <Text style={styles.checkmark}>✓</Text>}
               </View>
 
               <Text style={styles.termsText}>
                 Li e aceito os{" "}
                 <Text
                   style={styles.termsLink}
-                  onPress={() =>
-                    Linking.openURL(
-                      "https://seusite.com/termos"
-                    )
-                  }
+                  onPress={() => Linking.openURL("https://seusite.com/termos")}
                 >
                   Termos de Uso
                 </Text>
@@ -347,27 +302,16 @@ export default function RevisarAnuncios(props) {
 
             {/* Botões */}
             <View style={styles.navRow}>
-              <TouchableOpacity
-                style={styles.btnBack}
-                onPress={handleBack}
-              >
-                <Text style={styles.btnBackText}>
-                  ← Voltar
-                </Text>
+              <TouchableOpacity style={styles.btnBack} onPress={handleBack}>
+                <Text style={styles.btnBackText}>← Voltar</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[
-                  styles.btnPublish,
-                  !terms &&
-                    styles.btnPublishDisabled,
-                ]}
+                style={[styles.btnPublish, !terms && styles.btnPublishDisabled]}
                 onPress={handlePublish}
                 disabled={!terms}
               >
-                <Text style={styles.btnPublishText}>
-                  Publicar anúncio
-                </Text>
+                <Text style={styles.btnPublishText}>Publicar anúncio</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -379,14 +323,9 @@ export default function RevisarAnuncios(props) {
         visible={lbVisible}
         transparent
         animationType="fade"
-        onRequestClose={() =>
-          setLbVisible(false)
-        }
+        onRequestClose={() => setLbVisible(false)}
       >
-        <Pressable
-          style={styles.lbOverlay}
-          onPress={() => setLbVisible(false)}
-        >
+        <Pressable style={styles.lbOverlay} onPress={() => setLbVisible(false)}>
           <Pressable style={styles.lbContainer}>
             {photos[lbIndex] && (
               <Image
@@ -400,35 +339,23 @@ export default function RevisarAnuncios(props) {
               style={styles.lbClose}
               onPress={() => setLbVisible(false)}
             >
-              <Text style={styles.lbCloseText}>
-                ×
-              </Text>
+              <Text style={styles.lbCloseText}>×</Text>
             </TouchableOpacity>
 
             {photos.length > 1 && (
               <>
                 <TouchableOpacity
-                  style={[
-                    styles.lbArrow,
-                    styles.lbArrowLeft,
-                  ]}
+                  style={[styles.lbArrow, styles.lbArrowLeft]}
                   onPress={lbPrev}
                 >
-                  <Text style={styles.lbArrowText}>
-                    ‹
-                  </Text>
+                  <Text style={styles.lbArrowText}>‹</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[
-                    styles.lbArrow,
-                    styles.lbArrowRight,
-                  ]}
+                  style={[styles.lbArrow, styles.lbArrowRight]}
                   onPress={lbNext}
                 >
-                  <Text style={styles.lbArrowText}>
-                    ›
-                  </Text>
+                  <Text style={styles.lbArrowText}>›</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -444,7 +371,7 @@ export default function RevisarAnuncios(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#303030",
+    backgroundColor: "#0f0f1a",
   },
   scrollContent: {
     flexGrow: 1,
