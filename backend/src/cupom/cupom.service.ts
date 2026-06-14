@@ -26,6 +26,7 @@ export class CupomService {
     desconto: number;
     validade: string;
   }) {
+    console.log('DADOS CUPOM:', data) // adiciona isso
     const cupom = this.cupomRepo.create({
       ...data,
       validade: new Date(data.validade),
