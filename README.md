@@ -2,15 +2,19 @@
 
 **Marketplace gamer — anuncie de graça e venda mais rápido!**
 
-Plataforma de compra e venda de jogos, periféricos e hardware voltada para a comunidade gamer. Qualquer pessoa pode criar um anúncio em minutos, sem pagar nada.
+Compre e venda jogos, periféricos e hardware em uma plataforma criada para a comunidade gamer.
 
-
+Anuncie gratuitamente, negocie diretamente com outros usuários e acompanhe suas compras e vendas em tempo real.
 
 # Sobre
 
 A **Haunter Store** é um marketplace focado no universo gamer, onde usuários podem **comprar e vender** jogos, periféricos e hardware de forma simples e completamente gratuita.
 
 O objetivo é conectar compradores e vendedores da comunidade gamer em um único lugar, oferecendo uma experiência fluida com chat integrado, sistema de avaliações, cupons de desconto e notificações em tempo real.
+
+Vender produtos gamers em marketplaces genéricos pode ser demorado, burocrático e cheio de taxas.
+
+A Haunter Store nasceu para simplificar esse processo, reunindo compradores e vendedores em um único ambiente focado exclusivamente no universo gamer.
 
 
 
