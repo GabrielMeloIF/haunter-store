@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from "react";
-
 import {
   View,
   Text,
@@ -8,21 +7,14 @@ import {
   ScrollView,
   StyleSheet,
 } from "react-native";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import Header from "../../components/header";
+import { useRouter, useFocusEffect } from "expo-router";
 
-import {
-  useRouter,
-  useFocusEffect,
-} from "expo-router";
-
-const API_URL = "http://192.168.56.1:4000";
+const API_URL = "http://192.168.0.8:5000";
 
 export default function Carrinho() {
   const [itens, setItens] = useState([]);
-
   const router = useRouter();
 
   useFocusEffect(
@@ -33,103 +25,67 @@ export default function Carrinho() {
 
   const carregarCarrinho = async () => {
     try {
-      // pega ids do carrinho
-      const salvo =
-        await AsyncStorage.getItem("carrinho");
+      const salvo = await AsyncStorage.getItem("carrinho");
+      const ids = salvo ? JSON.parse(salvo) : [];
 
-      const ids = salvo
-        ? JSON.parse(salvo)
-        : [];
+      if (ids.length === 0) {
+        setItens([]);
+        return;
+      }
 
-      // busca produtos no banco
-      const response = await fetch(
-        `${API_URL}/produtos`
-      );
+      const response = await fetch(`${API_URL}/produtos`);
+      const todosProdutos = await response.json();
 
-      const todosProdutos =
-        await response.json();
+      // Conta quantas vezes cada ID aparece no carrinho
+      const contagemIds = {};
+      for (const id of ids.map(Number)) {
+        contagemIds[id] = (contagemIds[id] || 0) + 1;
+      }
 
-      // filtra produtos do carrinho
+      // Monta lista sem duplicatas, com quantidade correta
       const produtos = todosProdutos
-        .filter((p) =>
-          ids.includes(Number(p.id))
-        )
+        .filter((p) => contagemIds[Number(p.id)] > 0)
         .map((p) => ({
           ...p,
-
-          quantidade: ids.filter(
-            (id) => id === p.id
-          ).length,
+          id: Number(p.id),
+          quantidade: contagemIds[Number(p.id)],
         }));
 
-      // remove duplicados
-      const unicos = produtos.filter(
-        (p, i, arr) =>
-          arr.findIndex(
-            (x) => x.id === p.id
-          ) === i
-      );
-
-      setItens(unicos);
-
+      setItens(produtos);
     } catch (error) {
-      console.log(
-        "Erro ao carregar carrinho:",
-        error
-      );
+      console.log("Erro ao carregar carrinho:", error);
     }
   };
 
-  const salvarCarrinho = async (
-    lista
-  ) => {
+  const salvarCarrinho = async (lista) => {
     const ids = lista.flatMap((p) =>
-      Array(p.quantidade).fill(p.id)
+      Array(p.quantidade).fill(Number(p.id))
     );
-
-    await AsyncStorage.setItem(
-      "carrinho",
-      JSON.stringify(ids)
-    );
+    await AsyncStorage.setItem("carrinho", JSON.stringify(ids));
   };
 
   const removerItem = async (id) => {
-    const novos = itens.filter(
-      (p) => p.id !== id
-    );
-
+    const novos = itens.filter((p) => Number(p.id) !== id);
     setItens(novos);
-
     await salvarCarrinho(novos);
   };
 
-  const alterarQuantidade = async (
-    id,
-    delta
-  ) => {
+  const alterarQuantidade = async (id, delta) => {
     const novos = itens
       .map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              quantidade:
-                p.quantidade + delta,
-            }
+        Number(p.id) === id
+          ? { ...p, quantidade: p.quantidade + delta }
           : p
       )
       .filter((p) => p.quantidade > 0);
 
     setItens(novos);
-
     await salvarCarrinho(novos);
   };
 
   const calcularTotal = () => {
     return itens.reduce((acc, p) => {
-      return (
-        acc +
-        Number(p.preco) * p.quantidade
-      );
+      return acc + Number(p.preco) * p.quantidade;
     }, 0);
   };
 
@@ -138,164 +94,69 @@ export default function Carrinho() {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={
-        styles.scrollContainer
-      }
+      contentContainerStyle={styles.scrollContainer}
     >
       <View style={styles.content}>
         <Header />
 
         <View style={styles.main}>
-          <Text style={styles.titulo}>
-            Meu Carrinho
-          </Text>
+          <Text style={styles.titulo}>Meu Carrinho</Text>
 
           {itens.length === 0 ? (
-            <Text style={styles.vazio}>
-              Seu carrinho está vazio.
-            </Text>
+            <Text style={styles.vazio}>Seu carrinho está vazio.</Text>
           ) : (
             <>
               {itens.map((produto) => (
-                <View
-                  key={produto.id}
-                  style={styles.card}
-                >
+                <View key={produto.id} style={styles.card}>
                   <Image
-                    source={{
-                      uri:
-                        produto.imagem_url,
-                    }}
+                    source={{ uri: produto.imagem_url }}
                     style={styles.imagem}
                   />
 
                   <View style={{ flex: 1 }}>
-                    <Text
-                      style={styles.nome}
-                    >
-                      {produto.nome}
-                    </Text>
+                    <Text style={styles.nome}>{produto.nome}</Text>
 
-                    <Text
-                      style={
-                        styles.descricao
-                      }
-                    >
-                      {produto.descricao}
-                    </Text>
+                    <Text style={styles.descricao}>{produto.descricao}</Text>
 
-                    <Text
-                      style={styles.preco}
-                    >
-                      R$ {produto.preco}
-                    </Text>
+                    <Text style={styles.preco}>R$ {produto.preco}</Text>
                   </View>
 
-                  <View
-                    style={
-                      styles.qtdContainer
-                    }
-                  >
+                  <View style={styles.qtdContainer}>
                     <TouchableOpacity
-                      onPress={() =>
-                        alterarQuantidade(
-                          produto.id,
-                          -1
-                        )
-                      }
-                      style={
-                        styles.btnQtd
-                      }
+                      onPress={() => alterarQuantidade(produto.id, -1)}
+                      style={styles.btnQtd}
                     >
-                      <Text
-                        style={
-                          styles.btnTexto
-                        }
-                      >
-                        -
-                      </Text>
+                      <Text style={styles.btnTexto}>-</Text>
                     </TouchableOpacity>
 
-                    <Text
-                      style={styles.qtd}
-                    >
-                      {
-                        produto.quantidade
-                      }
-                    </Text>
+                    <Text style={styles.qtd}>{produto.quantidade}</Text>
 
                     <TouchableOpacity
-                      onPress={() =>
-                        alterarQuantidade(
-                          produto.id,
-                          1
-                        )
-                      }
-                      style={
-                        styles.btnQtd
-                      }
+                      onPress={() => alterarQuantidade(produto.id, 1)}
+                      style={styles.btnQtd}
                     >
-                      <Text
-                        style={
-                          styles.btnTexto
-                        }
-                      >
-                        +
-                      </Text>
+                      <Text style={styles.btnTexto}>+</Text>
                     </TouchableOpacity>
                   </View>
 
-                  <TouchableOpacity
-                    onPress={() =>
-                      removerItem(
-                        produto.id
-                      )
-                    }
-                  >
-                    <Text
-                      style={
-                        styles.remover
-                      }
-                    >
-                      Remover
-                    </Text>
+                  <TouchableOpacity onPress={() => removerItem(produto.id)}>
+                    <Text style={styles.remover}>Remover</Text>
                   </TouchableOpacity>
                 </View>
               ))}
 
               <View style={styles.resumo}>
-                <Text
-                  style={
-                    styles.resumoTitulo
-                  }
-                >
-                  Total
-                </Text>
+                <Text style={styles.resumoTitulo}>Total</Text>
 
                 <Text style={styles.total}>
-                  R${" "}
-                  {total
-                    .toFixed(2)
-                    .replace(".", ",")}
+                  R$ {total.toFixed(2).replace(".", ",")}
                 </Text>
 
                 <TouchableOpacity
-                  style={
-                    styles.btnFinalizar
-                  }
-                  onPress={() =>
-                    router.push(
-                      "/pagamento"
-                    )
-                  }
+                  style={styles.btnFinalizar}
+                  onPress={() => router.push("/pagamento")}
                 >
-                  <Text
-                    style={
-                      styles.btnTexto
-                    }
-                  >
-                    Finalizar compra
-                  </Text>
+                  <Text style={styles.btnTexto}>Finalizar compra</Text>
                 </TouchableOpacity>
               </View>
             </>
@@ -309,7 +170,7 @@ export default function Carrinho() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#303030",
+    backgroundColor: "#0f0f1a",
   },
 
   scrollContainer: {

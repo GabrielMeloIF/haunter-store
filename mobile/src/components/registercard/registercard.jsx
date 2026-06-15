@@ -13,7 +13,7 @@ import { useAuth } from "../context/authContext";
 
 import { useState } from "react";
 
-const API_URL = "http://192.168.56.1:4000";
+const API_URL = "http://192.168.0.8:5000";
 
 export default function Register() {
   const router = useRouter();
@@ -61,7 +61,7 @@ export default function Register() {
         throw new Error("Erro ao cadastrar");
       }
 
-      // ✅ Em vez de ir para /login, já loga direto:
+    
       await login(email, senha);
       router.replace("/(tabs)");
 

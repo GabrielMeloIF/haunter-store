@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   View,
   Text,
- Image,
+  Image,
   TouchableOpacity,
   ScrollView,
   TextInput,
@@ -13,150 +13,25 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../../components/header";
 import { useRouter, useLocalSearchParams } from "expo-router";
 
-// Mapa de imagens por id
-const imagensPorId = {
-  1: [
-    require("../../../assets/headset 1.png"),
-    require("../../../assets/headset 1.png"),
-    require("../../../assets/headset 1.png"),
-  ],
-
-  2: [
-    require("../../../assets/headset 1.png"),
-    require("../../../assets/headset 1.png"),
-  ],
-
-  5: [
-    require("../../../assets/headset 1.png"),
-    require("../../../assets/headset 1.png"),
-  ],
-
-  6: [
-    require("../../../assets/headset 1.png"),
-    require("../../../assets/headset 1.png"),
-  ],
-
-  7: [
-    require("../../../assets/headset 1.png"),
-    require("../../../assets/headset 1.png"),
-  ],
-
-  8: [
-    require("../../../assets/headset 1.png"),
-    require("../../../assets/headset 1.png"),
-  ],
-
-  9: [
-    require("../../../assets/god.webp"),
-    require("../../../assets/god.webp"),
-  ],
-
-  10: [
-    require("../../../assets/forza.png"),
-    require("../../../assets/forza.png"),
-  ],
-
-  11: [
-    require("../../../assets/god.webp"),
-    require("../../../assets/god.webp"),
-  ],
-
-  12: [
-    require("../../../assets/forza.png"),
-    require("../../../assets/forza.png"),
-  ],
-
-  13: [
-    require("../../../assets/god.webp"),
-    require("../../../assets/god.webp"),
-  ],
-
-  14: [
-    require("../../../assets/forza.png"),
-    require("../../../assets/forza.png"),
-  ],
-
-  15: [
-    require("../../../assets/ps5.png"),
-    require("../../../assets/ps5.png"),
-  ],
-
-  16: [
-    require("../../../assets/xbox.png"),
-    require("../../../assets/xbox.png"),
-  ],
-
-  17: [
-    require("../../../assets/switch.png"),
-    require("../../../assets/switch.png"),
-  ],
-
-  18: [
-    require("../../../assets/ps5.png"),
-    require("../../../assets/ps5.png"),
-  ],
-
-  19: [
-    require("../../../assets/xbox.png"),
-    require("../../../assets/xbox.png"),
-  ],
-
-  20: [
-    require("../../../assets/switch.png"),
-    require("../../../assets/switch.png"),
-  ],
-
-  21: [
-    require("../../../assets/pc1.png"),
-    require("../../../assets/pc1.png"),
-  ],
-
-  22: [
-    require("../../../assets/pc2.png"),
-    require("../../../assets/pc2.png"),
-  ],
-
-  23: [
-    require("../../../assets/pc3.png"),
-    require("../../../assets/pc3.png"),
-  ],
-
-  24: [
-    require("../../../assets/pc4.png"),
-    require("../../../assets/pc4.png"),
-  ],
-
-  25: [
-    require("../../../assets/pc1.png"),
-    require("../../../assets/pc1.png"),
-  ],
-
-  26: [
-    require("../../../assets/pc2.png"),
-    require("../../../assets/pc2.png"),
-  ],
-};
+const API_URL = "http://192.168.0.8:5000";
 
 export default function Comprar() {
   const router = useRouter();
   const params = useLocalSearchParams();
 
-  const id = Number(params.id);
-
-  const produto = {
-    id,
-    nome: params.nome,
-    preco: params.preco,
-    descricao: params.descricao,
-    imagens:
-      imagensPorId[id] ?? [require("../../../assets/headset 1.png")],
-  };
+ const produto = {
+  id: Number(params.id),
+  nome: params.nome,
+  preco: params.preco,
+  descricao: params.descricao,
+  imagem: params.imagem,
+};
 
   const [favoritos, setFavoritos] = useState([]);
   const [nota, setNota] = useState(0);
   const [comentarioNovo, setComentarioNovo] = useState("");
+
   const [comentarios, setComentarios] = useState([]);
-  const [imagemAtual, setImagemAtual] = useState(0);
   const [toast, setToast] = useState(false);
 
   useEffect(() => {
@@ -167,6 +42,24 @@ export default function Comprar() {
     const salvo = await AsyncStorage.getItem("favoritos");
     setFavoritos(salvo ? JSON.parse(salvo) : []);
   };
+ useEffect(() => {
+  if (!produto.id || isNaN(produto.id)) return;
+  carregarComentarios();
+}, [produto.id]);
+
+
+const carregarComentarios = async () => {
+  try {
+    const response = await fetch(`${API_URL}/avaliacoes/produto/${produto.id}`);
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+    setComentarios(data);
+  } catch (err) {
+    console.log("Erro ao carregar comentários:", err);
+  }
+};
 
   const toggleFavorito = async (id) => {
     const novos = favoritos.includes(id)
@@ -174,52 +67,60 @@ export default function Comprar() {
       : [...favoritos, id];
 
     setFavoritos(novos);
-
-    await AsyncStorage.setItem(
-      "favoritos",
-      JSON.stringify(novos)
-    );
+    await AsyncStorage.setItem("favoritos", JSON.stringify(novos));
   };
 
   const adicionarAoCarrinho = async () => {
     const salvo = await AsyncStorage.getItem("carrinho");
-
     const ids = salvo ? JSON.parse(salvo) : [];
 
-    ids.push(produto.id);
+    ids.push(Number(produto.id));
 
-    await AsyncStorage.setItem(
-      "carrinho",
-      JSON.stringify(ids)
-    );
+    await AsyncStorage.setItem("carrinho", JSON.stringify(ids));
 
     setToast(true);
-
-    setTimeout(() => {
-      setToast(false);
-    }, 2500);
+    setTimeout(() => setToast(false), 2500);
   };
 
-  const adicionarComentario = () => {
-    if (!comentarioNovo.trim()) return;
+const adicionarComentario = async () => {
+  if (!comentarioNovo.trim()) return;
 
-    setComentarios([
-      ...comentarios,
-      {
-        texto: comentarioNovo,
-        estrelas: nota,
+  try {
+    // Pega o usuário salvo no login
+    const usuarioSalvo = await AsyncStorage.getItem("usuario");
+    const usuario = usuarioSalvo ? JSON.parse(usuarioSalvo) : null;
+
+    const novo = {
+      id_produto: produto.id,
+      id_usuario: usuario?.id_usuario ?? usuario?.id ?? 1,
+      nota,
+      comentario: comentarioNovo, // ✅ campo correto que o backend espera
+    };
+
+    const response = await fetch(`${API_URL}/avaliacoes`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    ]);
+      body: JSON.stringify(novo),
+    });
 
+    if (!response.ok) {
+      const erro = await response.json();
+      console.log("Erro ao enviar:", erro);
+      return;
+    }
+
+    setComentarios([...comentarios, { ...novo, texto: comentarioNovo }]);
     setComentarioNovo("");
     setNota(0);
-  };
+  } catch (err) {
+    console.log("Erro ao enviar comentário:", err);
+  }
+};
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.scrollContainer}
-    >
+    <ScrollView style={styles.container}>
       {toast && (
         <View style={styles.toast}>
           <Text style={styles.toastTexto}>
@@ -228,176 +129,86 @@ export default function Comprar() {
         </View>
       )}
 
-      <View style={styles.conteudo}>
-        <Header />
+      <Header />
 
-        {/* GALERIA */}
-        <View style={styles.galeriaContainer}>
-          <Image
-            source={produto.imagens[imagemAtual]}
-            style={styles.imagemPrincipal}
-          />
+      {/* IMAGEM */}
+      <View style={styles.galeriaContainer}>
+        <Image
+          source={{ uri: produto.imagem }}
+          style={styles.imagemPrincipal}
+        />
+      </View>
 
-          <View style={styles.miniaturasContainer}>
-            <TouchableOpacity
-              onPress={() =>
-                setImagemAtual(
-                  imagemAtual === 0
-                    ? produto.imagens.length - 1
-                    : imagemAtual - 1
-                )
-              }
-            >
-              <Text style={styles.seta}>{"<"}</Text>
-            </TouchableOpacity>
+      {/* PRODUTO */}
+      <View style={styles.card}>
+        <Text style={styles.nome}>{produto.nome}</Text>
 
-            {produto.imagens.map((img, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={() => setImagemAtual(index)}
-              >
-                <Image
-                  source={img}
-                  style={[
-                    styles.miniatura,
-                    index === imagemAtual &&
-                      styles.miniaturaAtiva,
-                  ]}
-                />
-              </TouchableOpacity>
-            ))}
+        <Text style={styles.descricao}>{produto.descricao}</Text>
 
-            <TouchableOpacity
-              onPress={() =>
-                setImagemAtual(
-                  (imagemAtual + 1) %
-                    produto.imagens.length
-                )
-              }
-            >
-              <Text style={styles.seta}>{">"}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        <Text style={styles.preco}>R$ {produto.preco}</Text>
 
-        {/* CARD PRODUTO */}
-        <View style={styles.cardProduto}>
-          <Text style={styles.nomeProduto}>
-            {produto.nome}
-          </Text>
-
-          <View style={styles.estrelasContainer}>
-            {[1, 2, 3, 4, 5].map((estrela) => (
-              <Text
-                key={estrela}
-                style={[
-                  styles.estrela,
-                  estrela <= nota && {
-                    color: "yellow",
-                  },
-                ]}
-                onPress={() => setNota(estrela)}
-              >
-                ★
-              </Text>
-            ))}
-          </View>
-
-          <Text style={styles.descricaoProduto}>
-            {produto.descricao}
-          </Text>
-
-          <Text style={styles.precoProduto}>
-            {produto.preco}
-          </Text>
-
-          <View style={styles.botoesContainer}>
-            <TouchableOpacity
-              style={styles.botao}
-              onPress={adicionarAoCarrinho}
-            >
-              <Text style={styles.textoBotao}>
-                Adicionar
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.botao}
-              onPress={() =>
-                router.push("/(tabs)/conversas")
-              }
-            >
-              <Text style={styles.textoBotao}>
-                Conversar
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity
-              style={styles.botao}
-              onPress={() =>
-                router.push("/finalizar")
-              }
-            >
-              <Text style={styles.textoBotao}>
-                Comprar
-              </Text>
-            </TouchableOpacity>
-        </View>
-
-        {/* COMENTÁRIOS */}
-        <View style={styles.cardProduto}>
-          <Text style={styles.nomeProduto}>
-            Avalie este produto
-          </Text>
-
-          <View style={styles.estrelasContainer}>
-            {[1, 2, 3, 4, 5].map((estrela) => (
-              <Text
-                key={estrela}
-                style={[
-                  styles.estrela,
-                  estrela <= nota && {
-                    color: "yellow",
-                  },
-                ]}
-                onPress={() => setNota(estrela)}
-              >
-                ★
-              </Text>
-            ))}
-          </View>
-
-          <TextInput
-            style={styles.inputComentario}
-            placeholder="Deixe seu comentário..."
-            placeholderTextColor="#aaa"
-            value={comentarioNovo}
-            onChangeText={setComentarioNovo}
-          />
-
-          <TouchableOpacity
-            style={styles.botao}
-            onPress={adicionarComentario}
-          >
-            <Text style={styles.textoBotao}>
-              Enviar
-            </Text>
+        <View style={styles.botoes}>
+          <TouchableOpacity style={styles.btn} onPress={adicionarAoCarrinho}>
+            <Text style={styles.btnText}>Adicionar ao carrinho</Text>
           </TouchableOpacity>
 
-          {comentarios.map((c, i) => (
-            <View
-              key={i}
-              style={styles.comentarioBox}
-            >
-              <Text style={{ color: "yellow" }}>
-                {"★".repeat(c.estrelas)}
-              </Text>
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={() =>
+              router.push({
+                pathname: "/pagamento",
+                params: {
+                  id: produto.id,
+                  nome: produto.nome,
+                  preco: produto.preco,
+                  descricao: produto.descricao,
+                  imagem: produto.imagem,
+                },
+              })
+            }
+          >
+            <Text style={styles.btnText}>Comprar</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
 
-              <Text style={{ color: "#fff" }}>
-                {c.texto}
-              </Text>
-            </View>
+      {/* AVALIAÇÃO */}
+      <View style={styles.card}>
+        <Text style={styles.nome}>Avaliar produto</Text>
+
+        <View style={{ flexDirection: "row" }}>
+          {[1, 2, 3, 4, 5].map((n) => (
+            <Text
+              key={n}
+              onPress={() => setNota(n)}
+              style={{
+                fontSize: 30,
+                color: n <= nota ? "yellow" : "#555",
+              }}
+            >
+              ★
+            </Text>
           ))}
         </View>
+
+        <TextInput
+          value={comentarioNovo}
+          onChangeText={setComentarioNovo}
+          placeholder="Escreva um comentário..."
+          placeholderTextColor="#aaa"
+          style={styles.input}
+        />
+
+        <TouchableOpacity style={styles.btn} onPress={adicionarComentario}>
+          <Text style={styles.btnText}>Enviar comentário</Text>
+        </TouchableOpacity>
+
+        {comentarios.map((c, i) => (
+          <View key={i} style={styles.comment}>
+            <Text style={{ color: "yellow" }}>{"★".repeat(c.nota)}</Text>
+            <Text style={{ color: "#fff" }}>{c.comentario}</Text>
+          </View>
+        ))}
       </View>
     </ScrollView>
   );
@@ -406,34 +217,8 @@ export default function Comprar() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#303030",
+    backgroundColor: "#0f0f1a",
   },
-
-  scrollContainer: {
-    paddingBottom: 40,
-  },
-
-  conteudo: {
-    gap: 20,
-  },
-
-  toast: {
-    position: "absolute",
-    bottom: 40,
-    alignSelf: "center",
-    backgroundColor: "#A636E9",
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 99,
-    zIndex: 999,
-  },
-
-  toastTexto: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-
-  // GALERIA
 
   galeriaContainer: {
     alignItems: "center",
@@ -441,113 +226,79 @@ const styles = StyleSheet.create({
   },
 
   imagemPrincipal: {
-    width: "88%",
+    width: "90%",
     height: 260,
-    borderRadius: 20,
-    resizeMode: "cover",
+    borderRadius: 15,
   },
 
-  miniaturasContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 14,
+  card: {
+    margin: 16,
+    backgroundColor: "#1c1c2e",
+    padding: 16,
+    borderRadius: 12,
     gap: 10,
   },
 
-  miniatura: {
-    width: 60,
-    height: 60,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "transparent",
-  },
-
-  miniaturaAtiva: {
-    borderColor: "#A636E9",
-  },
-
-  seta: {
-    color: "#fff",
-    fontSize: 22,
-    fontWeight: "bold",
-    paddingHorizontal: 10,
-  },
-
-  // CARD PRODUTO
-
-  cardProduto: {
-    backgroundColor: "#3a3a3a",
-    marginHorizontal: 16,
-    padding: 18,
-    borderRadius: 18,
-    gap: 12,
-  },
-
-  nomeProduto: {
+  nome: {
     color: "#fff",
     fontSize: 20,
     fontWeight: "bold",
   },
 
-  descricaoProduto: {
+  descricao: {
     color: "#ccc",
-    fontSize: 14,
-    lineHeight: 22,
   },
 
-  precoProduto: {
+  preco: {
     color: "#A636E9",
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
   },
 
-  estrelasContainer: {
+  botoes: {
     flexDirection: "row",
-    gap: 4,
+    gap: 10,
   },
 
-  estrela: {
-    fontSize: 30,
-    color: "#555",
-  },
-
-  botoesContainer: {
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 8,
-  },
-
-  botao: {
+  btn: {
     flex: 1,
     backgroundColor: "#A636E9",
-    paddingVertical: 14,
+    padding: 14,
     borderRadius: 10,
     alignItems: "center",
   },
 
-  textoBotao: {
+  btnText: {
     color: "#fff",
-    fontSize: 15,
     fontWeight: "bold",
   },
 
-  // COMENTÁRIOS
-
-  inputComentario: {
+  input: {
     backgroundColor: "#4a4a4a",
+    padding: 10,
+    borderRadius: 8,
     color: "#fff",
-    borderRadius: 10,
-    padding: 12,
-    minHeight: 90,
-    textAlignVertical: "top",
   },
 
-  comentarioBox: {
-    marginTop: 12,
+  comment: {
+    marginTop: 10,
     backgroundColor: "#4a4a4a",
+    padding: 10,
+    borderRadius: 8,
+  },
+
+  toast: {
+    position: "absolute",
+    bottom: 40,
+    alignSelf: "center",
+    backgroundColor: "#A636E9",
     padding: 12,
-    borderRadius: 10,
-    gap: 6,
+    borderRadius: 20,
+    zIndex: 999,
+  },
+
+  toastTexto: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });

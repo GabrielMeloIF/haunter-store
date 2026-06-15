@@ -30,9 +30,9 @@ const CONDITION_OPTIONS = ["Novo", "Seminovo", "Usado"];
 export const INITIAL_FORM = {
   category:    "",
   subcategory: "",
-  title:       "",
-  description: "",
-  price:       "",
+  nome:       "",
+  descricao: "",
+  preco:       "",
   negotiable:  false,
   condition:   "",
   cep:         "",
@@ -193,7 +193,7 @@ export default function StepDetails() {
       JSON.stringify(form)
     );
 
-    router.push("/revisa=Anuncio");
+    router.push("/revisarAnuncio");
   } catch (err) {
     console.log(err);
   }
@@ -294,13 +294,13 @@ export default function StepDetails() {
               </Text>
               <TextInput
                 style={styles.input}
-                value={form.title}
-                onChangeText={(v) => handleUpdate("title", v)}
+                value={form.nome}
+                onChangeText={(v) => handleUpdate("nome", v)}
                 placeholder="Ex: iPhone 13 128GB – Preto – Perfeito estado"
                 placeholderTextColor="#999"
                 maxLength={70}
               />
-              <Text style={styles.counter}>{form.title.length}/70</Text>
+              <Text style={styles.counter}>{form.nome.length}/70</Text>
             </View>
 
             {/* ── Descrição ── */}
@@ -310,8 +310,8 @@ export default function StepDetails() {
               </Text>
               <TextInput
                 style={[styles.input, styles.textarea]}
-                value={form.description}
-                onChangeText={(v) => handleUpdate("description", v)}
+                value={form.descricao}
+                onChangeText={(v) => handleUpdate("descricao", v)}
                 placeholder="Descreva seu produto com detalhes: estado, defeitos, motivo da venda, acessórios incluídos..."
                 placeholderTextColor="#999"
                 maxLength={6000}
@@ -319,7 +319,7 @@ export default function StepDetails() {
                 numberOfLines={5}
                 textAlignVertical="top"
               />
-              <Text style={styles.counter}>{form.description.length}/6000</Text>
+              <Text style={styles.counter}>{form.descricao.length}/6000</Text>
             </View>
 
             {/* ── Preço ── */}
@@ -331,8 +331,8 @@ export default function StepDetails() {
                 <Text style={styles.currencySymbol}>R$</Text>
                 <TextInput
                   style={[styles.input, { flex: 1 }]}
-                  value={form.price}
-                  onChangeText={(v) => handleUpdate("price", v)}
+                  value={form.preco}
+                  onChangeText={(v) => handleUpdate("preco", v)}
                   placeholder="0,00"
                   placeholderTextColor="#999"
                   keyboardType="numeric"
@@ -551,7 +551,7 @@ export default function StepDetails() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#303030",
+    backgroundColor: "#0f0f1a",
   },
   scrollContainer: {
     flexGrow: 1,

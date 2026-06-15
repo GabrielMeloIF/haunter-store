@@ -20,7 +20,7 @@ import Register from '../components/registercard/registercard';
  const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#303030',
+    backgroundColor: '#0f0f1a',
     alignItems: 'center',
   },
   card: {

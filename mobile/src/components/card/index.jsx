@@ -1,4 +1,3 @@
-
 import {
   View,
   Text,
@@ -13,14 +12,14 @@ import { useState, useEffect, useCallback } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter, useFocusEffect } from "expo-router";
-import { Image } from "expo-image";
+import { Image } from "react-native";
 
 const { width } = Dimensions.get("window");
 
 const CARD_GAP = 12;
 const CARD_WIDTH = width * 0.45;
 
-const API_URL = "http://192.168.56.1:5000";
+const API_URL = "http://192.168.0.8:5000";
 
 export default function Cards() {
   const router = useRouter();
@@ -36,30 +35,20 @@ export default function Cards() {
 
   // FAVORITOS
   const carregarFavoritos = async () => {
-  try {
-    const salvo = await AsyncStorage.getItem(
-      "favoritos"
-    );
+    try {
+      const salvo = await AsyncStorage.getItem("favoritos");
 
-    if (salvo) {
-      setFavoritos(JSON.parse(salvo));
-    } else {
-      setFavoritos([]);
+      setFavoritos(salvo ? JSON.parse(salvo) : []);
+    } catch (error) {
+      console.log("Erro ao carregar favoritos:", error);
     }
+  };
 
-  } catch (error) {
-    console.log(
-      "Erro ao carregar favoritos:",
-      error
-    );
-  }
-};
-
-useFocusEffect(
-  useCallback(() => {
-    carregarFavoritos();
-  }, [])
-);
+  useFocusEffect(
+    useCallback(() => {
+      carregarFavoritos();
+    }, [])
+  );
 
   // PRODUTOS
   useEffect(() => {
@@ -67,32 +56,26 @@ useFocusEffect(
       try {
         const response = await fetch(`${API_URL}/produtos`);
 
+        if (!response.ok) {
+          throw new Error(`Erro na API: ${response.status}`);
+        }
+
         const dados = await response.json();
 
-        console.log("PRODUTOS:", dados);
+        console.log("DADOS BRUTOS:", dados);
 
         const lista = Array.isArray(dados)
           ? dados
-          : dados.produtos || [];
+          : Array.isArray(dados?.produtos)
+          ? dados.produtos
+          : [];
 
-        // DEBUG
-        console.log("TOTAL:", lista.length);
+        console.log("LISTA FINAL:", lista);
 
-        setPerifericos(
-          lista.filter((p) => Number(p.categoriaId) === 1)
-        );
-
-        setPcs(
-          lista.filter((p) => Number(p.categoriaId) === 2)
-        );
-
-        setGames(
-          lista.filter((p) => Number(p.categoriaId) === 3)
-        );
-
-        setConsoles(
-          lista.filter((p) => Number(p.categoriaId) === 4)
-        );
+        setPerifericos(lista.filter(p => Number(p.categoriaId) === 1));
+        setPcs(lista.filter(p => Number(p.categoriaId) === 2));
+        setGames(lista.filter(p => Number(p.categoriaId) === 3));
+        setConsoles(lista.filter(p => Number(p.categoriaId) === 4));
 
       } catch (error) {
         console.log("Erro ao buscar produtos:", error);
@@ -108,15 +91,12 @@ useFocusEffect(
   const toggleFavorito = async (id) => {
     try {
       const novos = favoritos.includes(id)
-        ? favoritos.filter((f) => f !== id)
+        ? favoritos.filter(f => f !== id)
         : [...favoritos, id];
 
       setFavoritos(novos);
+      await AsyncStorage.setItem("favoritos", JSON.stringify(novos));
 
-      await AsyncStorage.setItem(
-        "favoritos",
-        JSON.stringify(novos)
-      );
     } catch (error) {
       console.log("Erro ao salvar favorito:", error);
     }
@@ -144,7 +124,6 @@ useFocusEffect(
         <Image
           source={{ uri: produto.imagem_url }}
           style={styles.image}
-          contentFit="cover"
         />
 
         <TouchableOpacity
@@ -154,11 +133,7 @@ useFocusEffect(
           <AntDesign
             name="star"
             size={22}
-            color={
-              favoritos.includes(produto.id)
-                ? "#facc15"
-                : "#fff"
-            }
+            color={favoritos.includes(produto.id) ? "#facc15" : "#fff"}
           />
         </TouchableOpacity>
       </View>
@@ -169,9 +144,7 @@ useFocusEffect(
         </Text>
 
         <View style={styles.footer}>
-          <Text style={styles.preco}>
-            R$ {produto.preco}
-          </Text>
+          <Text style={styles.preco}>R$ {produto.preco}</Text>
 
           <TouchableOpacity
             style={styles.comprarBtn}
@@ -188,93 +161,44 @@ useFocusEffect(
               })
             }
           >
-            <Text style={styles.comprarText}>
-              Comprar
-            </Text>
+            <Text style={styles.comprarText}>Comprar</Text>
           </TouchableOpacity>
         </View>
       </View>
     </View>
   );
 
-  const Carrossel = ({ data }) => {
-    if (!data || data.length === 0) {
-      return (
-        <Text
-          style={{
-            color: "#888",
-            paddingHorizontal: 16,
-          }}
-        >
-          Nenhum produto encontrado
-        </Text>
-      );
-    }
-
-    return (
-      <FlatList
-        data={data}
-        horizontal
-        keyExtractor={(item) => String(item.id)}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingLeft: 16,
-          paddingRight: 40,
-          paddingBottom: 8,
-        }}
-        renderItem={({ item }) => (
-          <View
-            style={{
-              width: CARD_WIDTH,
-              marginRight: CARD_GAP,
-            }}
-          >
-            <CardItem produto={item} />
-          </View>
-        )}
-      />
-    );
-  };
-
-  const filtrarProdutos = (lista) => {
-  if (!busca.trim()) return lista;
-
-  return lista.filter((produto) =>
-    produto.nome.toLowerCase().includes(busca.toLowerCase())
+  const Carrossel = ({ data }) => (
+    <FlatList
+      data={data || []}
+      horizontal
+      keyExtractor={(item) => String(item.id)}
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{
+        paddingLeft: 16,
+        paddingRight: 40,
+        paddingBottom: 8,
+      }}
+      renderItem={({ item }) => (
+        <View style={{ width: CARD_WIDTH, marginRight: CARD_GAP }}>
+          <CardItem produto={item} />
+        </View>
+      )}
+    />
   );
-};
 
   const secoes = [
-  {
-    key: "perifericos",
-    titulo: "Periféricos",
-    data: perifericos,
-  },
-  {
-    key: "jogos",
-    titulo: "Jogos",
-    data: games,
-  },
-  {
-    key: "consoles",
-    titulo: "Consoles",
-    data: consoles,
-  },
-  {
-    key: "pcs",
-    titulo: "PCs",
-    data: pcs,
-  },
-];
+    { key: "perifericos", titulo: "Periféricos", data: perifericos },
+    { key: "jogos", titulo: "Jogos", data: games },
+    { key: "consoles", titulo: "Consoles", data: consoles },
+    { key: "pcs", titulo: "PCs", data: pcs },
+  ];
 
   return (
     <View style={styles.container}>
       {secoes.map((item) => (
         <View key={item.key} style={styles.secao}>
-          <Text style={styles.sectionTitle}>
-            {item.titulo}
-          </Text>
-
+          <Text style={styles.sectionTitle}>{item.titulo}</Text>
           <Carrossel data={item.data} />
         </View>
       ))}
@@ -309,7 +233,6 @@ const styles = StyleSheet.create({
     width: CARD_WIDTH,
     borderRadius: 12,
     overflow: "hidden",
-    backgroundColor: "#3a3a3a",
   },
 
   imageContainer: {
@@ -334,7 +257,7 @@ const styles = StyleSheet.create({
 
   info: {
     padding: 12,
-    backgroundColor: "#4a4a4a",
+    backgroundColor: "#1c1c2e",
     gap: 12,
   },
 
@@ -342,14 +265,12 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 12,
     fontWeight: "bold",
-    lineHeight: 18,
-    minHeight: 36,
   },
 
   footer: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
+    alignItems: "center",
   },
 
   preco: {
