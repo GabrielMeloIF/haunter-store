@@ -55,6 +55,7 @@ export default function Layout() {
         <Tabs.Screen name="perifericos" options={{ href: null }} />
         <Tabs.Screen name="consoles" options={{ href: null }} />
         <Tabs.Screen name="pcs" options={{ href: null }} />
+        <Tabs.Screen name="minhascompras" options={{ href: null }} />
         <Tabs.Screen name="anuncios" options={{ title: 'Anúncios' }} />
         <Tabs.Screen
           name="admin"
