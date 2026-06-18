@@ -14,7 +14,7 @@ export default function AIChat() {
     const nextUser: Msg = { from: "user", text };
     const history = messages.slice(-10);
     setMessages((m) => [...m, nextUser]);
-    setInput("");
+    setInput("");'z'
     setLoading(true);
     try {
       const res = await fetch("/api/ai-chat", {

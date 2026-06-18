@@ -13,7 +13,7 @@ import { useAuth } from "../context/authContext";
 
 import { useState } from "react";
 
-const API_URL = "http://192.168.0.8:5000";
+const API_URL = "http://10.81.204.25:5000";
 
 export default function Register() {
   const router = useRouter();

@@ -64,7 +64,7 @@ export default function Jogos() {
   const buscarProdutos = async () => {
     try {
       const response = await fetch(
-        "http://192.168.56.1:4000/produtos"
+        "http://10.81.204.25:5000/produtos"
       );
 
       const data = await response.json();

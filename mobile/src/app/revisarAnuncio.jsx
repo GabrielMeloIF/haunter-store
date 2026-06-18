@@ -117,7 +117,7 @@ export default function RevisarAnuncios(props) {
   if (!terms) return;
 
   try {
-    const response = await fetch("http://192.168.0.8:5000/produtos", {
+    const response = await fetch("http://10.81.204.25:5000/produtos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

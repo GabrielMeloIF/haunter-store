@@ -12,7 +12,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useAuth } from "../context/authContext";
 import Feather from "@expo/vector-icons/Feather";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://192.168.0.8:5000";
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://10.81.204.25:5000";
 
 export default function UserCard() {
   const router = useRouter();

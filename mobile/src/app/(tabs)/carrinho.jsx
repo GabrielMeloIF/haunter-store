@@ -11,8 +11,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../../components/header";
 import { useRouter, useFocusEffect } from "expo-router";
 
-const API_URL = "http://192.168.0.8:5000";
-
+const API_URL = "http://10.81.204.25:5000";
+ 
 export default function Carrinho() {
   const [itens, setItens] = useState([]);
   const router = useRouter();

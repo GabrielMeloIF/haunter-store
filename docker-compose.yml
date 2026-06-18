@@ -9,14 +9,23 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     restart: unless-stopped
+   
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ualuno", "-paluno"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   backend:
     build: ./backend
     image: backend-test
     ports:
-      - "4000:4000"
+      - "5001:5000"
+  
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       - DATABASE_URL=mysql://root:aluno@db:3306/haunter_store
       - DB_HOST=db
@@ -33,7 +42,7 @@ services:
     depends_on:
       - backend
     environment:
-      - NEXT_PUBLIC_API_URL=http://backend:4000
+      - NEXT_PUBLIC_API_URL=http://backend:5001
     restart: unless-stopped
 
   mobile:
@@ -43,7 +52,7 @@ services:
     depends_on:
       - backend
     environment:
-      - API_URL=http://backend:4000
+      - API_URL=http://backend:5001
     restart: unless-stopped
 
 volumes:
