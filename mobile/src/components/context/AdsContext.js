@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const AdsContext = createContext(null)
 
-const API_URL = 'http://192.168.0.8:5000'
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export function AdsProvider({ children }) {
   const [ads, setAds] = useState([])

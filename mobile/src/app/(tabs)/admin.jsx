@@ -14,7 +14,7 @@ import { useFocusEffect } from "expo-router";
 import Header from "../../components/header/index";
 import { useAuth } from "../../components/context/authContext";
 
-const API_URL = "http://10.81.204.25:5000";
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function Admin() {
   const { usuario } = useAuth();

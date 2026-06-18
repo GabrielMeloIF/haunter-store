@@ -9,13 +9,16 @@ import {
   StyleSheet,
 } from "react-native";
 
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Header from "../../components/header";
 
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
 export default function Favoritos() {
+  const router = useRouter();
   const [produtosFavoritos, setProdutosFavoritos] = useState([]);
 
   const [todosProdutos, setTodosProdutos] = useState([]);
@@ -28,7 +31,7 @@ export default function Favoritos() {
 
   async function fetchProdutos() {
     try {
-      const response = await fetch("http://10.81.204.25:5000/produtos");
+      const response = await fetch(`${API_URL}/produtos`);
 
       const data = await response.json();
 
@@ -96,9 +99,23 @@ export default function Favoritos() {
                       <Text style={styles.btnTexto}>Remover</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.btnComprar}>
-                      <Text style={styles.btnTexto}>Comprar</Text>
-                    </TouchableOpacity>
+                    <TouchableOpacity
+  style={styles.btnComprar}
+  onPress={() =>
+    router.push({
+      pathname: "/(tabs)/comprar",
+      params: {
+        id: produto.id,
+        nome: produto.nome,
+        preco: produto.preco,
+        descricao: produto.descricao,
+        imagem: produto.imagem_url,
+      },
+    })
+  }
+>
+  <Text style={styles.btnTexto}>Comprar</Text>
+</TouchableOpacity>
                   </View>
                 </View>
               ))}

@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AuthContext = createContext();
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://192.168.0.8:5000";
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const AuthProvider = ({ children }) => {
   const [usuario, setUsuario] = useState(null);

@@ -15,6 +15,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import Header from "../components/header";
 
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
 const AD_STORAGE_KEY = "ad_form_data";
 
 const INITIAL_FORM = {
@@ -117,7 +119,7 @@ export default function RevisarAnuncios(props) {
   if (!terms) return;
 
   try {
-    const response = await fetch("http://10.81.204.25:5000/produtos", {
+    const response = await fetch(`${API_URL}/produtos`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -38,7 +38,7 @@ const CONTACT_LABEL = {
   phone: "Telefone",
 };
 
-export default function RevisarAnuncios(props) {
+export default function Finalizar(props) {
   const router = useRouter();
 
   const [form, setForm] = useState(INITIAL_FORM);

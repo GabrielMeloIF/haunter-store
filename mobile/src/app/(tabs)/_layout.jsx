@@ -50,7 +50,7 @@ export default function Layout() {
         <Tabs.Screen name="favoritos" options={{ title: 'Favoritos' }} />
         <Tabs.Screen name="carrinho" options={{ title: 'Carrinho' }} />
         <Tabs.Screen name="conversas" options={{ title: 'Conversas' }} />
-        <Tabs.Screen name="user" options={{ title: 'Perfil' }} />
+        <Tabs.Screen name="user" options={{ href: null }} />
         <Tabs.Screen name="jogos" options={{ href: null }} />
         <Tabs.Screen name="perifericos" options={{ href: null }} />
         <Tabs.Screen name="consoles" options={{ href: null }} />

@@ -15,6 +15,8 @@ import { useRouter, useFocusEffect } from "expo-router";
 
 import Header from "../../components/header";
 
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
 const { width } = Dimensions.get("window");
 
 const CARD_GAP = 16;
@@ -64,7 +66,7 @@ export default function Jogos() {
   const buscarProdutos = async () => {
     try {
       const response = await fetch(
-        "http://10.81.204.25:5000/produtos"
+        `${API_URL}/produtos`
       );
 
       const data = await response.json();

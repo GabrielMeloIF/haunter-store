@@ -12,7 +12,8 @@ import * as ImagePicker from "expo-image-picker";
 import { useAuth } from "../context/authContext";
 import Feather from "@expo/vector-icons/Feather";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://10.81.204.25:5000";
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function UserCard() {
   const router = useRouter();
@@ -238,6 +239,13 @@ export default function UserCard() {
               : "Deletar conta"}
           </Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+                style={styles.btnCompras}
+                onPress={() => router.push("/minhasCompras")}
+            >
+                <Text style={styles.btnTexto}> <Feather name="shopping-bag" size={24} color="white" /> Minhas Compras </Text>
+            </TouchableOpacity>
       </View>
     </View>
   );
@@ -377,4 +385,18 @@ deletarButton: {
 deletarConfirmando: {
   backgroundColor: "#430883",
 },
+  btnCompras: {
+        backgroundColor: "#A636E9",
+        marginHorizontal: 16,
+        marginTop: 16,
+        padding: 14,
+        borderRadius: 10,
+        alignItems: "center",
+    },
+
+    btnTexto: {
+        color: "#fff",
+        fontWeight: "bold",
+        fontSize: 15,
+    },
 });

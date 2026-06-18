@@ -41,7 +41,7 @@ export function AdsProvider({ children }: { children: ReactNode }) {
     preco:       parseFloat(data.price),
     estoque:     1,
     categoriaId: data.categoriaId,
-    imagem_url:  null,           
+    imagem_url:  data.photos[0] ?? null,
     imagens:     data.photos,    
     negociavel:  data.negotiable,
     condicao:    data.condition,

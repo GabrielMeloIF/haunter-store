@@ -9,7 +9,7 @@ import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 
-const API_URL = "http://10.81.204.25:5000";
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function Pesquisa() {
   const { q } = useLocalSearchParams();
