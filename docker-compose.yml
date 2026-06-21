@@ -9,7 +9,6 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     restart: unless-stopped
-   
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ualuno", "-paluno"]
       interval: 5s
@@ -22,7 +21,6 @@ services:
     image: backend-test
     ports:
       - "5001:5000"
-  
     depends_on:
       db:
         condition: service_healthy
@@ -42,7 +40,8 @@ services:
     depends_on:
       - backend
     environment:
-      - NEXT_PUBLIC_API_URL=http://backend:5001
+      - NEXT_PUBLIC_API_URL=http://localhost:5000
+      - API_URL=http://backend:5000
     restart: unless-stopped
 
   mobile:
@@ -52,7 +51,7 @@ services:
     depends_on:
       - backend
     environment:
-      - API_URL=http://backend:5001
+      - API_URL=http://backend:5000
     restart: unless-stopped
 
 volumes:
